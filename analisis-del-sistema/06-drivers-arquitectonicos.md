@@ -12,10 +12,11 @@ Los drivers arquitectónicos corresponden a los requisitos funcionales, atributo
 | **DA02** | El sistema debe mantener tiempos de respuesta adecuados durante periodos de alta demanda. | AC01 | Influye en el uso de caché, optimización de consultas y distribución de solicitudes. |
 | **DA03** | La plataforma debe soportar el crecimiento progresivo de pasajeros, empresas, agencias y operaciones. | AC03 / RC08 | Influye en la separación de responsabilidades, escalamiento de componentes y distribución de carga. |
 | **DA04** | El sistema debe mantenerse disponible durante periodos críticos de operación. | AC02 / AC08 | Influye en los mecanismos de monitoreo, respaldo y recuperación ante fallos. |
-| **DA05** | El sistema debe controlar el acceso según rol, empresa y agencia. | RF22 / AC04 / RC02 | Requiere mecanismos centralizados de autenticación, autorización y control de permisos. |
-| **DA06** | La plataforma debe integrarse con una pasarela de pago externa. | RF07 / RC04 | Condiciona la comunicación con servicios externos y el tratamiento de respuestas y fallos durante el proceso de pago. |
-| **DA07** | El sistema debe procesar notificaciones y tareas secundarias de manera asíncrona. | RF13 / RC06 | Justifica la incorporación de una cola de eventos para desacoplar procesos secundarios de las operaciones principales. |
+| **DA05** | El sistema debe controlar el acceso según rol, empresa y agencia. | RF22 / AC04 / RC08 | Requiere mecanismos centralizados de autenticación, autorización y control de permisos. |
+| **DA06** | La plataforma debe integrarse con una pasarela de pago externa. | RF07 / RC05 | Condiciona la comunicación con servicios externos y el tratamiento de respuestas y fallos durante el proceso de pago. |
+| **DA07** | El sistema debe procesar notificaciones y tareas secundarias sin afectar las operaciones principales. | RF13 / AC01 | Puede justificar mecanismos de procesamiento asíncrono para desacoplar procesos secundarios. |
 | **DA08** | El sistema debe registrar operaciones críticas para auditoría y trazabilidad. | RF23 / AC07 | Requiere mecanismos de registro, auditoría y monitoreo de operaciones. |
+| **DA09** | La comunicación entre la interfaz web y los servicios debe realizarse mediante API REST. | RC03 | Condiciona el mecanismo de comunicación entre presentación y lógica de negocio. |
 
 ## 3. Drivers prioritarios
 

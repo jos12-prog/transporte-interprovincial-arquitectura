@@ -8,15 +8,15 @@ Las restricciones representan condiciones y decisiones que limitan o condicionan
 
 | ID | Restricción | Descripción |
 |---|---|---|
-| **RC01** | Plataforma centralizada multiempresa | La solución debe integrar diferentes empresas y agencias de transporte dentro de una misma plataforma, manteniendo la independencia operativa de cada organización. |
-| **RC02** | Control de acceso | El acceso a las funcionalidades debe realizarse según el rol, empresa y agencia asociados a cada usuario. |
-| **RC03** | Base de datos PostgreSQL | La información transaccional del sistema será almacenada utilizando PostgreSQL, de acuerdo con la arquitectura técnica propuesta. |
-| **RC04** | Integración con pasarela de pago | La plataforma deberá utilizar un proveedor externo para procesar las operaciones de pago. |
-| **RC05** | Servicios externos de notificación | El envío de notificaciones deberá integrarse con medios electrónicos disponibles, como correo electrónico, SMS o notificaciones push. |
-| **RC06** | Procesamiento asíncrono | La solución deberá considerar un mecanismo de mensajería o cola de eventos para ejecutar procesos asíncronos como notificaciones, tareas secundarias y generación de reportes. |
-| **RC07** | Uso de caché | La arquitectura deberá considerar un mecanismo de caché, como Redis o un servicio equivalente, para información consultada frecuentemente. |
-| **RC08** | Incorporación progresiva | La arquitectura debe permitir incorporar nuevas empresas y agencias sin afectar la operación existente del sistema. |
-| **RC09** | Control de versiones | La documentación y los artefactos del proyecto deberán gestionarse mediante Git y mantenerse en un repositorio GitHub. |
+| **RC01** | Aplicación web | La plataforma debe ser accesible mediante una aplicación web desde navegadores modernos. |
+| **RC02** | Control de versiones | La documentación y los artefactos del proyecto deben gestionarse mediante Git y mantenerse en GitHub. |
+| **RC03** | API REST | La comunicación entre la interfaz web y los servicios de aplicación se realizará mediante una API REST. |
+| **RC04** | PostgreSQL | La información transaccional será almacenada utilizando PostgreSQL, de acuerdo con la arquitectura técnica propuesta. |
+| **RC05** | Pasarela de pago | La plataforma deberá integrarse con una pasarela de pago externa para procesar las operaciones de pago. |
+| **RC06** | Servicio de notificaciones | La plataforma deberá integrarse con servicios externos para el envío de notificaciones mediante los medios electrónicos disponibles. |
+| **RC07** | Plataforma multiempresa | La solución debe permitir integrar diferentes empresas y agencias manteniendo su independencia operativa. |
+| **RC08** | Control de acceso | El acceso a las funcionalidades deberá controlarse según rol, empresa y agencia. |
+| **RC09** | Incorporación progresiva | La arquitectura debe permitir incorporar nuevas empresas y agencias sin afectar la operación existente. |
 
 ## 3. Impacto de las restricciones
 
