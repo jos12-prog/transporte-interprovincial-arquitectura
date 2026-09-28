@@ -1,0 +1,14 @@
+# Configuración local de Visual Studio Code
+.vscode/
+
+# Archivos temporales
+*.tmp
+*.log
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de respaldo
+*.bak
+*~
