@@ -1,0 +1,192 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="620" viewBox="0 0 1240 620" role="img" aria-labelledby="title desc">
+  <title id="title">Diagrama de Contenedores - Nivel 2 C4</title>
+  <desc id="desc">Diagrama de Contenedores de la Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial</desc>
+
+  <defs>
+    <!-- Marcador de flecha derecha azul -->
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
+    </marker>
+    <!-- Marcador de flecha abajo -->
+    <marker id="arrow-down" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
+    </marker>
+
+    <style>
+      .card-actor { fill: #f8fbff; stroke: #2563eb; stroke-width: 1.8; rx: 14px; }
+      .card-spa { fill: #eff6ff; stroke: #2563eb; stroke-width: 2; rx: 16px; }
+      .card-api { fill: #f0fdf4; stroke: #16a34a; stroke-width: 2; rx: 16px; }
+      .card-db { fill: #fffbeb; stroke: #d97706; stroke-width: 2; rx: 16px; }
+      .card-storage { fill: #f8fafc; stroke: #64748b; stroke-width: 2; rx: 16px; }
+      .card-ext { fill: #f8fbff; stroke: #2563eb; stroke-width: 1.8; rx: 14px; }
+      .system-boundary { fill: none; stroke: #22c55e; stroke-width: 1.8; stroke-dasharray: 6 5; rx: 8px; }
+
+      .pill-bg { fill: #ffffff; stroke: #93c5fd; stroke-width: 1.4; rx: 11px; }
+      .pill-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 600; fill: #1d4ed8; text-anchor: middle; dominant-baseline: central; }
+
+      .conn-line { fill: none; stroke: #60a5fa; stroke-width: 1.6; }
+
+      .actor-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12.5px; font-weight: 700; fill: #1e3a8a; text-anchor: middle; }
+      .actor-desc { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 400; fill: #1e40af; text-anchor: middle; }
+
+      .container-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; text-anchor: middle; }
+      .container-tech { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 600; text-anchor: middle; }
+      .container-desc { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11.5px; font-weight: 400; text-anchor: middle; }
+
+      .boundary-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; fill: #334155; letter-spacing: 1.2px; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <!-- Fondo blanco -->
+  <rect width="1240" height="620" fill="#ffffff" />
+
+  <!-- ================= LÍNEAS DE CONEXIÓN ================= -->
+
+  <!-- ACT01 -> SPA -->
+  <path d="M 235 55 C 310 55, 310 75, 385 75" class="conn-line" marker-end="url(#arrow-blue)" />
+  <rect x="270" y="42" width="95" height="24" class="pill-bg" />
+  <text x="317.5" y="54" class="pill-text">Acceso Web</text>
+
+  <!-- ACT02 -> SPA -->
+  <path d="M 235 155 C 310 155, 310 95, 385 95" class="conn-line" marker-end="url(#arrow-blue)" />
+  <rect x="270" y="142" width="95" height="24" class="pill-bg" />
+  <text x="317.5" y="154" class="pill-text">Ventanilla</text>
+
+  <!-- ACT03 -> SPA -->
+  <path d="M 235 255 C 310 255, 310 115, 385 115" class="conn-line" marker-end="url(#arrow-blue)" />
+  <rect x="270" y="242" width="95" height="24" class="pill-bg" />
+  <text x="317.5" y="254" class="pill-text">Gestión</text>
+
+  <!-- ACT04 -> SPA -->
+  <path d="M 235 355 C 330 355, 330 135, 385 135" class="conn-line" marker-end="url(#arrow-blue)" />
+  <rect x="260" y="342" width="115" height="24" class="pill-bg" />
+  <text x="317.5" y="354" class="pill-text">Administración</text>
+
+  <!-- SPA -> Backend API -->
+  <path d="M 610 155 L 610 215" class="conn-line" marker-end="url(#arrow-down)" />
+  <rect x="525" y="173" width="170" height="24" class="pill-bg" />
+  <text x="610" y="185" class="pill-text">JSON / HTTPS (REST API)</text>
+
+  <!-- Backend API -> PostgreSQL -->
+  <path d="M 495 355 L 495 425" class="conn-line" marker-end="url(#arrow-down)" />
+  <rect x="420" y="377" width="150" height="24" class="pill-bg" />
+  <text x="495" y="389" class="pill-text">EF Core / Npgsql [TCP]</text>
+
+  <!-- Backend API -> Object Storage -->
+  <path d="M 725 355 L 725 425" class="conn-line" marker-end="url(#arrow-down)" />
+  <rect x="650" y="377" width="150" height="24" class="pill-bg" />
+  <text x="725" y="389" class="pill-text">S3 API / REST [HTTPS]</text>
+
+  <!-- Backend API -> Pasarela de Pagos -->
+  <path d="M 830 260 L 935 260" class="conn-line" marker-end="url(#arrow-blue)" />
+  <rect x="835" y="248" width="95" height="24" class="pill-bg" />
+  <text x="882.5" y="260" class="pill-text">Pagos HTTPS</text>
+
+  <!-- Backend API -> Proveedor de Notificaciones -->
+  <path d="M 830 310 C 880 310, 880 395, 935 395" class="conn-line" marker-end="url(#arrow-blue)" />
+  <rect x="835" y="350" width="95" height="24" class="pill-bg" />
+  <text x="882.5" y="362" class="pill-text">Avisos HTTPS</text>
+
+  <!-- ================= LÍMITE DEL SISTEMA ================= -->
+  <g id="limite-sistema">
+    <rect x="365" y="20" width="490" height="575" class="system-boundary" />
+    <text x="610" y="42" class="boundary-label">LÍMITE DEL SISTEMA · CONTENEDORES</text>
+  </g>
+
+  <!-- ================= CONTENEDOR 1: APLICACIÓN WEB (SPA) ================= -->
+  <g id="contenedor-spa">
+    <rect x="385" y="60" width="450" height="95" class="card-spa" />
+    <text x="610" y="85" class="container-title" fill="#1e3a8a">APLICACIÓN WEB (SPA)</text>
+    <text x="610" y="103" class="container-tech" fill="#2563eb">[Contenedor: React · TypeScript · Vite · Tailwind CSS]</text>
+    <text x="610" y="123" class="container-desc" fill="#1e40af">Interfaz responsive y dinámica para pasajeros, agentes de ventanilla,</text>
+    <text x="610" y="139" class="container-desc" fill="#1e40af">administradores de agencia y superadministrador.</text>
+  </g>
+
+  <!-- ================= CONTENEDOR 2: BACKEND API (MONOLITO MODULAR) ================= -->
+  <g id="contenedor-api">
+    <rect x="385" y="215" width="450" height="140" class="card-api" />
+    <text x="610" y="242" class="container-title" fill="#14532d">BACKEND API (MONOLITO MODULAR)</text>
+    <text x="610" y="260" class="container-tech" fill="#15803d">[Contenedor: ASP.NET Core 8 · C# · Clean Architecture]</text>
+    <text x="610" y="282" class="container-desc" fill="#166534">Expone endpoints REST. Ejecuta la lógica y reglas de los 8 módulos (MI01–MI08):</text>
+    <text x="610" y="300" class="container-desc" fill="#166534">Reservas sin sobreventa, emisión de pasajes, encomiendas, ventas y flota.</text>
+    <text x="610" y="322" class="container-desc" fill="#166534">Aplica control transaccional, seguridad multiempresa y autenticación Identity/JWT.</text>
+  </g>
+
+  <!-- ================= CONTENEDOR 3: BASE DE DATOS PRINCIPAL ================= -->
+  <g id="contenedor-db">
+    <rect x="385" y="425" width="215" height="150" class="card-db" />
+    <text x="492.5" y="452" class="container-title" fill="#78350f">BASE DE DATOS</text>
+    <text x="492.5" y="468" class="container-title" fill="#78350f">PRINCIPAL</text>
+    <text x="492.5" y="488" class="container-tech" fill="#b45309">[Contenedor: PostgreSQL 16]</text>
+    <text x="492.5" y="512" class="container-desc" fill="#92400e">Fuente única de verdad ACID.</text>
+    <text x="492.5" y="528" class="container-desc" fill="#92400e">Almacena viajes, asientos,</text>
+    <text x="492.5" y="544" class="container-desc" fill="#92400e">reservas, pagos, encomiendas</text>
+    <text x="492.5" y="560" class="container-desc" fill="#92400e">y pistas de auditoría.</text>
+  </g>
+
+  <!-- ================= CONTENEDOR 4: ALMACENAMIENTO DE OBJETOS ================= -->
+  <g id="contenedor-storage">
+    <rect x="620" y="425" width="215" height="150" class="card-storage" />
+    <text x="727.5" y="452" class="container-title" fill="#1e293b">ALMACENAMIENTO</text>
+    <text x="727.5" y="468" class="container-title" fill="#1e293b">DE OBJETOS</text>
+    <text x="727.5" y="488" class="container-tech" fill="#475569">[Contenedor: Object Storage S3/Blob]</text>
+    <text x="727.5" y="512" class="container-desc" fill="#334155">Almacén binario desacoplado.</text>
+    <text x="727.5" y="528" class="container-desc" fill="#334155">Guarda comprobantes de pago,</text>
+    <text x="727.5" y="544" class="container-desc" fill="#334155">fotos de buses, guías de</text>
+    <text x="727.5" y="560" class="container-desc" fill="#334155">encomienda y documentos.</text>
+  </g>
+
+  <!-- ================= ACTORES (IZQUIERDA) ================= -->
+
+  <!-- ACT01 -->
+  <g id="act01">
+    <rect x="20" y="20" width="215" height="70" class="card-actor" />
+    <text x="127.5" y="43" class="actor-title">ACT01 · PASAJERO / CLIENTE</text>
+    <text x="127.5" y="63" class="actor-desc">Consulta viajes, reserva pasajes</text>
+    <text x="127.5" y="77" class="actor-desc">y gestiona encomiendas</text>
+  </g>
+
+  <!-- ACT02 -->
+  <g id="act02">
+    <rect x="20" y="120" width="215" height="70" class="card-actor" />
+    <text x="127.5" y="143" class="actor-title">ACT02 · AGENTE / VENDEDOR</text>
+    <text x="127.5" y="163" class="actor-desc">Ventas presenciales, reservas</text>
+    <text x="127.5" y="177" class="actor-desc">y operaciones de encomiendas</text>
+  </g>
+
+  <!-- ACT03 -->
+  <g id="act03">
+    <rect x="20" y="220" width="215" height="70" class="card-actor" />
+    <text x="127.5" y="243" class="actor-title">ACT03 · ADMIN DE AGENCIA</text>
+    <text x="127.5" y="263" class="actor-desc">Gestiona flota, rutas, horarios,</text>
+    <text x="127.5" y="277" class="actor-desc">tarifas y personal de agencia</text>
+  </g>
+
+  <!-- ACT04 -->
+  <g id="act04">
+    <rect x="20" y="320" width="215" height="70" class="card-actor" />
+    <text x="127.5" y="343" class="actor-title">ACT04 · SUPERADMINISTRADOR</text>
+    <text x="127.5" y="363" class="actor-desc">Administra empresas, accesos,</text>
+    <text x="127.5" y="377" class="actor-desc">parámetros y supervisa auditoría</text>
+  </g>
+
+  <!-- ================= SISTEMAS EXTERNOS (DERECHA) ================= -->
+
+  <!-- Pasarela de Pagos -->
+  <g id="ext-pagos">
+    <rect x="935" y="215" width="280" height="90" class="card-ext" />
+    <text x="1075" y="242" class="actor-title">PASARELA DE PAGOS</text>
+    <text x="1075" y="260" class="container-tech" fill="#2563eb">[Sistema Externo · EXT01]</text>
+    <text x="1075" y="282" class="actor-desc">Procesamiento y verificación</text>
+    <text x="1075" y="296" class="actor-desc">de pagos electrónicos</text>
+  </g>
+
+  <!-- Proveedor de Notificaciones -->
+  <g id="ext-notificaciones">
+    <rect x="935" y="350" width="280" height="90" class="card-ext" />
+    <text x="1075" y="377" class="actor-title">PROVEEDOR DE NOTIFICACIONES</text>
+    <text x="1075" y="395" class="container-tech" fill="#2563eb">[Sistema Externo · EXT02]</text>
+    <text x="1075" y="417" class="actor-desc">Entrega de correos electrónicos,</text>
+    <text x="1075" y="431" class="actor-desc">mensajes SMS y boletos digitales</text>
+  </g>
+</svg>

@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1230" viewBox="0 0 1900 1230">
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9Z" fill="#45566b"/></marker><style>text{font-family:Arial,Helvetica,sans-serif;fill:#192a3d} .title{font-size:27px;font-weight:700}.sub{font-size:15px;fill:#506176}.head{font-size:17px;font-weight:700}.txt{font-size:15px}.small{font-size:13px}.tiny{font-size:12px}.module{font-size:16px;font-weight:700}.layer{font-size:17px;font-weight:700}.line{stroke:#45566b;stroke-width:2;fill:none;marker-end:url(#arrow)}.dash{stroke:#718096;stroke-width:1.6;fill:none;stroke-dasharray:7 5}</style></defs>
+<rect x="0" y="0" width="1900" height="1230" rx="0" fill="#fff" stroke="#fff" stroke-width="0"/>
+<text x="950" y="46" text-anchor="middle" class="title">ESTILO ARQUITECTÓNICO EN CAPAS</text>
+<text x="950" y="73" text-anchor="middle" class="sub">Plataforma integrada de reservas y gestión de transporte interprovincial</text>
+<rect x="225" y="100" width="300" height="50" rx="6" fill="#f8fafc" stroke="#8595a8" stroke-width="1.5"/>
+<text x="375" y="130" text-anchor="middle" class="head">Pasajero / Cliente</text>
+<path d="M375 150 V173" stroke="#536579" stroke-width="1.8" fill="none"/>
+<rect x="615" y="100" width="300" height="50" rx="6" fill="#f8fafc" stroke="#8595a8" stroke-width="1.5"/>
+<text x="765" y="130" text-anchor="middle" class="head">Agente / Vendedor</text>
+<path d="M765 150 V173" stroke="#536579" stroke-width="1.8" fill="none"/>
+<rect x="1005" y="100" width="300" height="50" rx="6" fill="#f8fafc" stroke="#8595a8" stroke-width="1.5"/>
+<text x="1155" y="130" text-anchor="middle" class="head">Administrador de Agencia</text>
+<path d="M1155 150 V173" stroke="#536579" stroke-width="1.8" fill="none"/>
+<rect x="1395" y="100" width="300" height="50" rx="6" fill="#f8fafc" stroke="#8595a8" stroke-width="1.5"/>
+<text x="1545" y="130" text-anchor="middle" class="head">Superadministrador</text>
+<path d="M1545 150 V173" stroke="#536579" stroke-width="1.8" fill="none"/>
+<path d="M375 173 H1545 M950 173 V194" stroke="#536579" stroke-width="2" fill="none"/>
+<rect x="630" y="194" width="640" height="66" rx="8" fill="#e9f1fd" stroke="#5083c2" stroke-width="2"/>
+<text x="950" y="219" text-anchor="middle" class="head">CLIENTE WEB</text>
+<text x="950" y="242" text-anchor="middle" class="txt">React · TypeScript · Vite  |  Navegador</text>
+<path class="line" d="M950 260 L950 315"/>
+<text x="1030" y="291" text-anchor="start" class="small">HTTPS / JSON</text>
+<rect x="70" y="315" width="1760" height="738" rx="8" fill="#ffffff" stroke="#566574" stroke-width="2" stroke-dasharray="10 7"/>
+<text x="92" y="345" text-anchor="start" class="head">«monolito modular» Backend ASP.NET Core / C#</text>
+<text x="92" y="367" text-anchor="start" class="small">Una aplicación desplegable · módulos de negocio internos · PostgreSQL compartido con aislamiento por empresa</text>
+<rect x="93" y="390" width="1714" height="175" rx="6" fill="#eaf2fd" stroke="#5b8cc6" stroke-width="1.5"/>
+<text x="112" y="417" text-anchor="start" class="layer">01  PRESENTACIÓN / API</text>
+<rect x="93" y="579" width="1714" height="198" rx="6" fill="#ecf7ec" stroke="#6fa57b" stroke-width="1.5"/>
+<text x="112" y="606" text-anchor="start" class="layer">02  APLICACIÓN Y DOMINIO</text>
+<rect x="93" y="791" width="1714" height="185" rx="6" fill="#fff3d9" stroke="#d4aa57" stroke-width="1.5"/>
+<text x="112" y="818" text-anchor="start" class="layer">03  PERSISTENCIA E INTEGRACIONES</text>
+<rect x="310" y="423" width="1425" height="39" rx="4" fill="#d8e8fa" stroke="#7fa7d7" stroke-width="1.5"/>
+<text x="1022" y="448" text-anchor="middle" class="txt">Controladores REST · validación de entrada · autorización por rol / empresa / agencia · manejo de errores</text>
+<rect x="310" y="473" width="215" height="70" rx="4" fill="#fff" stroke="#6794c7" stroke-width="1.5"/>
+<text x="417.5" y="497" text-anchor="middle" class="module">Identidad y acceso</text>
+<text x="417.5" y="519" text-anchor="middle" class="small">Autenticación</text>
+<text x="417.5" y="536" text-anchor="middle" class="small">y autorización</text>
+<rect x="310" y="617" width="215" height="68" rx="4" fill="#fff" stroke="#76aa7a" stroke-width="1.5"/>
+<text x="417.5" y="643" text-anchor="middle" class="module">Gestionar acceso</text>
+<text x="417.5" y="664" text-anchor="middle" class="small">Casos de uso y reglas</text>
+<rect x="310" y="701" width="215" height="52" rx="4" fill="#fff" stroke="#76aa7a" stroke-width="1.5"/>
+<text x="417.5" y="722" text-anchor="middle" class="txt">Roles y alcance</text>
+<text x="417.5" y="740" text-anchor="middle" class="small">Dominio</text>
+<rect x="310" y="827" width="215" height="65" rx="4" fill="#fff" stroke="#d3a14a" stroke-width="1.5"/>
+<text x="417.5" y="852" text-anchor="middle" class="txt">Identidad (Identity)</text>
+<text x="417.5" y="873" text-anchor="middle" class="small">Adaptador de persistencia</text>
+<path class="line" d="M417 543 L417 617"/>
+<path class="line" d="M417 685 L417 701"/>
+<path class="line" d="M417 753 L417 827"/>
+<rect x="553" y="473" width="215" height="70" rx="4" fill="#fff" stroke="#6794c7" stroke-width="1.5"/>
+<text x="660.5" y="497" text-anchor="middle" class="module">Empresas y agencias</text>
+<text x="660.5" y="519" text-anchor="middle" class="small">Administración</text>
+<text x="660.5" y="536" text-anchor="middle" class="small">multiempresa</text>
+<rect x="553" y="617" width="215" height="68" rx="4" fill="#fff" stroke="#76aa7a" stroke-width="1.5"/>
+<text x="660.5" y="643" text-anchor="middle" class="module">Gestionar empresas</text>
+<text x="660.5" y="664" text-anchor="middle" class="small">Casos de uso y reglas</text>
+<rect x="553" y="701" width="215" height="52" rx="4" fill="#fff" stroke="#76aa7a" stroke-width="1.5"/>
+<text x="660.5" y="722" text-anchor="middle" class="txt">Empresa / Agencia</text>
+<text x="660.5" y="740" text-anchor="middle" class="small">Dominio</text>
+<rect x="553" y="827" width="215" height="65" rx="4" fill="#fff" stroke="#d3a14a" stroke-width="1.5"/>
+<text x="660.5" y="852" text-anchor="middle" class="txt">Repositorio empresas</text>
+<text x="660.5" y="873" text-anchor="middle" class="small">Adaptador de persistencia</text>
+<path class="line" d="M660 543 L660 617"/>
+<path class="line" d="M660 685 L660 701"/>
+<path class="line" d="M660 753 L660 827"/>
+<rect x="796" y="473" width="215" height="70" rx="4" fill="#fff" stroke="#6794c7" stroke-width="1.5"/>
+<text x="903.5" y="497" text-anchor="middle" class="module">Transporte y viajes</text>
+<text x="903.5" y="519" text-anchor="middle" class="small">Rutas · unidades</text>
+<text x="903.5" y="536" text-anchor="middle" class="small">horarios · cupos</text>
+<rect x="796" y="617" width="215" height="68" rx="4" fill="#fff" stroke="#76aa7a" stroke-width="1.5"/>
+<text x="903.5" y="643" text-anchor="middle" class="module">Programar viajes</text>
+<text x="903.5" y="664" text-anchor="middle" class="small">Casos de uso y reglas</text>
+<rect x="796" y="701" width="215" height="52" rx="4" fill="#fff" stroke="#76aa7a" stroke-width="1.5"/>
+<text x="903.5" y="722" text-anchor="middle" class="txt">Ruta / Viaje / Cupo</text>
+<text x="903.5" y="740" text-anchor="middle" class="small">Dominio</text>
+<rect x="796" y="827" width="215" height="65" rx="4" fill="#fff" stroke="#d3a14a" stroke-width="1.5"/>
+<text x="903.5" y="852" text-anchor="middle" class="txt">Repositorio viajes</text>
+<text x="903.5" y="873" text-anchor="middle" class="small">Adaptador de persistencia</text>
+<path class="line" d="M903 543 L903 617"/>
+<path class="line" d="M903 685 L903 701"/>
+<path class="line" d="M903 753 L903 827"/>
+<rect x="1039" y="473" width="215" height="70" rx="4" fill="#fff" stroke="#6794c7" stroke-width="1.5"/>
+<text x="1146.5" y="497" text-anchor="middle" class="module">Reservas y pasajes</text>
+<text x="1146.5" y="519" text-anchor="middle" class="small">Consulta · reserva</text>
+<text x="1146.5" y="536" text-anchor="middle" class="small">cancelación</text>
+<rect x="1039" y="617" width="215" height="68" rx="4" fill="#fff" stroke="#76aa7a" stroke-width="1.5"/>
+<text x="1146.5" y="643" text-anchor="middle" class="module">Gestionar reservas</text>
+<text x="1146.5" y="664" text-anchor="middle" class="small">Casos de uso y reglas</text>
+<rect x="1039" y="701" width="215" height="52" rx="4" fill="#fff" stroke="#76aa7a" stroke-width="1.5"/>
+<text x="1146.5" y="722" text-anchor="middle" class="txt">Reserva / Asiento</text>
+<text x="1146.5" y="740" text-anchor="middle" class="small">Dominio</text>
+<rect x="1039" y="827" width="215" height="65" rx="4" fill="#fff" stroke="#d3a14a" stroke-width="1.5"/>
+<text x="1146.5" y="852" text-anchor="middle" class="txt">Repositorio reservas</text>
+<text x="1146.5" y="873" text-anchor="middle" class="small">Adaptador de persistencia</text>
+<path class="line" d="M1146 543 L1146 617"/>
+<path class="line" d="M1146 685 L1146 701"/>
+<path class="line" d="M1146 753 L1146 827"/>
+<rect x="1282" y="473" width="215" height="70" rx="4" fill="#fff" stroke="#6794c7" stroke-width="1.5"/>
+<text x="1389.5" y="497" text-anchor="middle" class="module">Ventas y pagos</text>
+<text x="1389.5" y="519" text-anchor="middle" class="small">Registro de venta</text>
+<text x="1389.5" y="536" text-anchor="middle" class="small">confirmación</text>
+<rect x="1282" y="617" width="215" height="68" rx="4" fill="#fff" stroke="#76aa7a" stroke-width="1.5"/>
+<text x="1389.5" y="643" text-anchor="middle" class="module">Registrar pagos</text>
+<text x="1389.5" y="664" text-anchor="middle" class="small">Casos de uso y reglas</text>
+<rect x="1282" y="701" width="215" height="52" rx="4" fill="#fff" stroke="#76aa7a" stroke-width="1.5"/>
+<text x="1389.5" y="722" text-anchor="middle" class="txt">Venta / Pago</text>
+<text x="1389.5" y="740" text-anchor="middle" class="small">Dominio</text>
+<rect x="1282" y="827" width="215" height="65" rx="4" fill="#fff" stroke="#d3a14a" stroke-width="1.5"/>
+<text x="1389.5" y="852" text-anchor="middle" class="txt">Repositorio pagos</text>
+<text x="1389.5" y="873" text-anchor="middle" class="small">Adaptador de persistencia</text>
+<path class="line" d="M1389 543 L1389 617"/>
+<path class="line" d="M1389 685 L1389 701"/>
+<path class="line" d="M1389 753 L1389 827"/>
+<rect x="1525" y="473" width="215" height="70" rx="4" fill="#fff" stroke="#6794c7" stroke-width="1.5"/>
+<text x="1632.5" y="497" text-anchor="middle" class="module">Encomiendas</text>
+<text x="1632.5" y="519" text-anchor="middle" class="small">Recepción · despacho</text>
+<text x="1632.5" y="536" text-anchor="middle" class="small">seguimiento</text>
+<rect x="1525" y="617" width="215" height="68" rx="4" fill="#fff" stroke="#76aa7a" stroke-width="1.5"/>
+<text x="1632.5" y="643" text-anchor="middle" class="module">Gestionar envíos</text>
+<text x="1632.5" y="664" text-anchor="middle" class="small">Casos de uso y reglas</text>
+<rect x="1525" y="701" width="215" height="52" rx="4" fill="#fff" stroke="#76aa7a" stroke-width="1.5"/>
+<text x="1632.5" y="722" text-anchor="middle" class="txt">Encomienda / Estado</text>
+<text x="1632.5" y="740" text-anchor="middle" class="small">Dominio</text>
+<rect x="1525" y="827" width="215" height="65" rx="4" fill="#fff" stroke="#d3a14a" stroke-width="1.5"/>
+<text x="1632.5" y="852" text-anchor="middle" class="txt">Repositorio envíos</text>
+<text x="1632.5" y="873" text-anchor="middle" class="small">Adaptador de persistencia</text>
+<path class="line" d="M1632 543 L1632 617"/>
+<path class="line" d="M1632 685 L1632 701"/>
+<path class="line" d="M1632 753 L1632 827"/>
+<rect x="310" y="906" width="1425" height="43" rx="4" fill="#fff" stroke="#d3a14a" stroke-width="1.5"/>
+<text x="1022" y="931" text-anchor="middle" class="txt">Acceso a datos: Entity Framework Core · transacciones · auditoría · aislamiento de datos por empresa</text>
+<path class="line" d="M417 892 L417 906"/>
+<path class="line" d="M660 892 L660 906"/>
+<path class="line" d="M903 892 L903 906"/>
+<path class="line" d="M1146 892 L1146 906"/>
+<path class="line" d="M1389 892 L1389 906"/>
+<path class="line" d="M1632 892 L1632 906"/>
+<path class="line" d="M1022 949 L1022 1069"/>
+<rect x="795" y="1070" width="455" height="73" rx="9" fill="#f7f9fc" stroke="#526579" stroke-width="2"/>
+<text x="1022" y="1100" text-anchor="middle" class="head">PostgreSQL</text>
+<text x="1022" y="1124" text-anchor="middle" class="txt">Persistencia transaccional principal</text>
+<rect x="1390" y="1070" width="420" height="112" rx="6" fill="#f8fafc" stroke="#97a4b4" stroke-width="1.5"/>
+<text x="1600" y="1095" text-anchor="middle" class="head">INTEGRACIONES EXTERNAS</text>
+<text x="1600" y="1118" text-anchor="middle" class="small">Pasarela de pago · Notificaciones</text>
+<text x="1600" y="1138" text-anchor="middle" class="small">Almacenamiento de objetos S3 compatible</text>
+<path d="M1700 949 V1058 H1600 V1070" stroke="#45566b" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+<rect x="70" y="1165" width="1180" height="45" rx="4" fill="#fff" stroke="#c5cdd7" stroke-width="1"/>
+<text x="90" y="1193" text-anchor="start" class="small">Regla: presentación → aplicación → dominio; infraestructura implementa contratos definidos hacia el núcleo.</text>
+<text x="1810" y="1200" text-anchor="end" class="tiny">Redis y colas: evolución opcional, no parte obligatoria de la versión inicial.</text>
+</svg>

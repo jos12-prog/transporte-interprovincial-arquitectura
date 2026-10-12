@@ -20,48 +20,9 @@ Los módulos se ejecutan dentro de una misma aplicación backend; **no son micro
 
 ## 3. Diagrama de arquitectura inicial
 
-```mermaid
-flowchart TB
-    U["Usuarios<br/>Pasajero · Agente · Administrador · Superadministrador"]
-    WEB["Aplicación web<br/>React + TypeScript + Vite"]
-    API["API REST / HTTPS<br/>ASP.NET Core · Autenticación y autorización"]
+![Arquitectura inicial del sistema](../../img/arquitectura-inicial.svg)
 
-    subgraph APP["Monolito modular — ASP.NET Core"]
-        direction TB
-        ADM["Administración<br/>Empresas y agencias · Rutas y vehículos · Programación"]
-        TRA["Operaciones transaccionales<br/>Reservas y pasajes · Ventas y pagos · Encomiendas"]
-        CON["Consultas y soporte<br/>Búsquedas · Reportes · Auditoría · Notificaciones"]
-    end
-
-    DB[("PostgreSQL<br/>Datos y transacciones")]
-    OBJ["Almacenamiento de objetos<br/>Logos y fotografías"]
-    PAY["Pasarela de pago<br/>Servicio externo"]
-    NOT["Servicio de notificaciones<br/>Servicio externo"]
-
-    U --> WEB --> API
-    API --> ADM
-    API --> TRA
-    API --> CON
-    ADM --> DB
-    TRA --> DB
-    CON --> DB
-    ADM --> OBJ
-    TRA --> PAY
-    CON --> NOT
-
-    classDef user fill:#EAF2FF,stroke:#4A78A8,color:#183153
-    classDef app fill:#E9F5EE,stroke:#4C9270,color:#173D2B
-    classDef module fill:#F5F7FA,stroke:#64748B,color:#1E293B
-    classDef data fill:#FFF3DF,stroke:#BE8B3D,color:#62430E
-    classDef external fill:#F4EBFA,stroke:#9672B6,color:#462D61
-    class U,WEB user
-    class API app
-    class ADM,TRA,CON module
-    class DB,OBJ data
-    class PAY,NOT external
-    style APP fill:#FFFFFF,stroke:#93A4B8,stroke-width:1.5px
-```
-
+**Figura 1.** Arquitectura inicial de la Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial.
 **Nota:** Las conexiones representan dependencias funcionales principales, no llamadas de red independientes entre módulos. Las operaciones críticas de reserva y pago se coordinan desde el backend.
 
 ## 4. Capas de la solución
