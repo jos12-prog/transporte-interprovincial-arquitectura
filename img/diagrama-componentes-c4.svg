@@ -1,0 +1,264 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1260" height="970" viewBox="0 0 1260 970" role="img" aria-labelledby="title desc">
+  <title id="title">Diagrama de Componentes - Nivel 3 C4</title>
+  <desc id="desc">Diagrama de Componentes: Módulos del monolito modular y sus relaciones</desc>
+
+  <defs>
+    <!-- Marcador de flecha para relaciones -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#718096" />
+    </marker>
+
+    <style>
+      .title-main { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 700; fill: #1a202c; }
+      .title-sub { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12.5px; font-weight: 400; fill: #718096; }
+      .version-tag { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11.5px; font-weight: 500; fill: #718096; text-anchor: end; }
+
+      .box-container { fill: #3182ce; stroke: #2b6cb0; stroke-width: 1.5; rx: 8px; }
+      .box-component { fill: #63b3ed; stroke: #4299e1; stroke-width: 1.5; rx: 8px; }
+      .box-ext { fill: #718096; stroke: #4a5568; stroke-width: 1.5; rx: 8px; }
+
+      .text-c-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; fill: #ffffff; text-anchor: middle; }
+      .text-c-tech { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 500; fill: #ebf8ff; text-anchor: middle; }
+      .text-c-desc { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 400; fill: #ebf8ff; text-anchor: middle; }
+
+      .text-m-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12.5px; font-weight: 700; fill: #1a202c; text-anchor: middle; }
+      .text-m-tech { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 9.5px; font-weight: 600; fill: #2d3748; text-anchor: middle; }
+      .text-m-desc { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 9.5px; font-weight: 400; fill: #2d3748; text-anchor: middle; }
+
+      .boundary-outer { fill: none; stroke: #718096; stroke-width: 1.5; stroke-dasharray: 6 5; rx: 8px; }
+      .boundary-inner { fill: none; stroke: #a0aec0; stroke-width: 1.2; stroke-dasharray: 4 4; rx: 6px; }
+
+      .boundary-label-outer { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; fill: #2d3748; }
+      .boundary-label-inner { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 600; fill: #718096; }
+
+      .conn-line { fill: none; stroke: #718096; stroke-width: 1.3; }
+      .conn-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 500; fill: #4a5568; text-anchor: middle; }
+      .conn-protocol { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 9px; font-weight: 500; fill: #718096; text-anchor: middle; }
+
+      .card-info { fill: #ffffff; stroke: #cbd5e0; stroke-width: 1; rx: 4px; }
+      .info-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; fill: #1a202c; }
+      .info-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 9.5px; font-weight: 400; fill: #4a5568; }
+    </style>
+  </defs>
+
+  <!-- Fondo blanco -->
+  <rect width="1260" height="970" fill="#ffffff" />
+
+  <!-- ================= ENCABEZADO SUPERIOR ================= -->
+  <text x="35" y="38" class="title-main">[Diagrama de componentes] Transporte Interprovincial – Backend API</text>
+  <text x="35" y="56" class="title-sub">Modelo C4 · Nivel 3 · Módulos del monolito modular y sus relaciones</text>
+  <text x="1225" y="38" class="version-tag">Vista de componentes · v1.0</text>
+
+  <!-- ================= CONTENEDOR SUPERIOR: APLICACIÓN WEB ================= -->
+  <g id="aplicacion-web">
+    <rect x="475" y="80" width="290" height="68" class="box-container" />
+    <text x="620" y="102" class="text-c-title">Aplicación web</text>
+    <text x="620" y="118" class="text-c-tech">[Contenedor: SPA - React + Vite]</text>
+    <text x="620" y="133" class="text-c-desc">Interfaz para pasajeros, agentes y administradores</text>
+  </g>
+
+  <!-- Conexión: Aplicación web -> API REST -->
+  <path d="M 620 148 L 620 238" class="conn-line" marker-end="url(#arrow)" />
+  <text x="620" y="186" class="conn-label">Llama a la API</text>
+  <text x="620" y="199" class="conn-protocol">[HTTPS/JSON]</text>
+
+  <!-- ================= LÍMITE EXTERNO: BACKEND API ================= -->
+  <rect x="75" y="210" width="895" height="550" class="boundary-outer" />
+  <text x="90" y="228" class="boundary-label-outer">Backend API [Contenedor: ASP.NET Core - monolito modular]</text>
+
+  <!-- ================= COMPONENTE: API REST ================= -->
+  <g id="api-rest">
+    <rect x="455" y="240" width="330" height="65" class="box-component" />
+    <text x="620" y="260" class="text-m-title">API REST</text>
+    <text x="620" y="275" class="text-m-tech">[Componente: Controllers + Middlewares ASP.NET Core]</text>
+    <text x="620" y="291" class="text-m-desc">Expone /api/v1, autentica (Identity / JWT) y valida la entrada</text>
+  </g>
+
+  <!-- Conexión: API REST -> Módulos de negocio -->
+  <path d="M 620 305 L 620 385" class="conn-line" marker-end="url(#arrow)" />
+  <text x="620" y="348" class="conn-label">Invoca casos de uso</text>
+
+  <!-- ================= LÍMITE INTERNO: MÓDULOS DE NEGOCIO ================= -->
+  <rect x="95" y="370" width="855" height="375" class="boundary-inner" />
+  <text x="110" y="390" class="boundary-label-inner">Módulos de negocio</text>
+
+  <!-- ================= FILA 1 DE MÓDULOS (4 COLUMNAS) ================= -->
+
+  <!-- 1. Identidad y Acceso (MI01) -->
+  <g id="mod-identidad">
+    <rect x="115" y="415" width="185" height="68" class="box-component" />
+    <text x="207.5" y="435" class="text-m-title">Identidad y Acceso</text>
+    <text x="207.5" y="450" class="text-m-tech">[Componente: módulo MI01]</text>
+    <text x="207.5" y="466" class="text-m-desc">Autenticación, roles y usuarios</text>
+  </g>
+
+  <!-- 2. Empresas y Agencias (MI02) -->
+  <g id="mod-empresas">
+    <rect x="325" y="415" width="185" height="68" class="box-component" />
+    <text x="417.5" y="435" class="text-m-title">Empresas y Agencias</text>
+    <text x="417.5" y="450" class="text-m-tech">[Componente: módulo MI02]</text>
+    <text x="417.5" y="466" class="text-m-desc">Gestión de empresas y terminales</text>
+  </g>
+
+  <!-- 3. Transporte y Programación (MI03) -->
+  <g id="mod-transporte">
+    <rect x="535" y="415" width="185" height="68" class="box-component" />
+    <text x="627.5" y="435" class="text-m-title">Transporte y Programación</text>
+    <text x="627.5" y="450" class="text-m-tech">[Componente: módulo MI03]</text>
+    <text x="627.5" y="466" class="text-m-desc">Rutas, buses, horarios y viajes</text>
+  </g>
+
+  <!-- 4. Consultas y Reportes (MI07) -->
+  <g id="mod-consultas">
+    <rect x="745" y="415" width="185" height="68" class="box-component" />
+    <text x="837.5" y="435" class="text-m-title">Consultas y Reportes</text>
+    <text x="837.5" y="450" class="text-m-tech">[Componente: módulo MI07]</text>
+    <text x="837.5" y="466" class="text-m-desc">Búsqueda de itinerarios y reportes</text>
+  </g>
+
+  <!-- Conexión: Identidad -> Empresas -->
+  <path d="M 300 449 L 325 449" class="conn-line" marker-end="url(#arrow)" />
+  <text x="312.5" y="440" class="conn-protocol">Valida</text>
+
+  <!-- Conexión: Transporte -> Consultas -->
+  <path d="M 720 449 L 745 449" class="conn-line" marker-end="url(#arrow)" />
+  <text x="732.5" y="440" class="conn-protocol">Itinerarios</text>
+
+  <!-- ================= FILA 2 DE MÓDULOS (4 COLUMNAS) ================= -->
+
+  <!-- 5. Auditoría y Notificaciones (MI08) -->
+  <g id="mod-auditoria">
+    <rect x="115" y="565" width="185" height="68" class="box-component" />
+    <text x="207.5" y="585" class="text-m-title">Auditoría y Notificaciones</text>
+    <text x="207.5" y="600" class="text-m-tech">[Componente: módulo MI08]</text>
+    <text x="207.5" y="616" class="text-m-desc">Trazabilidad y despacho de avisos</text>
+  </g>
+
+  <!-- 6. Encomiendas (MI06) -->
+  <g id="mod-encomiendas">
+    <rect x="325" y="565" width="185" height="68" class="box-component" />
+    <text x="417.5" y="585" class="text-m-title">Encomiendas</text>
+    <text x="417.5" y="600" class="text-m-tech">[Componente: módulo MI06]</text>
+    <text x="417.5" y="616" class="text-m-desc">Recepción, guías y entregas</text>
+  </g>
+
+  <!-- 7. Reservas y Pasajes (MI04) -->
+  <g id="mod-reservas">
+    <rect x="535" y="565" width="185" height="68" class="box-component" />
+    <text x="627.5" y="585" class="text-m-title">Reservas y Pasajes</text>
+    <text x="627.5" y="600" class="text-m-tech">[Componente: módulo MI04]</text>
+    <text x="627.5" y="616" class="text-m-desc">Disponibilidad, retención y asientos</text>
+  </g>
+
+  <!-- 8. Ventas y Pagos (MI05) -->
+  <g id="mod-ventas">
+    <rect x="745" y="565" width="185" height="68" class="box-component" />
+    <text x="837.5" y="585" class="text-m-title">Ventas y Pagos</text>
+    <text x="837.5" y="600" class="text-m-tech">[Componente: módulo MI05]</text>
+    <text x="837.5" y="616" class="text-m-desc">Registro de ventas y cobros</text>
+  </g>
+
+  <!-- Conexión: Encomiendas -> Empresas y Agencias -->
+  <path d="M 417.5 565 L 417.5 483" class="conn-line" marker-end="url(#arrow)" />
+  <text x="417.5" y="528" class="conn-label">Consulta agencias y tarifas</text>
+
+  <!-- Conexión: Reservas y Pasajes -> Transporte y Programación -->
+  <path d="M 627.5 565 L 627.5 483" class="conn-line" marker-end="url(#arrow)" />
+  <text x="627.5" y="528" class="conn-label">Consulta viajes y cupos</text>
+
+  <!-- Conexión: Ventas y Pagos -> Reservas y Pasajes -->
+  <path d="M 745 599 L 720 599" class="conn-line" marker-end="url(#arrow)" />
+  <text x="732.5" y="590" class="conn-protocol">Confirma</text>
+
+  <!-- Conexión: Publica cambio de estado / auditoría hacia MI08 -->
+  <path d="M 535 605 C 430 605, 430 599, 300 599" class="conn-line" marker-end="url(#arrow)" />
+  <text x="417.5" y="618" class="conn-label">Publica eventos de reserva y cobro</text>
+
+  <!-- ================= SISTEMAS EXTERNOS (DERECHA) ================= -->
+
+  <!-- Pasarela de pago -->
+  <g id="ext-pasarela">
+    <rect x="1030" y="440" width="190" height="68" class="box-ext" />
+    <text x="1125" y="465" class="text-c-title">Pasarela de pago</text>
+    <text x="1125" y="480" class="text-c-tech">[Sistema externo · EXT01]</text>
+    <text x="1125" y="495" class="text-c-desc">Procesa y verifica pagos</text>
+  </g>
+
+  <!-- Conexión: Ventas y Pagos -> Pasarela de pago -->
+  <path d="M 930 590 L 995 590 L 995 474 L 1030 474" class="conn-line" marker-end="url(#arrow)" />
+  <text x="965" y="582" class="conn-label">Cobra</text>
+  <text x="965" y="594" class="conn-protocol">[HTTPS/REST]</text>
+
+  <!-- Proveedor de notificaciones -->
+  <g id="ext-notificaciones">
+    <rect x="1030" y="545" width="190" height="68" class="box-ext" />
+    <text x="1125" y="570" class="text-c-title">Proveedor de notificaciones</text>
+    <text x="1125" y="585" class="text-c-tech">[Sistema externo · EXT02]</text>
+    <text x="1125" y="600" class="text-c-desc">Entrega correos y SMS</text>
+  </g>
+
+  <!-- Conexión: Auditoría y Notificaciones -> Proveedor de Notificaciones -->
+  <path d="M 207.5 633 L 207.5 705 L 980 705 L 980 579 L 1030 579" class="conn-line" marker-end="url(#arrow)" />
+  <text x="620" y="697" class="conn-label">Despacha notificaciones y boletos</text>
+  <text x="620" y="718" class="conn-protocol">[HTTPS/REST]</text>
+
+  <!-- Almacenamiento de objetos -->
+  <g id="ext-storage">
+    <rect x="1030" y="650" width="190" height="68" class="box-ext" />
+    <text x="1125" y="675" class="text-c-title">Almacén de objetos</text>
+    <text x="1125" y="690" class="text-c-tech">[Sistema externo · EXT03]</text>
+    <text x="1125" y="705" class="text-c-desc">Comprobantes y fotos de buses</text>
+  </g>
+
+  <!-- Conexión: Encomiendas/Empresas -> Almacén de objetos -->
+  <path d="M 930 615 L 1005 615 L 1005 684 L 1030 684" class="conn-line" marker-end="url(#arrow)" />
+  <text x="970" y="635" class="conn-label">Archivos</text>
+  <text x="970" y="647" class="conn-protocol">[HTTPS/S3]</text>
+
+  <!-- ================= BASE DE DATOS (ABAJO) ================= -->
+  <g id="base-datos">
+    <rect x="475" y="790" width="290" height="68" class="box-container" />
+    <text x="620" y="812" class="text-c-title">Base de datos</text>
+    <text x="620" y="828" class="text-c-tech">[Contenedor: PostgreSQL 16]</text>
+    <text x="620" y="843" class="text-c-desc">Tablas agrupadas por módulo / esquema</text>
+  </g>
+
+  <!-- Conexión: Backend API -> Base de datos -->
+  <path d="M 620 760 L 620 790" class="conn-line" marker-end="url(#arrow)" />
+  <text x="620" y="776" class="conn-label">Cada módulo lee y escribe solo sus tablas [SQL]</text>
+
+  <!-- ================= PIE DE PÁGINA: LEYENDA Y NOTAS ================= -->
+
+  <!-- Leyenda -->
+  <g id="leyenda">
+    <rect x="35" y="885" width="560" height="68" class="card-info" />
+    <text x="48" y="903" class="info-title">Leyenda:</text>
+    
+    <!-- Chip 1: Persona -->
+    <rect x="48" y="912" width="90" height="22" rx="4" fill="#1a365d" />
+    <text x="93" y="927" font-family="-apple-system, sans-serif" font-size="10" font-weight="600" fill="#ffffff" text-anchor="middle">Persona</text>
+
+    <!-- Chip 2: Contenedor -->
+    <rect x="148" y="912" width="100" height="22" rx="4" fill="#3182ce" />
+    <text x="198" y="927" font-family="-apple-system, sans-serif" font-size="10" font-weight="600" fill="#ffffff" text-anchor="middle">Contenedor</text>
+
+    <!-- Chip 3: Componente -->
+    <rect x="258" y="912" width="105" height="22" rx="4" fill="#63b3ed" />
+    <text x="310.5" y="927" font-family="-apple-system, sans-serif" font-size="10" font-weight="600" fill="#1a202c" text-anchor="middle">Componente</text>
+
+    <!-- Chip 4: Sistema externo -->
+    <rect x="373" y="912" width="115" height="22" rx="4" fill="#718096" />
+    <text x="430.5" y="927" font-family="-apple-system, sans-serif" font-size="10" font-weight="600" fill="#ffffff" text-anchor="middle">Sistema externo</text>
+
+    <text x="48" y="946" class="info-text">Flecha: relación (verbo + [protocolo]) · Línea discontinua: límite</text>
+  </g>
+
+  <!-- Notas -->
+  <g id="notas">
+    <rect x="615" y="885" width="605" height="68" class="card-info" />
+    <text x="628" y="903" class="info-title">Notas:</text>
+    <text x="628" y="918" class="info-text">• Todos los componentes se despliegan juntos en el contenedor Backend API (Monolito Modular).</text>
+    <text x="628" y="932" class="info-text">• Un módulo usa a otro solo por sus contratos públicos e interfaces, nunca accediendo a sus tablas.</text>
+    <text x="628" y="946" class="info-text">• Cada módulo se organiza internamente con Clean Architecture en 4 capas (ver nivel 4).</text>
+  </g>
+</svg>

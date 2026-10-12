@@ -1,0 +1,277 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1260" height="960" viewBox="0 0 1260 960" role="img" aria-labelledby="title desc">
+  <title id="title">Diagrama de Código - Nivel 4 C4</title>
+  <desc id="desc">Diagrama de Código (UML de Clases) con Clean Architecture dentro de cada módulo</desc>
+
+  <defs>
+    <!-- Marcadores de flechas -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#4a5568" />
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
+    </marker>
+    <!-- Triángulo de implementación UML -->
+    <marker id="arrow-impl" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 1 1 L 11 6 L 1 11 z" fill="#ffffff" stroke="#718096" stroke-width="1.4" />
+    </marker>
+    <marker id="arrow-diamond" viewBox="0 0 12 12" refX="1" refY="6" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <polygon points="1,6 6,1 11,6 6,11" fill="#4a5568" />
+    </marker>
+
+    <style>
+      .title-main { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 700; fill: #1a202c; }
+      .title-sub { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12.5px; font-weight: 400; fill: #718096; }
+
+      .col-header { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11.5px; font-weight: 700; text-anchor: middle; letter-spacing: 0.5px; }
+      .col-line { stroke: #e2e8f0; stroke-width: 1.5; stroke-dasharray: 5 4; }
+
+      .box-module-pedidos { fill: #ffffff; stroke: #3182ce; stroke-width: 1.5; rx: 4px; }
+      .box-module-pagos { fill: #ffffff; stroke: #7c3aed; stroke-width: 1.5; rx: 4px; }
+
+      .banner-pedidos { fill: #2b6cb0; }
+      .banner-pagos { fill: #6b46c1; }
+      .banner-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; fill: #ffffff; }
+
+      .uml-box { fill: #ffffff; stroke: #2d3748; stroke-width: 1.2; rx: 2px; }
+      .uml-line { stroke: #2d3748; stroke-width: 1; }
+
+      .text-stereo { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 9px; font-style: italic; fill: #718096; text-anchor: middle; }
+      .text-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11.5px; font-weight: 700; fill: #1a202c; text-anchor: middle; }
+      .text-code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 9.5px; fill: #2d3748; }
+
+      .conn-line { fill: none; stroke: #4a5568; stroke-width: 1.2; }
+      .conn-impl { fill: none; stroke: #718096; stroke-width: 1.2; stroke-dasharray: 4 3; }
+      .conn-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 9.5px; fill: #4a5568; }
+
+      .note-box { fill: #fffbeb; stroke: #fde047; stroke-width: 1; rx: 2px; }
+      .note-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 9px; fill: #78350f; line-height: 1.35; }
+    </style>
+  </defs>
+
+  <!-- Fondo blanco -->
+  <rect width="1260" height="960" fill="#ffffff" />
+
+  <!-- ================= ENCABEZADO SUPERIOR ================= -->
+  <text x="35" y="36" class="title-main">[Diagrama de código] Transporte Interprovincial – módulos Reservas y Pagos</text>
+  <text x="35" y="54" class="title-sub">Modelo C4 · Nivel 4 (UML de clases) · Clean Architecture dentro de cada módulo</text>
+
+  <!-- ================= COLUMNAS DE CLEAN ARCHITECTURE ================= -->
+  <rect x="35" y="72" width="1190" height="28" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
+  
+  <text x="145" y="90" class="col-header" fill="#2563eb">PRESENTACIÓN</text>
+  <text x="375" y="90" class="col-header" fill="#16a34a">APLICACIÓN</text>
+  <text x="695" y="90" class="col-header" fill="#d97706">DOMINIO</text>
+  <text x="1065" y="90" class="col-header" fill="#7c3aed">INFRAESTRUCTURA</text>
+
+  <!-- Líneas divisorias verticales de columnas -->
+  <line x1="255" y1="100" x2="255" y2="945" class="col-line" />
+  <line x1="505" y1="100" x2="505" y2="945" class="col-line" />
+  <line x1="885" y1="100" x2="885" y2="945" class="col-line" />
+
+  <!-- ================= MÓDULO 1: RESERVAS Y PASAJES (MI04) ================= -->
+  <rect x="35" y="115" width="1190" height="545" class="box-module-pedidos" />
+  <rect x="35" y="115" width="170" height="22" class="banner-pedidos" />
+  <text x="45" y="130" class="banner-text">módulo reservas y pasajes</text>
+
+  <!-- PRESENTACIÓN: ReservationsController -->
+  <g id="class-controller">
+    <rect x="50" y="155" width="190" height="75" class="uml-box" />
+    <text x="145" y="174" class="text-title">ReservationsController</text>
+    <line x1="50" y1="181" x2="240" y2="181" class="uml-line" />
+    <text x="56" y="195" class="text-code">- confirmReservation: ConfirmUseCase</text>
+    <line x1="50" y1="202" x2="240" y2="202" class="uml-line" />
+    <text x="56" y="217" class="text-code">+ confirmar(req, res): Task&lt;void&gt;</text>
+  </g>
+
+  <!-- NOTA AMARILLA: Módulo Reservas -->
+  <g id="note-reservas">
+    <polygon points="50,420 225,420 240,435 240,515 50,515" class="note-box" />
+    <polygon points="225,420 225,435 240,435" fill="#fef08a" stroke="#fde047" stroke-width="1" />
+    <text x="60" y="440" class="note-text" font-weight="700">Reservas usa a Pagos solo</text>
+    <text x="60" y="454" class="note-text">a través de su API pública</text>
+    <text x="60" y="468" class="note-text">(ProcessPaymentUseCase,</text>
+    <text x="60" y="482" class="note-text">exportado en su módulo).</text>
+    <text x="60" y="496" class="note-text">Nunca usa sus clases</text>
+    <text x="60" y="508" class="note-text">internas ni sus tablas.</text>
+  </g>
+
+  <!-- APLICACIÓN: ConfirmReservationUseCase -->
+  <g id="class-usecase">
+    <rect x="270" y="155" width="220" height="95" class="uml-box" />
+    <text x="380" y="174" class="text-title">ConfirmReservationUseCase</text>
+    <line x1="270" y1="181" x2="490" y2="181" class="uml-line" />
+    <text x="276" y="195" class="text-code">- reservationRepo: IReservationRepo</text>
+    <text x="276" y="209" class="text-code">- processPayment: ProcessPaymentUseCase</text>
+    <text x="276" y="223" class="text-code">- notificationPort: INotificationPort</text>
+    <line x1="270" y1="229" x2="490" y2="229" class="uml-line" />
+    <text x="276" y="243" class="text-code">+ ejecutar(cmd): Task&lt;string&gt;</text>
+  </g>
+
+  <!-- Conexión: Controller -> UseCase -->
+  <path d="M 240 185 L 270 185" class="conn-line" marker-end="url(#arrow)" />
+
+  <!-- DOMINIO: Entity Reservation -->
+  <g id="class-reservation">
+    <rect x="525" y="150" width="260" height="155" class="uml-box" />
+    <text x="655" y="165" class="text-stereo">«entity»</text>
+    <text x="655" y="179" class="text-title">Reservation</text>
+    <line x1="525" y1="185" x2="785" y2="185" class="uml-line" />
+    <text x="533" y="199" class="text-code">- id: Guid</text>
+    <text x="533" y="212" class="text-code">- passengerId: Guid</text>
+    <text x="533" y="225" class="text-code">- tripId: Guid</text>
+    <text x="533" y="238" class="text-code">- seat: SeatAllocation</text>
+    <text x="533" y="251" class="text-code">- estado: ReservationStatus</text>
+    <line x1="525" y1="257" x2="785" y2="257" class="uml-line" />
+    <text x="533" y="271" class="text-code">+ crear(tripId, passId, seat): Reservation {static}</text>
+    <text x="533" y="284" class="text-code">+ marcarConfirmada(autorizacion): void</text>
+    <text x="533" y="297" class="text-code">+ cancelar(): void</text>
+  </g>
+
+  <!-- Conexión: UseCase -> Reservation -->
+  <path d="M 490 185 L 525 185" class="conn-line" marker-end="url(#arrow)" />
+
+  <!-- DOMINIO: Value Object SeatAllocation -->
+  <g id="class-seat">
+    <rect x="525" y="340" width="160" height="85" class="uml-box" />
+    <text x="605" y="355" class="text-stereo">«value object»</text>
+    <text x="605" y="369" class="text-title">SeatAllocation</text>
+    <line x1="525" y1="375" x2="685" y2="375" class="uml-line" />
+    <text x="533" y="389" class="text-code">+ seatNumber: int?</text>
+    <text x="533" y="402" class="text-code">+ floor: int</text>
+    <text x="533" y="415" class="text-code">+ isWindow: bool</text>
+  </g>
+
+  <!-- DOMINIO: Enum ReservationStatus -->
+  <g id="class-status">
+    <rect x="705" y="340" width="130" height="100" class="uml-box" />
+    <text x="770" y="355" class="text-stereo">«enumeration»</text>
+    <text x="770" y="369" class="text-title">ReservationStatus</text>
+    <line x1="705" y1="375" x2="835" y2="375" class="uml-line" />
+    <text x="715" y="391" class="text-code">HELD</text>
+    <text x="715" y="405" class="text-code">CONFIRMED</text>
+    <text x="715" y="419" class="text-code">CANCELLED</text>
+    <text x="715" y="433" class="text-code">EXPIRED</text>
+  </g>
+
+  <!-- Relaciones de Reservation con Value Object y Enum -->
+  <path d="M 605 305 L 605 340" class="conn-line" marker-start="url(#arrow-diamond)" />
+  <path d="M 770 305 L 770 340" class="conn-line" marker-end="url(#arrow)" />
+
+  <!-- INTERFAZ: IReservationRepository -->
+  <g id="interface-repo">
+    <rect x="525" y="465" width="330" height="65" class="uml-box" />
+    <text x="690" y="480" class="text-stereo">«interface»</text>
+    <text x="690" y="494" class="text-title">IReservationRepository</text>
+    <line x1="525" y1="500" x2="855" y2="500" class="uml-line" />
+    <text x="533" y="514" class="text-code">+ guardar(reserva): Task&lt;void&gt;</text>
+    <text x="533" y="525" class="text-code">+ buscarPorId(id): Task&lt;Reservation?&gt;</text>
+  </g>
+
+  <!-- INTERFAZ: INotificationPort -->
+  <g id="interface-notif">
+    <rect x="525" y="555" width="330" height="65" class="uml-box" />
+    <text x="690" y="570" class="text-stereo">«interface»</text>
+    <text x="690" y="584" class="text-title">INotificationPort</text>
+    <line x1="525" y1="590" x2="855" y2="590" class="uml-line" />
+    <text x="533" y="605" class="text-code">+ notificarReservaConfirmada(reserva): Task&lt;void&gt;</text>
+  </g>
+
+  <!-- Conexiones UseCase -> Interfaces -->
+  <path d="M 440 250 L 440 495 L 525 495" class="conn-line" marker-end="url(#arrow)" />
+  <path d="M 400 250 L 400 585 L 525 585" class="conn-line" marker-end="url(#arrow)" />
+
+  <!-- INFRAESTRUCTURA: PostgresReservationRepository -->
+  <g id="class-repo-impl">
+    <rect x="910" y="465" width="290" height="65" class="uml-box" />
+    <text x="1055" y="484" class="text-title">PostgresReservationRepository</text>
+    <line x1="910" y1="491" x2="1200" y2="491" class="uml-line" />
+    <text x="918" y="505" class="text-code">- dbContext: TransportDbContext</text>
+    <line x1="910" y1="511" x2="1200" y2="511" class="uml-line" />
+    <text x="918" y="524" class="text-code">+ guardar(reserva), buscarPorId(id)</text>
+  </g>
+
+  <!-- INFRAESTRUCTURA: NotificationRestAdapter -->
+  <g id="class-notif-impl">
+    <rect x="910" y="555" width="290" height="65" class="uml-box" />
+    <text x="1055" y="574" class="text-title">NotificationRestAdapter</text>
+    <line x1="910" y1="581" x2="1200" y2="581" class="uml-line" />
+    <text x="918" y="595" class="text-code">- http: HttpClient</text>
+    <line x1="910" y1="601" x2="1200" y2="601" class="uml-line" />
+    <text x="918" y="614" class="text-code">+ notificarReservaConfirmada(reserva)</text>
+  </g>
+
+  <!-- Implementaciones (Líneas punteadas) -->
+  <path d="M 910 497 L 855 497" class="conn-impl" marker-end="url(#arrow-impl)" />
+  <path d="M 910 587 L 855 587" class="conn-impl" marker-end="url(#arrow-impl)" />
+
+  <!-- ================= MÓDULO 2: VENTAS Y PAGOS (MI05) ================= -->
+  <rect x="35" y="680" width="1190" height="255" class="box-module-pagos" />
+  <rect x="35" y="680" width="140" height="22" class="banner-pagos" />
+  <text x="45" y="695" class="banner-text">módulo ventas y pagos</text>
+
+  <!-- Conexión entre módulos: UseCase Reservas -> ProcessPaymentUseCase -->
+  <path d="M 330 250 L 330 735" class="conn-line" marker-end="url(#arrow)" />
+  <rect x="335" y="662" width="75" height="18" fill="#ffffff" stroke="#cbd5e0" rx="3" />
+  <text x="340" y="675" class="conn-text" font-weight="600">solicita cobro</text>
+
+  <!-- APLICACIÓN: ProcessPaymentUseCase -->
+  <g id="class-payment-usecase">
+    <rect x="270" y="735" width="220" height="90" class="uml-box" />
+    <text x="380" y="750" class="text-stereo">«API pública del módulo»</text>
+    <text x="380" y="764" class="text-title">ProcessPaymentUseCase</text>
+    <line x1="270" y1="770" x2="490" y2="770" class="uml-line" />
+    <text x="276" y="784" class="text-code">- paymentPort: IPaymentPort</text>
+    <line x1="270" y1="790" x2="490" y2="790" class="uml-line" />
+    <text x="276" y="805" class="text-code">+ ejecutar(monto, token):</text>
+    <text x="286" y="818" class="text-code">  Task&lt;PaymentResult&gt;</text>
+  </g>
+
+  <!-- DOMINIO: IPaymentPort -->
+  <g id="interface-payment-port">
+    <rect x="525" y="735" width="330" height="65" class="uml-box" />
+    <text x="690" y="750" class="text-stereo">«interface»</text>
+    <text x="690" y="764" class="text-title">IPaymentPort</text>
+    <line x1="525" y1="770" x2="855" y2="770" class="uml-line" />
+    <text x="533" y="788" class="text-code">+ cobrar(monto, token): Task&lt;PaymentResult&gt;</text>
+  </g>
+
+  <!-- Conexión: ProcessPaymentUseCase -> IPaymentPort -->
+  <path d="M 490 765 L 525 765" class="conn-line" marker-end="url(#arrow)" />
+
+  <!-- DOMINIO/DTO: PaymentResult -->
+  <g id="dto-payment-result">
+    <rect x="580" y="830" width="220" height="85" class="uml-box" />
+    <text x="690" y="845" class="text-stereo">«DTO»</text>
+    <text x="690" y="859" class="text-title">PaymentResult</text>
+    <line x1="580" y1="865" x2="800" y2="865" class="uml-line" />
+    <text x="588" y="879" class="text-code">+ aprobado: bool</text>
+    <text x="588" y="893" class="text-code">+ autorizacion: string</text>
+    <text x="588" y="906" class="text-code">+ motivoRechazo?: string</text>
+  </g>
+
+  <!-- Conexión: IPaymentPort -> PaymentResult (retorna) -->
+  <path d="M 690 800 L 690 830" class="conn-line" marker-end="url(#arrow)" stroke-dasharray="3 3" />
+  <text x="708" y="817" class="conn-text" font-size="8.5">retorna</text>
+
+  <!-- INFRAESTRUCTURA: StripeOrCulqiPaymentAdapter -->
+  <g id="class-stripe-adapter">
+    <rect x="910" y="735" width="290" height="65" class="uml-box" />
+    <text x="1055" y="754" class="text-title">StripePaymentAdapter</text>
+    <line x1="910" y1="761" x2="1200" y2="761" class="uml-line" />
+    <text x="918" y="775" class="text-code">- cliente: PasarelaSDK</text>
+    <line x1="910" y1="781" x2="1200" y2="781" class="uml-line" />
+    <text x="918" y="794" class="text-code">+ cobrar(monto, token)</text>
+  </g>
+
+  <!-- Implementación: StripePaymentAdapter -> IPaymentPort -->
+  <path d="M 910 767 L 855 767" class="conn-impl" marker-end="url(#arrow-impl)" />
+
+  <!-- NOTA AMARILLA: Módulo Pagos -->
+  <g id="note-pagos">
+    <polygon points="910,825 1185,825 1200,840 1200,905 910,905" class="note-box" />
+    <polygon points="1185,825 1185,840 1200,840" fill="#fef08a" stroke="#fde047" stroke-width="1" />
+    <text x="920" y="845" class="note-text" font-weight="700">Para otra pasarela (ej. Niubiz o Yape/Plin)</text>
+    <text x="920" y="860" class="note-text">se agrega otro adaptador que implemente</text>
+    <text x="920" y="874" class="note-text">IPaymentPort (patrón Adapter).</text>
+  </g>
+</svg>
