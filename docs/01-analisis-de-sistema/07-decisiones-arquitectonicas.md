@@ -1,165 +1,143 @@
+# 07. Decisiones Arquitectónicas (ADRs)
 
-# 07. Decisiones Arquitectónicas
+## 1. Fundamentación y Metodología (Paso 5 y Paso 13 de la Docente)
 
-## 1. Descripción
+Las **Decisiones Arquitectónicas** representan las respuestas formales de ingeniería ante los drivers arquitectónicos identificados (DA01 a DA08). 
 
-Las decisiones arquitectónicas establecen las tecnologías, estructuras y mecanismos seleccionados para implementar la Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial.
+Siguiendo la metodología enseñada por la docente, cada decisión de alto impacto se formaliza mediante un **ADR (Architecture Decision Record)**, el cual documenta:
+* **Contexto y problema:** ¿Qué situación o driver motiva la decisión?
+* **Alternativas evaluadas:** ¿Qué otras opciones técnicas se analizaron?
+* **Decisión y justificación:** ¿Qué opción se adoptó y por qué?
+* **Consecuencias:** ¿Qué beneficios aporta y qué compromisos (trade-offs) asumimos?
 
-Estas decisiones responden a los drivers arquitectónicos DA01-DA06 y consideran una implementación inicial viable, con posibilidades de evolución.
+---
 
-## 2. Decisiones arquitectónicas
+## 2. Registro de Decisiones Arquitectónicas (ADRs)
 
-| ID | Decisión | Justificación | Drivers |
-|---|---|---|---|
-| ADR01 | Adoptar un monolito modular con arquitectura en capas y enfoque Clean Architecture. | Facilita la separación de responsabilidades y reduce la complejidad operativa inicial. | DA05, DA06 |
-| ADR02 | Utilizar React, TypeScript y Vite para la aplicación web. | Permite desarrollar una interfaz modular, responsive y mantenible. | DA03, DA06 |
-| ADR03 | Utilizar ASP.NET Core y C# para la API REST. | Proporciona una plataforma adecuada para implementar reglas de negocio, seguridad y operaciones transaccionales. | DA01, DA02, DA06 |
-| ADR04 | Utilizar PostgreSQL como base de datos relacional principal. | Permite garantizar integridad referencial y gestionar transacciones concurrentes. | DA01, DA04 |
-| ADR05 | Implementar autenticación y autorización por roles y ámbito organizacional. | Protege las operaciones y mantiene el aislamiento entre empresas y agencias. | DA02 |
-| ADR06 | Controlar las reservas mediante transacciones y restricciones de base de datos. | Evita asignaciones duplicadas y sobreventa de asientos o cupos. | DA01 |
-| ADR07 | Integrar los pagos mediante un proveedor externo con verificación e idempotencia. | Evita confirmaciones incorrectas o duplicadas. | DA01, DA04 |
-| ADR08 | Separar las funcionalidades en módulos de negocio. | Facilita el mantenimiento y la evolución independiente de las funcionalidades. | DA06 |
-| ADR09 | Utilizar almacenamiento de objetos para imágenes y archivos. | Evita almacenar archivos binarios directamente en la base de datos transaccional. | DA05, DA06 |
-| ADR10 | Implementar respaldos, registros y monitoreo. | Permite detectar fallos, investigar operaciones y recuperar información. | DA04 |
-| ADR11 | Diseñar el backend para permitir escalamiento horizontal progresivo. | Facilita aumentar la capacidad de procesamiento cuando crezca la demanda. | DA05 |
-| ADR12 | Incorporar mecanismos de procesamiento secundario y caché cuando exista una necesidad comprobada. | Evita complejidad prematura y permite optimizar tareas no críticas. | DA03, DA05 |
+### ADR01: Adopción del Estilo Monolito Modular con Arquitectura en Capas
+* **Estado:** Aprobado.
+* **Drivers vinculados:** DA05 (Escalabilidad), DA06 (Mantenibilidad), DA01 (Consistencia).
+* **Contexto y problema:** Se requiere una solución que soporte 8 módulos funcionales complejos (reservas, pagos, encomiendas, administración, etc.) en un entorno académico y operativo inicial en Ayacucho. Se debe evitar la fragmentación operativa sin sacrificar la mantenibilidad futura.
+* **Alternativas evaluadas:**
+  1. *Monolito tradicional en capas (Sin modularidad estricta):* Rápido de programar, pero tiende al acoplamiento espagueti y rompe el aislamiento entre módulos.
+  2. *Microservicios distribuidos:* Máxima independencia de despliegue, pero introduce enorme complejidad de red, transacciones distribuidas (Saga), orquestación con Kubernetes y altos costos de infraestructura.
+  3. *Monolito Modular con arquitectura en capas:* Unifica el despliegue en un único artefacto ejecutable, manteniendo límites lógicos estrictos de código e interfaces entre módulos.
+* **Decisión y justificación:** Se adopta **Monolito Modular en capas**. Permite transacciones ACID locales inmediatas en PostgreSQL para resolver reservas sin sobreventa (DA01), reduce la sobrecarga de infraestructura y permite migrar módulos a microservicios en el futuro si la demanda lo exige.
+* **Consecuencias:**
+  * *Positivas:* Despliegue simple, desarrollo ágil, llamadas en memoria de latencia cero entre módulos, facilidad de refactorización y pruebas unificadas.
+  * *Trade-offs:* Requiere disciplina estricta del equipo para no realizar consultas cruzadas directas entre bases de datos o esquemas privados de diferentes módulos.
 
-## 3. Arquitectura seleccionada
+---
 
-### ADR01 — Estilo y organización arquitectónica
+### ADR02: Adopción del Enfoque Clean Architecture por Módulo
+* **Estado:** Aprobado.
+* **Drivers vinculados:** DA06 (Mantenibilidad), DA08 (Testabilidad), DA07 (Interoperabilidad).
+* **Contexto y problema:** Las reglas de negocio de reservas (vencimiento de retención temporal, cálculo de cupos, políticas de cancelación) no deben estar acopladas a la base de datos (PostgreSQL), al framework web (ASP.NET Core) ni a librerías externas.
+* **Alternativas evaluadas:**
+  1. *Arquitectura tradicional N-Capas (Presentación $\rightarrow$ Negocio $\rightarrow$ Datos):* La capa de negocio suele depender directamente de los modelos ORM (Entity Framework), acoplando el dominio a la base de datos.
+  2. *Clean Architecture / Arquitectura Hexagonal:* Invierte las dependencias: el Dominio se sitúa al centro, la Aplicación define puertos (interfaces) y la Infraestructura implementa adaptadores hacia afuera.
+* **Decisión y justificación:** Se adopta **Clean Architecture**. Cada módulo organiza su código en cuatro capas: *Presentación*, *Aplicación*, *Dominio* e *Infraestructura*. El núcleo de dominio es puro (C# estándar) y no referencia librerías externas.
+* **Consecuencias:**
+  * *Positivas:* Alta testabilidad unitaria mediante mocks de repositorios, independencia tecnológica y reglas de negocio protegidas frente a cambios de frameworks.
+  * *Trade-offs:* Mayor número de clases, interfaces, mapeadores y DTOs iniciales.
 
-Se adopta una arquitectura con las siguientes características:
+---
 
-- **Estilo arquitectónico:** arquitectura en capas.
-- **Estructura de implementación:** monolito modular.
-- **Enfoque de diseño:** Clean Architecture.
-- **Comunicación externa:** API REST mediante HTTPS.
+### ADR03: Selección del Stack Tecnológico Principal (ASP.NET Core 8+ y React + Vite)
+* **Estado:** Aprobado.
+* **Drivers vinculados:** DA01 (Consistencia), DA03 (Rendimiento), DA06 (Mantenibilidad), R02, R03.
+* **Contexto y problema:** Se requiere un entorno backend con tipado estricto, excelente soporte de transacciones ACID y concurrencia asíncrona, combinado con un cliente web ágil para visualización gráfica de asientos de buses.
+* **Alternativas evaluadas:**
+  1. *Backend Node.js (Express/NestJS) + Frontend Angular:* Buena opción, pero C# provee mayor madurez en compilación estricta, control transaccional relacional y concurrencia sin bloqueo de event loop.
+  2. *Backend ASP.NET Core 8+ (C#) + Frontend React 18+ (TypeScript, Vite):* Rendimiento sobresaliente en benchmarks I/O, soporte nativo de inyección de dependencias, tipado robusto de extremo a extremo con TypeScript y ecosistema maduro.
+* **Decisión y justificación:** Se selecciona **ASP.NET Core 8+** para la API REST y **React + Vite** para la SPA web.
+* **Consecuencias:**
+  * *Positivas:* Máximo rendimiento en procesamiento transaccional, mantenibilidad corporativa y rica experiencia de usuario en selección de asientos de dos pisos.
+  * *Trade-offs:* Requiere sincronización de contratos DTO entre C# y TypeScript (gestionable mediante esquemas OpenAPI/Swagger).
 
-Los módulos se ejecutarán inicialmente como una aplicación backend integrada, manteniendo responsabilidades y dependencias internas definidas.
+---
 
-No se adoptará una arquitectura de microservicios en la primera versión, debido a su mayor complejidad de despliegue, comunicación y mantenimiento.
+### ADR04: Selección de PostgreSQL como Motor de Base de Datos Principal y Fuente de Verdad
+* **Estado:** Aprobado.
+* **Drivers vinculados:** DA01 (Consistencia estricta), DA04 (Recuperabilidad), R01 (PostgreSQL).
+* **Contexto y problema:** La venta de pasajes exige consistencia inmediata (ACID). No se puede tolerar eventual consistency en la reserva del último asiento disponible de un bus hacia Lima en Semana Santa.
+* **Alternativas evaluadas:**
+  1. *Base de datos NoSQL (MongoDB, DynamoDB):* Excelente escalabilidad horizontal, pero carece de bloqueos transaccionales pesimistas nativos y comprobaciones de integridad relacional complejas.
+  2. *Base de datos Relacional PostgreSQL 16+:* Motor relacional open source líder, soporte completo de transacciones serializables, bloqueo de filas con `FOR UPDATE`, soporte JSONB e índices parciales condicionales.
+* **Decisión y justificación:** Se adopta **PostgreSQL** como la única fuente de verdad transaccional del sistema.
+* **Consecuencias:**
+  * *Positivas:* Cero riesgo de asientos duplicados gracias a restricciones de exclusión e índices únicos parciales. Soporte de transacciones atómicas seguras.
+  * *Trade-offs:* Escalamiento vertical prioritario en la base de datos de escritura; para consultas pesadas futuras se requerirán réplicas de lectura.
 
-### ADR02 y ADR03 — Tecnologías de aplicación
+---
 
-**Frontend:**
-- React.
-- TypeScript.
-- Vite.
-- Tailwind CSS y shadcn/ui.
+### ADR05: Mecanismo de Seguridad y Aislamiento Multiempresa
+* **Estado:** Aprobado.
+* **Drivers vinculados:** DA02 (Seguridad y aislamiento multiempresa), R04, R10.
+* **Contexto y problema:** Múltiples empresas competidoras utilizan la misma plataforma física. Una empresa nunca debe poder leer, editar ni consultar información de otras empresas o agencias.
+* **Alternativas evaluadas:**
+  1. *Base de datos física independiente por empresa (Multi-database):* Máximo aislamiento, pero eleva drásticamente los costos de mantenimiento, migraciones y despliegue.
+  2. *Base de datos compartida con esquema discriminador y Claims de autorización:* Todas las tablas operativas contienen `company_id` y `agency_id`. Los tokens JWT transportan los Claims de la empresa y los middlewares de ASP.NET Core junto con Global Query Filters de EF Core inyectan automáticamente el filtro en cada consulta SQL.
+* **Decisión y justificación:** Se adopta **Base de datos compartida con aislamiento lógico estricto mediante Claims y Global Query Filters**.
+* **Consecuencias:**
+  * *Positivas:* Costo de infraestructura optimizado, mantenimiento centralizado y garantía de que ninguna consulta filtre datos ajenos a nivel de ORM.
+  * *Trade-offs:* Las consultas SQL nativas directas deben auditarse rigurosamente para no omitir el parámetro de aislamiento.
 
-**Backend:**
-- ASP.NET Core.
-- C#.
-- API REST.
-- Entity Framework Core para acceso a datos.
+---
 
-La aplicación web permitirá el acceso desde navegadores de computadoras, tabletas y teléfonos móviles.
+### ADR06: Integración con Pasarela de Pagos mediante Adaptador e Idempotencia
+* **Estado:** Aprobado.
+* **Drivers vinculados:** DA01 (Consistencia de pagos), DA07 (Interoperabilidad externa), R05.
+* **Contexto y problema:** La confirmación de pasajes pagados depende de webhooks enviados por pasarelas externas (Stripe, Culqi, Niubiz). Las pasarelas pueden reenviar notificaciones repetidas por caídas de red o demoras en la respuesta HTTP.
+* **Alternativas evaluadas:**
+  1. *Confirmar reserva directamente en la llamada cliente:* Vulnerable a fraude y manipulación de datos en el navegador.
+  2. *Recepción de webhook sin validación de idempotencia:* Si la pasarela reintenta el webhook 3 veces, se corre el riesgo de emitir pasajes duplicados o generar inconsistencias en los libros contables.
+  3. *Patrón Adapter con registro de idempotencia (`payment_transactions`):* Se verifica la firma criptográfica (HMAC) y se almacena el identificador único del evento (`idempotency_key`). Si el evento ya fue procesado, se responde HTTP 200 inmediatamente sin reprocesar.
+* **Decisión y justificación:** Se adopta el **Patrón Adapter con tabla de eventos idempotentes**.
+* **Consecuencias:**
+  * *Positivas:* Cero pagos duplicados, desacoplamiento del proveedor externo y tolerancia ante fallos de conectividad.
+  * *Trade-offs:* Requiere almacenamiento adicional de eventos de pago y verificación criptográfica obligatoria.
 
-### ADR04 y ADR06 — Persistencia y consistencia
+---
 
-PostgreSQL será la fuente principal de información para empresas, agencias, viajes, reservas, pagos y encomiendas.
+### ADR07: Desacoplamiento de Almacenamiento de Archivos (Object Storage)
+* **Estado:** Aprobado.
+* **Drivers vinculados:** DA05 (Escalabilidad), DA03 (Rendimiento).
+* **Contexto y problema:** Las empresas deben subir logotipos, fotografías de buses, boletos PDF generados y fotografías de guías de encomiendas. Almacenar binarios (BLOBs) en PostgreSQL satura el tamaño de la base de datos y ralentiza los backups y consultas.
+* **Alternativas evaluadas:**
+  1. *Almacenamiento en disco local del servidor:* No escala horizontalmente si se tienen varias instancias de la API en contenedores.
+  2. *Almacenar BLOBs en PostgreSQL:* Degrada el rendimiento de lectura de la base de datos y triplica el tamaño de los respaldos.
+  3. *Almacenamiento de objetos compatible con S3 (MinIO / AWS S3):* Los archivos binarios se almacenan en un bucket y en PostgreSQL solo se guardan las URLs o identificadores con metadatos.
+* **Decisión y justificación:** Se adopta **Object Storage compatible S3**.
+* **Consecuencias:**
+  * *Positivas:* Base de datos relacional ligera y ágil, soporte para URLs firmadas temporales para descarga segura de pasajes.
+  * *Trade-offs:* Requiere configurar un servicio de almacenamiento adicional (MinIO para desarrollo / S3 para producción).
 
-Las operaciones críticas de reserva deberán utilizar:
+---
 
-- Transacciones de base de datos.
-- Restricciones de integridad.
-- Control de concurrencia.
-- Validación de disponibilidad.
-- Gestión del vencimiento de reservas temporales.
+### ADR08: Estrategia de Caché y Optimización Progresiva (YAGNI / KISS)
+* **Estado:** Aprobado.
+* **Drivers vinculados:** DA03 (Rendimiento), DA05 (Escalabilidad).
+* **Contexto y problema:** En fases iniciales, la carga de consultas de rutas y catálogos puede ser resuelta directamente por PostgreSQL con índices optimizados. Agregar Redis desde el día 1 incrementa la complejidad operativa sin necesidad justificada.
+* **Alternativas evaluadas:**
+  1. *Caché Redis distribuido obligatorio desde el día 1:* Aporta alta velocidad, pero añade otro contenedor a mantener, sincronización de invalidación de caché y riesgo de mostrar asientos desactualizados.
+  2. *Caché en memoria en ASP.NET Core (`IMemoryCache`) para catálogos estáticos + PostgreSQL indexado para disponibilidad:* Mantiene la simplicidad; Redis se reserva como táctica de escalabilidad futura cuando las métricas demuestren saturación.
+* **Decisión y justificación:** Se adopta **Caché en memoria para datos estáticos (ciudades, terminales) y PostgreSQL con índices para disponibilidad en tiempo real**. Redis queda documentado como táctica arquitectónica de evolución.
+* **Consecuencias:**
+  * *Positivas:* Simplicidad operativa inicial, cero problemas de inconsistencia de caché en disponibilidad de asientos.
+  * *Trade-offs:* En picos extremos de consulta, la base de datos absorberá las lecturas si no se escala con réplicas.
 
-Para los servicios con asientos numerados se impedirá la asignación duplicada de un asiento en un mismo viaje.
+---
 
-Para los servicios por cupos se impedirá superar la capacidad disponible.
+## 3. Matriz de Cobertura de Drivers vs. ADRs
 
-### ADR05 — Seguridad multiempresa
-
-Se utilizará ASP.NET Core Identity para gestionar identidades y autenticación.
-
-La autorización deberá verificar:
-
-- Rol del usuario.
-- Empresa autorizada.
-- Agencia autorizada.
-- Permiso requerido para la operación.
-
-La separación de información entre empresas deberá aplicarse desde el backend y las consultas de datos, no únicamente desde la interfaz.
-
-### ADR07 — Integración de pagos
-
-La plataforma se integrará con una pasarela de pago externa.
-
-La confirmación de una reserva pagada deberá realizarse únicamente después de verificar el resultado de la operación.
-
-Se aplicará idempotencia para evitar procesar dos veces una misma notificación o confirmación de pago.
-
-### ADR08 — Módulos del sistema
-
-El backend se organizará inicialmente en los siguientes módulos:
-
-1. Identidad y acceso.
-2. Empresas y agencias.
-3. Rutas, vehículos y programación.
-4. Reservas y pasajes.
-5. Ventas y pagos.
-6. Encomiendas.
-7. Reportes y auditoría.
-8. Notificaciones e integraciones.
-
-Estos módulos serán partes internas del monolito modular, no microservicios independientes.
-
-### ADR09 — Almacenamiento de archivos
-
-Los logos, fotografías y archivos asociados se almacenarán en un servicio de almacenamiento de objetos compatible con S3 o equivalente.
-
-PostgreSQL almacenará las referencias y metadatos necesarios.
-
-### ADR10 — Operación y recuperación
-
-La solución incorporará:
-
-- Registros de errores y eventos relevantes.
-- Auditoría de operaciones críticas.
-- Monitoreo básico de la aplicación.
-- Respaldos periódicos de PostgreSQL.
-- Procedimientos de restauración.
-
-### ADR11 — Despliegue y escalabilidad
-
-La aplicación se preparará para ejecutarse mediante contenedores Docker.
-
-Un servidor proxy inverso, como Nginx, podrá gestionar el acceso HTTPS y distribuir solicitudes cuando se incorporen varias instancias del backend.
-
-El escalamiento horizontal se realizará según las necesidades de capacidad, manteniendo PostgreSQL como fuente de verdad de las reservas.
-
-### ADR12 — Optimización progresiva
-
-En una evolución posterior podrán incorporarse:
-
-- Redis para consultas frecuentes y datos temporales no autoritativos.
-- Procesamiento en segundo plano para notificaciones y tareas secundarias.
-- Mensajería duradera para eventos críticos cuando sea necesaria.
-- Varias instancias del backend detrás de un balanceador de carga.
-
-Estas herramientas no reemplazarán las transacciones ni las restricciones de PostgreSQL utilizadas para controlar reservas.
-
-## 4. Implementación inicial y evolución
-
-| Componente | Implementación inicial | Evolución |
-|---|---|---|
-| Frontend | React + TypeScript + Vite | Optimización y ampliación funcional |
-| Backend | ASP.NET Core, monolito modular | Múltiples instancias si la demanda lo requiere |
-| Base de datos | PostgreSQL | Optimización, réplicas de lectura según necesidad |
-| Seguridad | Identity y autorización por ámbito | Controles adicionales según riesgo |
-| Reservas | Transacciones y control de concurrencia | Optimización bajo mayor carga |
-| Archivos | Almacenamiento de objetos | Escalamiento de capacidad |
-| Notificaciones | Integración y procesamiento básico | Cola duradera si es necesaria |
-| Caché | No obligatoria inicialmente | Redis según mediciones |
-| Infraestructura | Docker, HTTPS y respaldos | Balanceador y despliegue distribuido |
-
-## 5. Conclusión
-
-La arquitectura seleccionada prioriza la consistencia de reservas, la seguridad multiempresa y la mantenibilidad.
-
-El monolito modular con Clean Architecture permite construir una primera versión funcional sin introducir la complejidad de microservicios.
-
-La separación de módulos y el diseño de despliegue permitirán evolucionar la solución conforme aumenten las empresas, agencias y operaciones.
+| Driver Arquitectónico | ADR01 (Monolito) | ADR02 (Clean Arch) | ADR03 (Stack) | ADR04 (Postgres) | ADR05 (Seguridad) | ADR06 (Pagos) | ADR07 (Storage) | ADR08 (Caché) |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **DA01 — Consistencia de reservas y pagos** | ✓ | | ✓ | ✓ | | ✓ | | |
+| **DA02 — Seguridad multiempresa** | | | | | ✓ | | | |
+| **DA03 — Rendimiento en búsquedas** | | | ✓ | ✓ | | | ✓ | ✓ |
+| **DA04 — Disponibilidad y recuperación** | ✓ | | | ✓ | | ✓ | | |
+| **DA05 — Escalabilidad en picos** | ✓ | | ✓ | | | | ✓ | ✓ |
+| **DA06 — Mantenibilidad modular** | ✓ | ✓ | ✓ | | | | | |
+| **DA07 — Interoperabilidad externa** | | ✓ | | | | ✓ | ✓ | |
+| **DA08 — Observabilidad y testabilidad**| | ✓ | ✓ | ✓ | ✓ | ✓ | | |
