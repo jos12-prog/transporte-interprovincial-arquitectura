@@ -126,11 +126,13 @@ Estas clases representan una estructura conceptual. La implementación definitiv
 
 | Driver | Contribución |
 |---|---|
-| DA01 — Consistencia | Encapsulación de reglas de reserva y creación válida de entidades. |
-| DA02 — Seguridad multiempresa | Contratos que permiten aplicar el contexto de autorización en los casos de uso. |
-| DA03 — Rendimiento | Posibilidad de optimizar implementaciones de acceso a datos sin alterar los casos de uso. |
+| DA02 / DA03 — Concurrencia y Consistencia | Encapsulación de reglas de reserva, estrategia de disponibilidad y creación válida de entidades. |
+| DA04 — Seguridad y Aislamiento multiempresa | Contratos que permiten aplicar el contexto de autorización en los casos de uso. |
+| DA06 / DA11 — Rendimiento y Caché | Posibilidad de optimizar implementaciones de acceso a datos y repositorios sin alterar los casos de uso. |
 | DA05 — Escalabilidad | Separación de responsabilidades y adaptadores sustituibles. |
-| DA06 — Mantenibilidad | Bajo acoplamiento, facilidad de pruebas y extensibilidad. |
+| DA09 — Pagos con Adapter | Desacopla la lógica de ventas y pagos respecto de Culqi (`IPaymentGateway`). |
+| DA10 — Notificaciones asíncronas | Desacopla el envío de WhatsApp (`INotificationGateway`) procesado vía RabbitMQ. |
+| DA14 — Mantenibilidad | Bajo acoplamiento mediante interfaces, facilidad de pruebas unitarias y extensibilidad. |
 
 Los patrones complementan los controles de seguridad, concurrencia y escalabilidad, pero no los sustituyen.
 

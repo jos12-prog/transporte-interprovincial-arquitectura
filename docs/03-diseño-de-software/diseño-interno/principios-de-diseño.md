@@ -116,9 +116,10 @@ Se priorizarán implementaciones sencillas que satisfagan los requerimientos est
 No se incorporarán funcionalidades o componentes sin una necesidad identificada.
 
 **Aplicación:**
-- Redis se considera una optimización futura, no una dependencia inicial.
-- Las colas de eventos podrán incorporarse cuando los procesos asíncronos lo justifiquen.
-- No se requiere Kubernetes para la primera versión.
+- Se mantiene un monolito modular en lugar de adoptar microservicios, que introduciría complejidad no justificada en esta etapa.
+- Redis y RabbitMQ están establecidos como componentes obligatorios desde la primera versión (RC12 y RC13), pues responden a requerimientos concretos de rendimiento y desacoplamiento asíncrono identificados en el análisis.
+- No se requiere Kubernetes para la primera versión; Docker Compose es suficiente para el alcance actual.
+- No se implementarán módulos o integraciones sin una historia de usuario o requisito funcional que los justifique.
 
 Estas decisiones podrán revisarse cuando las mediciones de rendimiento o las necesidades operativas lo requieran.
 
@@ -133,7 +134,7 @@ Estas decisiones podrán revisarse cuando las mediciones de rendimiento o las ne
 | RG05 | La autorización debe considerar el rol y el contexto de empresa y agencia. |
 | RG06 | La asignación de asientos y cupos debe protegerse mediante transacciones y control de concurrencia. |
 | RG07 | Las confirmaciones de pago deben verificarse y procesarse de manera idempotente. |
-| RG08 | Las operaciones de encomiendas deben mantener su trazabilidad sin depender de la disponibilidad de asientos. |
+| RG08 | Las confirmaciones de pago deben verificarse y procesarse de manera idempotente para evitar confirmaciones duplicadas ante notificaciones repetidas del proveedor. |
 
 ## 6. Verificación de los principios
 
@@ -154,15 +155,14 @@ Durante el desarrollo y la revisión del código se comprobará lo siguiente:
 
 | Driver | Contribución de los principios |
 |---|---|
-| DA01 — Consistencia | Centralización de reglas y separación de operaciones transaccionales. |
-| DA02 — Seguridad multiempresa | Responsabilidades claras y controles de autorización reutilizables. |
-| DA03 — Rendimiento | Implementaciones optimizables sin alterar el dominio. |
-| DA04 — Disponibilidad y recuperación | Componentes delimitados que facilitan el diagnóstico y la recuperación. |
-| DA05 — Escalabilidad | Diseño modular que admite evolución y réplicas del backend sin estado. |
-| DA06 — Mantenibilidad | Aplicación de SOLID, DRY, KISS y YAGNI para reducir acoplamiento y complejidad. |
+| DA02 / DA03 — Concurrencia y Consistencia | Centralización de reglas invariantes y separación de operaciones transaccionales seguras. |
+| DA04 — Seguridad y Aislamiento multiempresa | Responsabilidades claras y controles de autorización contextual por empresa y agencia. |
+| DA06 / DA11 — Rendimiento y Caché | Implementaciones optimizables con Redis sin alterar las entidades del dominio. |
+| DA10 — Procesamiento asíncrono | Desacoplamiento mediante interfaces para publicar eventos en RabbitMQ y notificar por WhatsApp. |
+| DA05 / DA14 — Escalabilidad y Mantenibilidad | Aplicación de SOLID, DRY, KISS y YAGNI para reducir acoplamiento y permitir réplicas stateless. |
 
 ## 8. Conclusión
 
 Los principios SOLID, DRY, KISS y YAGNI orientan el diseño interno de la plataforma, estableciendo criterios concretos para separar responsabilidades, controlar dependencias y evitar complejidad innecesaria.
 
-Su aplicación permitirá desarrollar los módulos de reservas, transporte, pagos y encomiendas de forma consistente con las decisiones arquitectónicas del proyecto.
+Su aplicación permitirá desarrollar los módulos de reservas, transporte, pagos y notificaciones de forma consistente con las decisiones arquitectónicas del proyecto.

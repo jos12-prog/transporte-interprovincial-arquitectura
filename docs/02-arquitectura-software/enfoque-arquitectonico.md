@@ -1,54 +1,38 @@
-# Enfoque arquitectónico
+# Enfoque Arquitectónico
 
-## 1. Descripción
+## 1. Clean Architecture
 
-La Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial adopta **Clean Architecture** para organizar las dependencias internas de un **monolito modular con arquitectura en capas**. Las reglas de negocio permanecen independientes de frameworks, bases de datos e integraciones externas.
+La solución utiliza **Clean Architecture** dentro del monolito modular. Su objetivo es mantener las reglas del negocio independientes de frameworks, base de datos y proveedores externos. Esta decisión responde al driver **DA14** y a la restricción **RC15** del análisis de sistema.
 
-**Regla fundamental:** las dependencias de código se orientan hacia las capas internas; el dominio no depende de la infraestructura.
+## 2. Capas
 
-## 2. Organización del enfoque
-
-| Capa | Responsabilidad | Elementos del proyecto |
+| Capa | Responsabilidad | Drivers relacionados |
 |---|---|---|
-| **Dominio** | Modelar entidades y reglas de negocio. | Empresa, agencia, ruta, vehículo, viaje programado, asiento/cupo, reserva, pago y encomienda. |
-| **Aplicación** | Coordinar casos de uso y definir contratos para servicios externos y persistencia. | Buscar viajes, gestionar reservas, verificar pagos, gestionar encomiendas y generar reportes. |
-| **Adaptadores de interfaz** | Traducir solicitudes y respuestas entre la aplicación y el exterior. | Controladores REST, DTO, validadores y adaptadores de entrada/salida. |
-| **Infraestructura y frameworks** | Implementar mecanismos tecnológicos concretos. | ASP.NET Core, EF Core, PostgreSQL, ASP.NET Core Identity, almacenamiento de objetos y proveedores externos. |
-
-La **aplicación web React + TypeScript + Vite** es un cliente externo al backend que consume la API REST mediante HTTPS.
+| Presentación | Aplicación web y controladores REST; recibe solicitudes y entrega respuestas. | DA-03 |
+| Aplicación | Casos de uso, autorización contextual (rol, empresa, agencia) y coordinación de operaciones. | DA-04, DA-06 |
+| Dominio | Entidades, reglas de reservas, disponibilidad, control de concurrencia, estados y transporte. | DA-02, DA-03, DA-08 |
+| Adaptadores e infraestructura | EF Core, PostgreSQL, Redis, RabbitMQ, Identity y adaptadores de Culqi y WhatsApp. | DA-09, DA-10, DA-11 |
 
 ## 3. Diagrama del enfoque
 
-![Enfoque arquitectónico Clean Architecture](../../img/enfoque-arquitectonico.svg)
+![Clean Architecture aplicada al monolito modular](../../img/enfoque-arquitectonico.svg)
 
-**Figura 3.** Capas y dirección de dependencias de Clean Architecture en el monolito modular.
+**Figura 3.** Organización interna de Clean Architecture y dirección de dependencias.
 
 ## 4. Aplicación al proyecto
 
-- **Reservas:** el dominio define reglas de capacidad y disponibilidad; la aplicación coordina el caso de uso y la infraestructura garantiza la atomicidad mediante transacciones y restricciones de PostgreSQL.
-- **Seguridad multiempresa:** la identidad se gestiona con ASP.NET Core Identity; la autorización valida rol, empresa y agencia en las operaciones correspondientes.
-- **Pagos:** la aplicación define el contrato de integración; el adaptador verifica las respuestas de la pasarela y aplica idempotencia.
-- **Encomiendas:** el dominio aplica políticas y estados de envío por empresa; la infraestructura persiste los movimientos y la evidencia de entrega.
+- **Reservas:** el dominio define las reglas de disponibilidad, estados (`HELD`, `CONFIRMED`, `EXPIRED`, `CANCELLED`) y control de concurrencia; la capa de aplicación coordina el caso de uso y PostgreSQL garantiza la integridad transaccional. *(DA-02, DA-03, DA-07, DA-08)*
+- **Seguridad:** la capa de aplicación valida el contexto del usuario (rol, empresa y agencia) antes de ejecutar cualquier operación privada. Los controladores no ejecutan lógica de autorización directamente. *(DA-04, DA-06)*
+- **Pagos:** el contrato `IPaymentGateway` permite integrar Culqi sin acoplar el dominio al proveedor. Un futuro cambio de pasarela solo afectaría al adaptador correspondiente. *(DA-09, DA-11)*
+- **Notificaciones:** `INotificationGateway` permite enviar mensajes por WhatsApp Business Cloud API mediante RabbitMQ, sin bloquear la operación principal de reserva o venta. *(DA-10, DA-12)*
+- **Alta demanda:** Redis atiende consultas frecuentes de rutas, horarios y servicios, reduciendo la carga sobre PostgreSQL. RabbitMQ procesa alertas preventivas y tareas secundarias de forma asíncrona. *(DA-06, DA-10, DA-11)*
 
-## 5. Reglas de dependencia
+## 5. Regla de dependencias
 
-1. El dominio no referencia frameworks ni servicios externos.
-2. Los casos de uso dependen del dominio y de contratos definidos hacia el interior.
-3. Los controladores invocan casos de uso; no implementan reglas de negocio.
-4. La infraestructura implementa los contratos requeridos por la aplicación y se conecta mediante inyección de dependencias.
-5. Los módulos se mantienen dentro del mismo backend, con límites funcionales claros; no constituyen microservicios.
-
-## 6. Relación con las decisiones arquitectónicas
-
-| Elemento | Decisión vigente |
-|---|---|
-| Estilo | Arquitectura en capas |
-| Organización | Monolito modular |
-| Enfoque | Clean Architecture |
-| Cliente web | React + TypeScript + Vite |
-| API | ASP.NET Core + C#, REST/HTTPS |
-| Persistencia principal | PostgreSQL + EF Core |
-| Identidad | ASP.NET Core Identity |
-| Evolución opcional | Redis, mensajería duradera y escalamiento horizontal según necesidad |
-
-**Driver principal relacionado:** **DA06 — Mantenibilidad y evolución modular**. El enfoque también contribuye a DA01 (consistencia de reservas y pagos) y DA02 (seguridad y aislamiento multiempresa).
+1. El dominio no depende de frameworks, bases de datos ni servicios externos.
+2. Los casos de uso dependen únicamente del dominio y de contratos internos (interfaces).
+3. Los controladores delegan en casos de uso y no contienen reglas de negocio.
+4. La infraestructura implementa los contratos definidos en el dominio y la aplicación mediante inyección de dependencias.
+5. Redis y RabbitMQ no contienen ni aplican reglas críticas del negocio.
+6. Los módulos permanecen dentro del mismo backend y no se consideran microservicios independientes.
+7. El aislamiento entre empresas y agencias se aplica en la capa de aplicación antes de acceder a cualquier recurso del dominio o la infraestructura.

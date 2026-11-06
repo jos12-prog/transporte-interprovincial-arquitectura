@@ -73,8 +73,8 @@ El siguiente diagrama de secuencia detalla la colaboración cronológica entre c
 #### `IPaymentPort` (Dominio / Aplicación — Puerto)
 * Define el contrato para procesar cobros electrónicos, aislando la lógica de negocio de los detalles de proveedores específicos.
 
-#### `StripePaymentAdapter` (Infraestructura — Adaptador)
-* Implementa `IPaymentPort` adaptando las llamadas hacia el SDK o API REST del proveedor de pagos externo (Stripe, Culqi o Niubiz).
+#### `CulqiPaymentAdapter` (Infraestructura — Adaptador)
+* Implementa `IPaymentGateway` / `IPaymentPort` adaptando las llamadas hacia la API REST del proveedor de pagos Culqi (EXT01).
 
 ---
 
@@ -84,9 +84,9 @@ El siguiente diagrama de secuencia detalla la colaboración cronológica entre c
 |---|---|---|---|
 | **PD01** | **Repository** | `IReservationRepository` y `PostgresReservationRepository` | Desacopla la lógica de negocio de las consultas de Entity Framework Core y PostgreSQL. Permite crear pruebas unitarias mediante mocks. |
 | **PD02** | **Dependency Injection** | ASP.NET Core IoC Container (`IServiceCollection`) | Conecta controladores, casos de uso, puertos y adaptadores sin dependencias rígidas ni acoplamiento directo. |
-| **PD03** | **Strategy** | `IAvailabilityStrategy`, `NumberedSeatStrategy`, `QuotaSeatStrategy` | Permite alternar la regla de validación de disponibilidad dinámicamente según la modalidad del bus (asientos fijos o cupo abierto). |
-| **PD04** | **Adapter** | `StripePaymentAdapter` : `IPaymentPort` | Adapta la API externa de la pasarela de pagos a un contrato interno de la aplicación, aislando el dominio de cambios del proveedor. |
-| **PD05** | **Factory Method** | `Reservation.crear(...)` | Garantiza que ninguna entidad `Reservation` sea instanciada en un estado inválido o incompleto. |
+| **PD03** | **Strategy** | `IAvailabilityStrategy`, `NumberedSeatStrategy`, `QuotaSeatStrategy` | Permite alternar la regla de validación de disponibilidad dinámicamente según la modalidad del transporte (asientos fijos o cupo abierto). |
+| **PD04** | **Adapter** | `CulqiPaymentAdapter` : `IPaymentPort` | Adapta la API externa de Culqi a un contrato interno de la aplicación, aislando el dominio de cambios del proveedor. |
+| **PD05** | **Factory Method** | `Reservation.Crear(...)` | Garantiza que ninguna entidad `Reservation` sea instanciada en un estado inválido o incompleto. |
 
 ---
 

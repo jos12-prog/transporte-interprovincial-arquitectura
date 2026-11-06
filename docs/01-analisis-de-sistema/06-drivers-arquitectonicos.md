@@ -1,96 +1,300 @@
-# 06. Drivers Arquitectónicos
+# Drivers Arquitectónicos
 
-## 1. Definición y Fundamentación Teórica
+Los drivers arquitectónicos representan los requisitos funcionales, atributos de calidad y restricciones que tienen una influencia significativa en las decisiones de arquitectura de la Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial en Ayacucho.
 
-Según la metodología de arquitectura de software impartida por la docente (Paso 4):
+Los drivers identificados permiten justificar posteriormente el estilo arquitectónico, los componentes, las tecnologías, los mecanismos de concurrencia, la estrategia de escalabilidad y las integraciones externas.
 
-> [!IMPORTANT]
-> **Fórmula del Driver Arquitectónico:**
-> $$\textbf{Driver Arquitectónico} = \text{Requisito (RF)} + \text{Atributo de Calidad (RNF)} + \text{Restricción (R)}$$
-> *Un driver es cualquier requerimiento, atributo de calidad o restricción técnica/organizacional que influye de manera determinante y significativa en las decisiones de arquitectura de software.*
+## 1. Identificación de drivers arquitectónicos
 
-No todos los requisitos son drivers arquitectónicos. Por ejemplo, un CRUD administrativo estándar no condiciona la arquitectura global; en cambio, la necesidad de retener asientos concurrentemente sin sobreventa condiciona la elección de base de datos, el mecanismo de bloqueo y el diseño modular del backend.
-
----
-
-## 2. Drivers Arquitectónicos Identificados
-
-| ID | Driver Arquitectónico | Dimensión Docente | Prioridad | Atributo / RNF | Restricciones Vinculadas |
-|---|---|---|:---:|---|---|
-| **DA01** | **Consistencia estricta de reservas y pagos (Cero sobreventa)** | Consistencia / Concurrencia | **Crítica** | AC01 (Consistencia e integridad) | R01 (PostgreSQL ACID), R05 (Pasarela externa) |
-| **DA02** | **Seguridad y aislamiento multiempresa** | Seguridad | **Alta** | AC02 (Seguridad), AC07 (Auditabilidad) | R04 (API REST / HTTPS), R10 (Ley N° 29733) |
-| **DA03** | **Rendimiento en búsquedas de viajes y catálogos** | Rendimiento | **Alta** | AC03 (Rendimiento) | R03 (React/Vite SPA), R01 (Índices PostgreSQL) |
-| **DA04** | **Alta disponibilidad y recuperación ante fallos** | Disponibilidad / Resiliencia | **Alta** | AC04 (Disponibilidad), AC08 (Recuperabilidad) | R08 (Docker), R01 (Respaldos PostgreSQL) |
-| **DA05** | **Escalabilidad en picos de demanda regional** | Escalabilidad | **Alta** | AC05 (Escalabilidad) | R08 (Contenedores), R09 (Monolito modular) |
-| **DA06** | **Mantenibilidad y evolución desacoplada** | Mantenibilidad | **Alta** | AC06 (Mantenibilidad) | R02 (ASP.NET Core), R09 (Monolito modular) |
-| **DA07** | **Interoperabilidad e integraciones externas seguras** | Integraciones | **Alta** | AC09 (Interoperabilidad) | R04 (REST/HTTPS), R05 (Pasarela), R06 (Notificaciones) |
-| **DA08** | **Observabilidad, trazabilidad y testabilidad** | Testabilidad / Observabilidad | **Media-Alta** | AC07 (Auditabilidad), Mantenibilidad | R07 (GitHub CI/CD), R10 (Auditoría legal) |
+| ID | Driver arquitectónico | Origen | ¿Por qué influye en la arquitectura? |
+|---|---|---|---|
+| **DA01** | El sistema debe soportar múltiples pasajeros, agentes y administradores realizando operaciones simultáneamente. | AC01, AC02, AC05 | Influye en la estrategia de concurrencia, procesamiento de solicitudes, rendimiento y escalabilidad. |
+| **DA02** | El sistema debe impedir la confirmación simultánea del mismo asiento o cupo. | RF12, RF26, AC05, AC06 | Obliga a definir mecanismos transaccionales y de control de concurrencia para evitar sobreventas. |
+| **DA03** | El sistema debe mantener consistencia entre reservas, pagos, disponibilidad y pasajes. | RF10, RF11, RF19, RF21, AC06 | Determina el manejo de transacciones, estados de reserva y confirmación de operaciones. |
+| **DA04** | El sistema debe aislar la información de las diferentes empresas y agencias que utilizan la plataforma. | RF35, RF39, RC02, RC03, AC04 | Influye directamente en autenticación, autorización, modelo de datos y control del ámbito organizacional. |
+| **DA05** | El sistema debe permitir el crecimiento de empresas, agencias, pasajeros, servicios y operaciones sin modificar completamente la solución. | AC02, RC02 | Influye en la modularidad, escalabilidad y organización de los componentes. |
+| **DA06** | El sistema debe mantener tiempos de respuesta adecuados durante periodos de alta demanda. | AC01, AC03, RC12 | Influye en la utilización de caché, optimización de consultas y distribución de carga. |
+| **DA07** | El sistema debe permitir que las operaciones digitales y presenciales utilicen una disponibilidad común. | RF23, RF24, RF26, RC07 | Obliga a centralizar la disponibilidad y evitar fuentes independientes que puedan generar inconsistencias. |
+| **DA08** | El sistema debe mantener una reserva temporal durante un periodo limitado y liberarla automáticamente si no se confirma el pago. | RF07–RF13, RC08 | Influye en la gestión de estados, expiración de reservas, tareas programadas y actualización de disponibilidad. |
+| **DA09** | El sistema debe integrar una pasarela de pago externa sin acoplar la lógica de negocio al proveedor. | RF18–RF21, RC10, AC08 | Determina el uso de un adaptador para aislar la integración de Culqi y facilitar una futura sustitución del proveedor. |
+| **DA10** | El sistema debe enviar notificaciones sin bloquear las operaciones principales de reserva y venta. | RF47, RF48, RC11, RC13 | Influye en el procesamiento asíncrono y en el uso de una cola de eventos para desacoplar las notificaciones. |
+| **DA11** | El sistema debe soportar consultas frecuentes sin generar una carga innecesaria sobre la base de datos. | AC01, RC12 | Justifica la incorporación de una capa de caché para información de consulta frecuente. |
+| **DA12** | El sistema debe mantener trazabilidad de las operaciones administrativas y críticas. | RF43, AC09 | Influye en el diseño de auditoría, registros estructurados y mecanismos de seguimiento. |
+| **DA13** | El sistema debe integrarse mediante interfaces claramente definidas con servicios externos. | AC08, RC10, RC11, RC15 | Influye en la separación de responsabilidades y en la definición de contratos de integración. |
+| **DA14** | La solución debe permitir evolucionar sus módulos sin generar dependencias innecesarias entre las reglas de negocio y la infraestructura. | AC07, RC15 | Justifica una organización modular y la separación de responsabilidades mediante Clean Architecture. |
 
 ---
 
-## 3. Detalle de los Drivers Arquitectónicos
+## 2. Drivers prioritarios
 
-### DA01 — Consistencia estricta de reservas y pagos (Cero sobreventa)
-* **¿Qué problema atiende?** El riesgo de sobreventa de asientos o cupos cuando varios pasajeros y agentes intentan reservar simultáneamente en temporadas altas (Semana Santa, Fiestas Patrias), y el procesamiento de pagos duplicados.
-* **Composición:** RF05–RF12, RF14, RF19 + AC01 (Integridad y consistencia) + R01 (PostgreSQL ACID) + R05 (Pasarela de pagos).
-* **Impacto arquitectónico:** Obliga a utilizar transacciones ACID con bloqueo pesimista (`SELECT ... FOR UPDATE`), índices únicos parciales en base de datos (`idx_unique_active_seat`) y verificación con idempotencia en webhooks de pago.
+No todos los drivers tienen el mismo impacto sobre la solución. Los siguientes tienen prioridad arquitectónica.
 
-### DA02 — Seguridad y aislamiento multiempresa
-* **¿Qué problema atiende?** La plataforma integra a múltiples empresas y agencias competidoras; una empresa jamás debe visualizar ni alterar itinerarios, tarifas, reservas o clientes de otra.
-* **Composición:** RF20–RF23, RF40–RF44 + AC02 (Seguridad) + R10 (Ley N° 29733 de Protección de Datos).
-* **Impacto arquitectónico:** Determina la implementación de autenticación JWT, autorización basada en Claims (rol, empresa, agencia) y filtros de aislamiento a nivel de consulta (Row-Level Security o Global Query Filters en EF Core).
+### DA02 — Control de concurrencia
 
-### DA03 — Rendimiento en búsquedas de viajes y catálogos
-* **¿Qué problema atiende?** Las consultas de itinerarios y precios representan el 85 % del tráfico total del sistema; deben responder con inmediatez para evitar el abandono de compra.
-* **Composición:** RF01–RF04, RF30–RF31 + AC03 (Rendimiento) + R03 (React SPA).
-* **Impacto arquitectónico:** Conduce a la optimización de índices en base de datos, proyección de DTOs livianos, paginación en el API REST y previsión de caché en memoria o Redis para rutas frecuentes.
+Es uno de los principales drivers del proyecto debido a que diferentes pasajeros y agentes pueden intentar adquirir el mismo asiento o cupo simultáneamente.
 
-### DA04 — Alta disponibilidad y recuperación ante fallos
-* **¿Qué problema atiende?** La indisponibilidad del sistema detiene la venta de pasajes y el despacho de buses en terminales terrestres.
-* **Composición:** RF01–RF19 + AC04 (Disponibilidad), AC08 (Recuperabilidad) + R08 (Docker).
-* **Impacto arquitectónico:** Requiere manejo controlado de excepciones, health checks en ASP.NET Core, políticas de reintento ante fallos de proveedores y políticas de respaldo periódico (RTO < 4 h, RPO < 1 h).
+La arquitectura debe garantizar que solamente una operación pueda confirmar el recurso.
 
-### DA05 — Escalabilidad en picos de demanda regional
-* **¿Qué problema atiende?** El incremento súbito de tráfico durante festividades regionales sin degradar las operaciones en counter presencial.
-* **Composición:** RF01–RF04, RF20–RF39 + AC05 (Escalabilidad) + R08 (Docker).
-* **Impacto arquitectónico:** Diseña el backend como un monolito modular **sin estado (stateless)**, permitiendo ejecutar múltiples réplicas detrás de un proxy inverso (Nginx) y delegando la sesión a tokens JWT.
-
-### DA06 — Mantenibilidad y evolución desacoplada
-* **¿Qué problema atiende?** Permitir modificar módulos (ej. añadir una nueva política de encomiendas o un cálculo de tarifas) sin que colapse el módulo de reservas o ventas.
-* **Composición:** RF05–RF48 + AC06 (Mantenibilidad) + R02 (ASP.NET Core), R09 (Monolito modular).
-* **Impacto arquitectónico:** Impone el uso de **Clean Architecture** en cada uno de los 8 módulos, encapsulando el dominio e interactuando únicamente a través de contratos de aplicación (interfaces públicas).
-
-### DA07 — Interoperabilidad e integraciones externas seguras
-* **¿Qué problema atiende?** Dependencia de proveedores externos (Stripe/Culqi/Niubiz para cobros y servicios de SMS/Email para boletos digitales).
-* **Composición:** RF13–RF14, RF47–RF48 + AC09 (Interoperabilidad) + R05, R06.
-* **Impacto arquitectónico:** Obliga a emplear el patrón **Adapter (Puertos y Adaptadores)** para no acoplar el código de negocio a librerías de terceros, además de implementar verificación criptográfica de firmas HMAC.
-
-### DA08 — Observabilidad, trazabilidad y testabilidad
-* **¿Qué problema atiende?** Necesidad de auditar todas las operaciones comerciales y validar el software mediante pruebas automatizadas sin depender de la base de datos física.
-* **Composición:** RF17, RF29, RF39, RF44 + AC07 (Auditabilidad) + R07 (GitHub Actions).
-* **Impacto arquitectónico:** Registro estructurado de logs (Serilog), tablas inmutables de auditoría en PostgreSQL, y diseño desacoplado que permite pruebas unitarias con mocks de repositorios.
-
----
-
-## 4. Matriz de Síntesis y Priorización
-
-```mermaid
-quadrantChart
-    title Matriz de Prioridad de Drivers Arquitectónicos
-    x-axis "Bajo Impacto Estructural" --> "Alto Impacto Estructural"
-    y-axis "Baja Frecuencia / Severidad" --> "Alta Frecuencia / Severidad Crítica"
-    quadrant-1 "Drivers Críticos (Atención Inmediata)"
-    quadrant-2 "Drivers Importantes (Planificar)"
-    quadrant-3 "Drivers Secundarios"
-    quadrant-4 "Drivers de Soporte Técnico"
-    "DA01: Consistencia Reservas/Pagos": [0.95, 0.95]
-    "DA02: Seguridad Multiempresa": [0.85, 0.88]
-    "DA03: Rendimiento Búsquedas": [0.78, 0.82]
-    "DA05: Escalabilidad en Picos": [0.82, 0.75]
-    "DA06: Mantenibilidad Modular": [0.90, 0.70]
-    "DA07: Interoperabilidad Pagos": [0.72, 0.80]
-    "DA04: Disponibilidad/Recuperación": [0.65, 0.72]
-    "DA08: Observabilidad/Testabilidad": [0.60, 0.55]
+```text
+Pasajero A ──────┐
+                 ├──> Servicio de Reservas
+Pasajero B ──────┘
+                 │
+Agente ──────────┘
+                 ↓
+       Control transaccional
+                 ↓
+       Disponibilidad única
 ```
 
-El driver determinante de la arquitectura es **DA01 — Consistencia estricta de reservas y pagos**, seguido directamente por **DA02 — Seguridad multiempresa** y **DA06 — Mantenibilidad modular**. Estos tres pilares fundamentan la adopción de un **Monolito Modular con Clean Architecture y PostgreSQL**.
+**Impacto:** base de datos, transacciones, bloqueo/control de concurrencia y modelo de estados.
+
+---
+
+### DA04 — Seguridad y aislamiento multiempresa
+
+La plataforma será utilizada por diferentes empresas y agencias utilizando una misma solución y una misma base de datos.
+
+Por ello, el sistema debe identificar el ámbito organizacional del usuario:
+
+```text
+Usuario
+   ↓
+Rol
+   ↓
+Empresa
+   ↓
+Agencia
+   ↓
+Recursos autorizados
+```
+
+**Impacto:** autenticación, autorización, middleware/interceptores, modelo de datos y control de acceso.
+
+---
+
+### DA05 — Escalabilidad
+
+La plataforma debe poder incorporar progresivamente nuevas empresas, agencias, pasajeros y servicios.
+
+El crecimiento esperado no debe obligar a modificar completamente la solución.
+
+**Impacto:** arquitectura modular, separación de responsabilidades, caché, procesamiento asíncrono y capacidad de escalar la aplicación.
+
+---
+
+### DA06 — Rendimiento durante alta demanda
+
+Durante festividades, feriados y fechas de alta movilidad puede producirse un incremento significativo de consultas y reservas.
+
+**Impacto:** caché, optimización de consultas, procesamiento asíncrono y capacidad de atender solicitudes concurrentes.
+
+---
+
+### DA08 — Reserva temporal
+
+La reserva temporal requiere mantener un recurso bloqueado durante un periodo limitado.
+
+El flujo arquitectónico será:
+
+```text
+Disponible
+    ↓
+HELD
+    ↓
+10 minutos
+    ↓
+ ┌───────────────┐
+ │               │
+Pago confirmado  Sin pago
+ │               │
+ ↓               ↓
+CONFIRMADA     EXPIRED
+                 ↓
+          Liberar recurso
+```
+
+**Impacto:** gestión de estados, persistencia, expiración y actualización de disponibilidad.
+
+---
+
+### DA09 — Integración de pagos
+
+La solución utilizará **Culqi** como proveedor externo de pagos.
+
+La lógica de reservas no deberá depender directamente de la implementación específica de Culqi.
+
+```text
+Reserva
+   ↓
+Servicio de pagos
+   ↓
+Payment Adapter
+   ↓
+Culqi
+   ↓
+Resultado del pago
+   ↓
+Confirmación de reserva
+```
+
+**Impacto:** patrón Adapter, contratos de integración, manejo de errores, validación de respuestas y webhooks.
+
+---
+
+### DA10 — Notificaciones asíncronas
+
+Las notificaciones de WhatsApp no deben bloquear una reserva o venta.
+
+El flujo previsto será:
+
+```text
+Reserva confirmada
+       ↓
+Publicar evento
+       ↓
+RabbitMQ
+       ↓
+Servicio de notificaciones
+       ↓
+WhatsApp Business Cloud API
+```
+
+Si WhatsApp presenta una falla temporal, la operación principal deberá conservarse correctamente.
+
+**Impacto:** cola de eventos, reintentos, procesamiento asíncrono y tolerancia a fallos.
+
+---
+
+### DA11 — Caché
+
+Determinadas consultas serán realizadas frecuentemente, por ejemplo:
+
+- rutas;
+- destinos;
+- horarios;
+- información de servicios;
+- disponibilidad de información no crítica.
+
+Se utilizará **Redis** para reducir consultas repetitivas a PostgreSQL cuando sea apropiado.
+
+La caché no será la fuente principal de verdad para las operaciones críticas de reserva.
+
+```text
+Cliente
+   ↓
+API
+   ↓
+Redis
+   │
+   ├── Existe → responder
+   │
+   └── No existe
+          ↓
+      PostgreSQL
+          ↓
+       Redis
+```
+
+**Impacto:** rendimiento, disponibilidad y estrategia de invalidación de caché.
+
+---
+
+### DA12 — Trazabilidad
+
+Las operaciones críticas deberán poder reconstruirse posteriormente.
+
+Se deberá identificar como mínimo:
+
+- usuario;
+- rol;
+- empresa;
+- agencia;
+- operación;
+- fecha y hora;
+- recurso afectado;
+- resultado.
+
+**Impacto:** auditoría, almacenamiento de eventos y registros estructurados.
+
+---
+
+## 3. Relación entre drivers y mecanismos arquitectónicos
+
+| Driver | Mecanismo arquitectónico |
+|---|---|
+| **DA01 - Concurrencia de usuarios** | API REST, control de concurrencia y escalabilidad horizontal. |
+| **DA02 - Evitar sobreventa** | Transacciones, restricciones de BD y control de concurrencia. |
+| **DA03 - Consistencia** | Transacciones, estados controlados y validación de operaciones. |
+| **DA04 - Aislamiento** | RBAC + ámbito empresa/agencia + autorización en backend. |
+| **DA05 - Escalabilidad** | Monolito modular, separación de módulos y escalamiento de infraestructura. |
+| **DA06 - Rendimiento** | Redis, optimización de consultas y procesamiento asíncrono. |
+| **DA07 - Disponibilidad común** | Fuente transaccional única para canales web y presencial. |
+| **DA08 - Reserva temporal** | Estados de reserva, expiración y tareas programadas. |
+| **DA09 - Pagos** | Adapter + Culqi + validación de resultado/webhook. |
+| **DA10 - Notificaciones** | RabbitMQ + consumidor de eventos + WhatsApp API. |
+| **DA11 - Consultas frecuentes** | Redis como caché. |
+| **DA12 - Auditoría** | Registro de eventos y operaciones críticas. |
+| **DA13 - Integraciones** | Interfaces y adaptadores externos. |
+| **DA14 - Mantenibilidad** | Monolito modular + Clean Architecture. |
+
+---
+
+## 4. Priorización de drivers
+
+| Prioridad | Drivers |
+|---|---|
+| **Crítica** | DA02, DA03, DA04 |
+| **Alta** | DA01, DA05, DA06, DA08, DA09, DA10 |
+| **Media-Alta** | DA07, DA11, DA12, DA13, DA14 |
+
+Los drivers críticos serán considerados como restricciones principales para la definición de la arquitectura.
+
+---
+
+## 5. Trazabilidad inicial
+
+Los drivers arquitectónicos se derivan de los elementos previamente definidos:
+
+```text
+Necesidad del negocio
+        ↓
+Actores
+        ↓
+Historias de usuario
+        ↓
+Requisitos funcionales
+        ↓
+Atributos de calidad
+        ↓
+Restricciones
+        ↓
+Drivers arquitectónicos
+        ↓
+Decisiones arquitectónicas
+        ↓
+Arquitectura de la solución
+```
+
+Esta trazabilidad permitirá justificar por qué cada decisión arquitectónica responde a una necesidad concreta del sistema.
+
+---
+
+## 6. Aspectos que deberán resolverse en la arquitectura
+
+Los siguientes aspectos deberán ser definidos en la siguiente etapa:
+
+1. Estrategia concreta de control de concurrencia para las reservas.
+2. Modelo de estados de una reserva.
+3. Estrategia de expiración automática de reservas.
+4. Estrategia de caché con Redis.
+5. Diseño de la cola de eventos con RabbitMQ.
+6. Integración de Culqi mediante Adapter.
+7. Integración de WhatsApp mediante procesamiento asíncrono.
+8. Modelo de aislamiento multiempresa y multiagencia.
+9. Estrategia de autenticación y autorización.
+10. Organización modular de la aplicación.
+11. Estrategia de despliegue y escalabilidad.
+12. Monitoreo, auditoría y recuperación ante fallos.
+
+Estos puntos serán utilizados como entrada para las decisiones arquitectónicas y el diseño de la arquitectura inicial.

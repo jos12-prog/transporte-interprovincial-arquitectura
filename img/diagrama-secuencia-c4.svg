@@ -92,11 +92,11 @@
   <!-- 6. IPaymentPort -->
   <rect x="715" y="60" width="110" height="38" fill="#faf5ff" stroke="#7c3aed" class="box-part" />
   <text x="770" y="76" class="text-p-name" fill="#581c87">:IPaymentPort</text>
-  <text x="770" y="89" class="text-p-sub">StripePaymentAdapter</text>
+  <text x="770" y="89" class="text-p-sub">CulqiPaymentAdapter</text>
 
   <!-- 7. Pasarela de pago -->
   <rect x="835" y="60" width="120" height="38" fill="#f8fafc" stroke="#94a3b8" class="box-part" />
-  <text x="895" y="76" class="text-p-name" fill="#334155">Pasarela de pago</text>
+  <text x="895" y="76" class="text-p-name" fill="#334155">Culqi (EXT01)</text>
   <text x="895" y="89" class="text-p-sub">sistema externo</text>
 
   <!-- 8. IReservationRepository -->

@@ -127,19 +127,20 @@
   <!-- ================= FILA 2 DE MÓDULOS (4 COLUMNAS) ================= -->
 
   <!-- 5. Auditoría y Notificaciones (MI08) -->
+  <!-- 5. Auditoría y Notificaciones (MI07) -->
   <g id="mod-auditoria">
     <rect x="115" y="565" width="185" height="68" class="box-component" />
     <text x="207.5" y="585" class="text-m-title">Auditoría y Notificaciones</text>
-    <text x="207.5" y="600" class="text-m-tech">[Componente: módulo MI08]</text>
-    <text x="207.5" y="616" class="text-m-desc">Trazabilidad y despacho de avisos</text>
+    <text x="207.5" y="600" class="text-m-tech">[Componente: módulo MI07]</text>
+    <text x="207.5" y="616" class="text-m-desc">Trazabilidad y eventos WhatsApp</text>
   </g>
 
-  <!-- 6. Encomiendas (MI06) -->
-  <g id="mod-encomiendas">
+  <!-- 6. Consultas y Reportes (MI06) -->
+  <g id="mod-consultas">
     <rect x="325" y="565" width="185" height="68" class="box-component" />
-    <text x="417.5" y="585" class="text-m-title">Encomiendas</text>
+    <text x="417.5" y="585" class="text-m-title">Consultas y Reportes</text>
     <text x="417.5" y="600" class="text-m-tech">[Componente: módulo MI06]</text>
-    <text x="417.5" y="616" class="text-m-desc">Recepción, guías y entregas</text>
+    <text x="417.5" y="616" class="text-m-desc">Búsqueda rápida y reportes</text>
   </g>
 
   <!-- 7. Reservas y Pasajes (MI04) -->
@@ -147,7 +148,7 @@
     <rect x="535" y="565" width="185" height="68" class="box-component" />
     <text x="627.5" y="585" class="text-m-title">Reservas y Pasajes</text>
     <text x="627.5" y="600" class="text-m-tech">[Componente: módulo MI04]</text>
-    <text x="627.5" y="616" class="text-m-desc">Disponibilidad, retención y asientos</text>
+    <text x="627.5" y="616" class="text-m-desc">Disponibilidad, HELD y asientos</text>
   </g>
 
   <!-- 8. Ventas y Pagos (MI05) -->
@@ -155,12 +156,12 @@
     <rect x="745" y="565" width="185" height="68" class="box-component" />
     <text x="837.5" y="585" class="text-m-title">Ventas y Pagos</text>
     <text x="837.5" y="600" class="text-m-tech">[Componente: módulo MI05]</text>
-    <text x="837.5" y="616" class="text-m-desc">Registro de ventas y cobros</text>
+    <text x="837.5" y="616" class="text-m-desc">Registro de ventas y Culqi</text>
   </g>
 
-  <!-- Conexión: Encomiendas -> Empresas y Agencias -->
+  <!-- Conexión: Consultas -> Empresas y Agencias -->
   <path d="M 417.5 565 L 417.5 483" class="conn-line" marker-end="url(#arrow)" />
-  <text x="417.5" y="528" class="conn-label">Consulta agencias y tarifas</text>
+  <text x="417.5" y="528" class="conn-label">Consulta agencias y rutas</text>
 
   <!-- Conexión: Reservas y Pasajes -> Transporte y Programación -->
   <path d="M 627.5 565 L 627.5 483" class="conn-line" marker-end="url(#arrow)" />
@@ -192,9 +193,9 @@
   <!-- Proveedor de notificaciones -->
   <g id="ext-notificaciones">
     <rect x="1030" y="545" width="190" height="68" class="box-ext" />
-    <text x="1125" y="570" class="text-c-title">Proveedor de notificaciones</text>
+    <text x="1125" y="570" class="text-c-title">WhatsApp Cloud API</text>
     <text x="1125" y="585" class="text-c-tech">[Sistema externo · EXT02]</text>
-    <text x="1125" y="600" class="text-c-desc">Entrega correos y SMS</text>
+    <text x="1125" y="600" class="text-c-desc">Notificaciones y alertas</text>
   </g>
 
   <!-- Conexión: Auditoría y Notificaciones -> Proveedor de Notificaciones -->
@@ -210,7 +211,7 @@
     <text x="1125" y="705" class="text-c-desc">Comprobantes y fotos de buses</text>
   </g>
 
-  <!-- Conexión: Encomiendas/Empresas -> Almacén de objetos -->
+  <!-- Conexión: Auditoría / Empresas -> Almacén / RabbitMQ -->
   <path d="M 930 615 L 1005 615 L 1005 684 L 1030 684" class="conn-line" marker-end="url(#arrow)" />
   <text x="970" y="635" class="conn-label">Archivos</text>
   <text x="970" y="647" class="conn-protocol">[HTTPS/S3]</text>

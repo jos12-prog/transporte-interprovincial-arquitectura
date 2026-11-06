@@ -20,10 +20,10 @@ Su objetivo principal es definir de forma explícita el **límite del sistema de
 
 | ID | Actor | Responsabilidades en el Diagrama | Verbo de Interacción |
 |---|---|---|:---:|
-| **ACT01** | **Pasajero / Cliente** | Consulta viajes, reserva pasajes y gestiona encomiendas. | **Utiliza** |
-| **ACT02** | **Agente / Vendedor** | Ventas presenciales, reservas y operaciones de encomiendas en ventanilla. | **Opera** |
-| **ACT03** | **Administrador de Agencia** | Gestiona servicios y operaciones de su empresa de transporte. | **Administra** |
-| **ACT04** | **Superadministrador** | Administra empresas, accesos y supervisa la plataforma globalmente. | **Supervisa y configura** |
+| **ACT01** | **Pasajero** | Consulta rutas, horarios, tarifas, reserva pasajes y realiza pagos en línea. | **Utiliza** |
+| **ACT02** | **Agente / Vendedor** | Atiende ventas presenciales, reservas y emite pasajes en ventanilla de su agencia. | **Opera** |
+| **ACT03** | **Administrador de Agencia** | Gestiona rutas, horarios, servicios, flota y supervisa la operación de sus agencias autorizadas. | **Administra** |
+| **ACT04** | **Superadministrador** | Administra empresas de transporte, agencias, usuarios y supervisa la plataforma globalmente. | **Supervisa y configura** |
 
 ---
 
@@ -31,9 +31,9 @@ Su objetivo principal es definir de forma explícita el **límite del sistema de
 
 * **Límite del Sistema:** Frontera lógica y de despliegue que delimita la responsabilidad directa del software desarrollado.
 * **Sistema Central:** **Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial**
-  * **Consulta de servicios · Reservas y pasajes:** Búsqueda en tiempo real de itinerarios, retención temporal de asientos y emisión de pasajes evitando sobreventas.
-  * **Ventas y pagos · Gestión de encomiendas:** Registro de ventas físicas y electrónicas, control de guías, recepción, despacho y seguimiento de encomiendas.
-  * **Administración multiempresa:** Aislamiento y control de datos operativos para múltiples empresas y agencias de transporte interprovincial.
+  * **Consulta de servicios · Reservas y pasajes:** Búsqueda en tiempo real de itinerarios, retención temporal de asientos (estado HELD por 10 minutos) y emisión de pasajes garantizando cero sobreventa.
+  * **Ventas y pagos:** Registro de ventas presenciales y cobros electrónicos verificados mediante pasarela de pagos.
+  * **Administración multiempresa y multiagencia:** Aislamiento y control de datos operativos para múltiples empresas y sus respectivas agencias en una misma base de datos compartida.
 
 ---
 
@@ -41,16 +41,16 @@ Su objetivo principal es definir de forma explícita el **límite del sistema de
 
 | Sistema Externo | Responsabilidad en el Diagrama | Interacción con la Plataforma |
 |---|---|---|
-| **Pasarela de Pagos** | Procesamiento y verificación de pagos electrónicos. | La plataforma **solicita y verifica pagos** mediante transacciones seguras y confirmaciones idempotentes. |
-| **Proveedor de Notificaciones** | Entrega de comunicaciones a usuarios y clientes. | La plataforma **solicita notificaciones** de boletos digitales, confirmaciones y avisos de encomiendas. |
+| **Culqi (Pasarela de Pagos)** | Procesamiento y verificación de pagos electrónicos (EXT01). | La plataforma **solicita y verifica pagos** mediante transacciones seguras y adaptadores (`IPaymentGateway`). |
+| **WhatsApp Business Cloud API** | Entrega de comunicaciones directas a pasajeros (EXT02). | La plataforma **solicita notificaciones** de confirmaciones, pasajes emitidos, recordatorios y alertas preventivas de alta demanda. |
 
 ---
 
 ## 6. Descripción de las Interacciones
 
-1. **Pasajero / Cliente → Plataforma (Utiliza):** El usuario final accede mediante navegador web o móvil para buscar rutas, reservar asientos disponibles, pagar y dar seguimiento a sus encomiendas.
-2. **Agente / Vendedor → Plataforma (Opera):** El personal de agencia interactúa con la interfaz de ventanilla para registrar ventas directas de pasajes, gestionar reservas presenciales y recepcionar/entregar encomiendas.
-3. **Administrador de Agencia → Plataforma (Administra):** Configura la flota de buses, asigna choferes, define tarifas y horarios, y supervisa la operación diaria de su empresa.
-4. **Superadministrador → Plataforma (Supervisa y configura):** Da de alta empresas de transporte, administra cuentas de usuario, audita eventos y mantiene los parámetros globales del sistema.
-5. **Plataforma → Pasarela de Pagos (Solicita y verifica pagos):** Solicita el cobro electrónico y valida las confirmaciones bancarias antes de emitir definitivamente los pasajes.
-6. **Plataforma → Proveedor de Notificaciones (Solicita notificaciones):** Despacha mensajes por correo electrónico o SMS con comprobantes y estados de viaje de manera desacoplada.
+1. **Pasajero → Plataforma (Utiliza):** El usuario final accede mediante navegador web o móvil para buscar rutas, seleccionar asientos o cupos, realizar reservas temporales y pagar en línea.
+2. **Agente / Vendedor → Plataforma (Opera):** El personal de agencia interactúa con la interfaz web de ventanilla para consultar disponibilidad compartida, registrar reservas presenciales, procesar cobros y emitir pasajes.
+3. **Administrador de Agencia → Plataforma (Administra):** Configura frecuencias de viajes, unidades de transporte (buses, combis, minivanes), tarifas, horarios y supervisa las ventas y ocupación de sus agencias asignadas.
+4. **Superadministrador → Plataforma (Supervisa y configura):** Registra empresas de transporte, activa o desactiva agencias, asigna administradores, audita eventos y mantiene parámetros globales del sistema.
+5. **Plataforma → Culqi (Solicita y verifica pagos):** Solicita el cobro electrónico y valida el resultado de la transacción antes de confirmar definitivamente la reserva.
+6. **Plataforma → WhatsApp Business Cloud API (Solicita notificaciones):** Despacha confirmaciones de reserva, pasajes digitales emitidos, recordatorios y alertas preventivas de forma desacoplada y asíncrona.

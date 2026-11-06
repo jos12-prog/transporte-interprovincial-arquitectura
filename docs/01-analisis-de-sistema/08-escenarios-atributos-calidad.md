@@ -1,153 +1,216 @@
-# 08. Escenarios de Atributos de Calidad
+# Escenarios de Atributos de Calidad
 
-## 1. Descripción
+Los escenarios de atributos de calidad describen situaciones concretas y verificables que permitirán evaluar el comportamiento de la Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial en Ayacucho.
 
-Los escenarios de calidad permiten evaluar cómo debe responder la Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial ante situaciones que afectan su funcionamiento.
+Cada escenario identifica la fuente del estímulo, el evento que ocurre, el componente afectado, las condiciones de ejecución, la respuesta esperada y una medida cuantificable para su posterior validación mediante pruebas.
 
-Cada escenario describe una situación concreta, la respuesta esperada y una medida verificable.
+Los valores cuantitativos establecidos son objetivos iniciales y podrán ser ajustados cuando se disponga del entorno definitivo de pruebas.
 
-## 2. Escenarios de calidad
+---
 
-### EC01 — Consistencia de reservas simultáneas
-
-**Atributo:** AC01 — Consistencia e integridad  
-**Driver:** DA01 — Consistencia de reservas y pagos
+## EQ-01. Rendimiento: consulta de viajes
 
 | Elemento | Descripción |
 |---|---|
-| Fuente | Dos o más pasajeros o agentes. |
-| Estímulo | Intentan reservar simultáneamente el último asiento o cupo disponible de un viaje. |
-| Entorno | Sistema operativo con solicitudes concurrentes. |
-| Artefacto | Módulo de reservas y base de datos. |
-| Respuesta | El sistema confirma únicamente las reservas que respetan la disponibilidad y rechaza las restantes. |
-| Medida | Cero asientos duplicados y cero sobreventas en las pruebas de concurrencia. |
+| **Atributo de calidad** | Rendimiento |
+| **Fuente del estímulo** | Pasajeros y agentes que consultan viajes disponibles. |
+| **Estímulo** | Se realizan múltiples consultas simultáneas de rutas, horarios y servicios disponibles. |
+| **Artefacto** | API REST, módulo de consulta de servicios, Redis y PostgreSQL. |
+| **Entorno** | Operación normal y periodos de alta demanda, como feriados o festividades. |
+| **Respuesta esperada** | El sistema devuelve los servicios disponibles sin errores y utiliza la caché cuando corresponda. |
+| **Medida de la respuesta** | El 95 % de las consultas deberá responder en **2 segundos o menos**, con menos del **1 % de errores técnicos**, durante una prueba con al menos 200 usuarios concurrentes. |
+| **Verificación** | Ejecutar pruebas de carga y registrar tiempos de respuesta, errores y usuarios concurrentes. |
+| **Drivers relacionados** | DA01, DA06, DA11 |
+| **Estado** | Pendiente de validación en el entorno de pruebas. |
 
-### EC02 — Seguridad y aislamiento multiempresa
+---
 
-**Atributo:** AC02 — Seguridad  
-**Driver:** DA02 — Seguridad y aislamiento multiempresa
-
-| Elemento | Descripción |
-|---|---|
-| Fuente | Usuario autenticado de una empresa. |
-| Estímulo | Intenta consultar o modificar información privada de otra empresa sin autorización. |
-| Entorno | Operación normal del sistema. |
-| Artefacto | API, autorización y acceso a datos. |
-| Respuesta | El sistema deniega la operación y evita exponer información no autorizada. |
-| Medida | El 100 % de las solicitudes no autorizadas evaluadas en las pruebas de aislamiento deben ser rechazadas. |
-
-### EC03 — Rendimiento de búsqueda de viajes
-
-**Atributo:** AC03 — Rendimiento  
-**Driver:** DA03 — Rendimiento de consultas y disponibilidad
+## EQ-02. Concurrencia: reserva simultánea del mismo asiento
 
 | Elemento | Descripción |
 |---|---|
-| Fuente | Pasajeros. |
-| Estímulo | Realizan búsquedas por origen, destino y fecha. |
-| Entorno | Carga concurrente definida para las pruebas. |
-| Artefacto | API de búsqueda y base de datos. |
-| Respuesta | El sistema muestra empresas, horarios, tarifas y disponibilidad correspondientes. |
-| Medida | Meta inicial: al menos el 95 % de las consultas responde en 3 segundos o menos, bajo la carga de prueba acordada. |
+| **Atributo de calidad** | Concurrencia y consistencia |
+| **Fuente del estímulo** | Pasajeros y agentes que intentan reservar simultáneamente. |
+| **Estímulo** | Dos o más usuarios intentan reservar el mismo asiento o cupo del mismo servicio al mismo tiempo. |
+| **Artefacto** | Módulo de Reservas, módulo de Disponibilidad y PostgreSQL. |
+| **Entorno** | Servicio con disponibilidad limitada y múltiples solicitudes concurrentes. |
+| **Respuesta esperada** | El sistema permite confirmar el recurso únicamente a una operación válida y rechaza las demás sin generar sobreventa. |
+| **Medida de la respuesta** | En el 100 % de las pruebas, un mismo asiento o cupo deberá tener como máximo **una reserva confirmada**. No deberán existir registros de sobreventa. |
+| **Verificación** | Ejecutar pruebas concurrentes sobre el mismo recurso y comprobar el estado final de reservas y disponibilidad en PostgreSQL. |
+| **Drivers relacionados** | DA01, DA02, DA03, DA07 |
+| **Estado** | Pendiente de validación. |
 
-### EC04 — Disponibilidad y recuperación
+---
 
-**Atributos:** AC04 — Disponibilidad; AC08 — Recuperabilidad  
-**Driver:** DA04 — Disponibilidad y recuperación
-
-| Elemento | Descripción |
-|---|---|
-| Fuente | Fallo de infraestructura o aplicación. |
-| Estímulo | Se interrumpe el servicio o se requiere recuperar información. |
-| Entorno | Operación normal o procedimiento de recuperación. |
-| Artefacto | Backend, base de datos y respaldos. |
-| Respuesta | Se detecta el fallo, se ejecuta el procedimiento de recuperación y se verifica la integridad de los datos. |
-| Medida | Meta inicial: RTO máximo de 4 horas y RPO máximo de 1 hora, sujetos a validación según infraestructura y presupuesto. |
-
-### EC05 — Escalabilidad de la plataforma
-
-**Atributo:** AC05 — Escalabilidad  
-**Driver:** DA05 — Escalabilidad del sistema
+## EQ-03. Seguridad: aislamiento entre empresas y agencias
 
 | Elemento | Descripción |
 |---|---|
-| Fuente | Crecimiento de usuarios y empresas. |
-| Estímulo | Aumenta la cantidad de búsquedas y operaciones simultáneas. |
-| Entorno | Pruebas de carga con una configuración inicial y otra ampliada. |
-| Artefacto | Backend e infraestructura. |
-| Respuesta | La solución permite aumentar la capacidad de procesamiento sin modificar las reglas de negocio. |
-| Medida | Verificar que una configuración ampliada soporte mayor carga manteniendo los objetivos de rendimiento e integridad establecidos. |
+| **Atributo de calidad** | Seguridad y aislamiento de información |
+| **Fuente del estímulo** | Administrador de Agencia o Agente/Vendedor. |
+| **Estímulo** | Un usuario intenta consultar o modificar información perteneciente a otra empresa o agencia. |
+| **Artefacto** | API REST, autenticación, autorización y módulos de negocio. |
+| **Entorno** | Plataforma multiempresa con varias agencias registradas en una misma base de datos. |
+| **Respuesta esperada** | El backend rechaza la operación no autorizada y no devuelve información perteneciente a otra organización. |
+| **Medida de la respuesta** | El **100 % de los intentos no autorizados** incluidos en las pruebas deberán ser rechazados y no deberán exponer información de otra empresa o agencia. |
+| **Verificación** | Ejecutar pruebas de autorización utilizando diferentes roles, empresas y agencias. |
+| **Drivers relacionados** | DA04, DA05, DA06 |
+| **Estado** | Pendiente de validación. |
 
-### EC06 — Mantenibilidad y evolución modular
+---
 
-**Atributo:** AC06 — Mantenibilidad  
-**Driver:** DA06 — Mantenibilidad y evolución modular
-
-| Elemento | Descripción |
-|---|---|
-| Fuente | Equipo de desarrollo. |
-| Estímulo | Se solicita modificar una política de encomiendas. |
-| Entorno | Desarrollo y mantenimiento. |
-| Artefacto | Módulos de negocio y pruebas. |
-| Respuesta | La modificación se realiza principalmente en el módulo correspondiente, respetando sus interfaces. |
-| Medida | Las pruebas automatizadas de los módulos afectados y las pruebas de regresión deben completarse satisfactoriamente. |
-
-### EC07 — Integridad de confirmaciones de pago
-
-**Atributo:** AC01 — Consistencia e integridad  
-**Driver:** DA01 — Consistencia de reservas y pagos
+## EQ-04. Disponibilidad: continuidad de las operaciones críticas
 
 | Elemento | Descripción |
 |---|---|
-| Fuente | Pasarela de pago externa. |
-| Estímulo | Envía dos o más veces la misma confirmación de pago. |
-| Entorno | Procesamiento normal de notificaciones externas. |
-| Artefacto | Módulo de pagos y reservas. |
-| Respuesta | El sistema verifica el pago y procesa su confirmación una sola vez. |
-| Medida | Cero confirmaciones o registros de pago duplicados en las pruebas de idempotencia. |
+| **Atributo de calidad** | Disponibilidad |
+| **Fuente del estímulo** | Pasajeros, agentes y administradores. |
+| **Estímulo** | Los usuarios intentan consultar o realizar operaciones durante periodos de alta demanda o ante una falla controlada de un componente secundario. |
+| **Artefacto** | API REST, aplicación, PostgreSQL, Redis y RabbitMQ. |
+| **Entorno** | Sistema publicado y monitoreado durante una operación normal o de alta demanda. |
+| **Respuesta esperada** | El sistema mantiene disponibles las operaciones críticas que no dependen del componente afectado y comunica de forma controlada las operaciones temporalmente no disponibles. |
+| **Medida de la respuesta** | Alcanzar una disponibilidad mensual objetivo de **99,5 %** para las operaciones críticas. |
+| **Verificación** | Revisar registros de monitoreo, errores, interrupciones y tiempo total de disponibilidad. |
+| **Drivers relacionados** | DA05, DA06, DA10, DA15 |
+| **Estado** | Pendiente de validación en producción o entorno de simulación. |
 
-### EC08 — Trazabilidad de encomiendas
+---
 
-**Atributo:** AC07 — Auditabilidad  
-**Driver relacionado:** DA06 — Mantenibilidad y evolución modular
+## EQ-05. Reserva temporal: liberación automática del asiento
 
 | Elemento | Descripción |
 |---|---|
-| Fuente | Agente autorizado. |
-| Estímulo | Registra el despacho, llegada o entrega de una encomienda. |
-| Entorno | Operación normal de una agencia. |
-| Artefacto | Módulo de encomiendas y registros de auditoría. |
-| Respuesta | El sistema actualiza el estado y registra fecha, responsable y datos de la operación. |
-| Medida | El 100 % de los cambios de estado ejecutados durante las pruebas debe contar con su registro de trazabilidad. |
+| **Atributo de calidad** | Consistencia y gestión de recursos |
+| **Fuente del estímulo** | Pasajero que inicia una reserva pero no completa el pago. |
+| **Estímulo** | El pasajero selecciona un asiento y obtiene una reserva temporal sin completar el pago. |
+| **Artefacto** | Módulo de Reservas, disponibilidad, PostgreSQL y mecanismo de expiración. |
+| **Entorno** | El servicio tiene disponibilidad limitada y la reserva se encuentra en estado `HELD`. |
+| **Respuesta esperada** | Después del periodo establecido, la reserva pasa a `EXPIRED` y el asiento vuelve a estar disponible. |
+| **Medida de la respuesta** | La reserva deberá mantenerse durante **10 minutos** y liberarse automáticamente como máximo **30 segundos después de su expiración**. |
+| **Verificación** | Crear una reserva temporal, esperar su vencimiento y comprobar el cambio de estado y la disponibilidad del asiento. |
+| **Drivers relacionados** | DA02, DA03, DA08 |
+| **Estado** | Pendiente de validación. |
 
-## 3. Matriz de trazabilidad
+---
 
-| Escenario | Atributo | Driver | Requisitos relacionados |
+## EQ-06. Pagos: consistencia ante respuesta del proveedor
+
+| Elemento | Descripción |
+|---|---|
+| **Atributo de calidad** | Integridad y confiabilidad |
+| **Fuente del estímulo** | Pasajero que confirma el pago de una reserva. |
+| **Estímulo** | Culqi procesa una operación y devuelve una respuesta de aprobación, rechazo o error. |
+| **Artefacto** | Servicio de Pagos, Payment Adapter, módulo de Reservas y PostgreSQL. |
+| **Entorno** | Operación normal o escenario donde el proveedor externo presenta demora o error. |
+| **Respuesta esperada** | El sistema actualiza correctamente el estado del pago y de la reserva sin generar confirmaciones duplicadas. |
+| **Medida de la respuesta** | El **100 % de las operaciones** utilizadas en las pruebas deberán mantener una relación consistente entre pago, reserva y pasaje. Las notificaciones duplicadas del proveedor no deberán generar una segunda confirmación. |
+| **Verificación** | Simular aprobaciones, rechazos, errores y mensajes repetidos del proveedor y comprobar los estados finales. |
+| **Drivers relacionados** | DA03, DA09 |
+| **Estado** | Pendiente de validación con la integración real o simulada de Culqi. |
+
+---
+
+## EQ-07. Procesamiento asíncrono: notificaciones por WhatsApp
+
+| Elemento | Descripción |
+|---|---|
+| **Atributo de calidad** | Rendimiento y desacoplamiento |
+| **Fuente del estímulo** | Sistema después de confirmar una reserva o detectar una condición de notificación. |
+| **Estímulo** | Se genera un evento que requiere enviar una notificación al pasajero. |
+| **Artefacto** | Servicio de Notificaciones, RabbitMQ y WhatsApp Business Cloud API. |
+| **Entorno** | Operación normal o indisponibilidad temporal del servicio externo de WhatsApp. |
+| **Respuesta esperada** | El sistema publica el evento en RabbitMQ sin bloquear la operación principal y procesa posteriormente el envío. |
+| **Medida de la respuesta** | La confirmación de una reserva no deberá depender de la respuesta inmediata de WhatsApp. Los eventos deberán ser procesados correctamente en al menos el **99 %** de las pruebas, considerando reintentos ante fallos temporales. |
+| **Verificación** | Simular envíos exitosos, fallidos y reintentos y verificar el estado de los mensajes en la cola. |
+| **Drivers relacionados** | DA10, DA13 |
+| **Estado** | Pendiente de validación. |
+
+---
+
+## EQ-08. Caché: reducción de consultas repetitivas
+
+| Elemento | Descripción |
+|---|---|
+| **Atributo de calidad** | Rendimiento |
+| **Fuente del estímulo** | Pasajeros que consultan repetidamente rutas, horarios y servicios. |
+| **Estímulo** | Se reciben múltiples solicitudes para consultar información que cambia con poca frecuencia. |
+| **Artefacto** | API REST, Redis y PostgreSQL. |
+| **Entorno** | Periodo de alta demanda con múltiples consultas concurrentes. |
+| **Respuesta esperada** | Redis responde las consultas almacenadas en caché y evita consultas innecesarias a PostgreSQL. |
+| **Medida de la respuesta** | En las consultas configuradas para caché, al menos el **80 %** de las solicitudes repetitivas deberán ser atendidas mediante Redis durante la prueba definida. |
+| **Verificación** | Comparar solicitudes atendidas por Redis frente a consultas realizadas directamente a PostgreSQL. |
+| **Drivers relacionados** | DA06, DA11 |
+| **Estado** | Pendiente de validación. |
+
+---
+
+## EQ-09. Escalabilidad: incremento de usuarios concurrentes
+
+| Elemento | Descripción |
+|---|---|
+| **Atributo de calidad** | Escalabilidad |
+| **Fuente del estímulo** | Incremento simultáneo de pasajeros y agentes. |
+| **Estímulo** | La cantidad de solicitudes aumenta durante una festividad o periodo de alta demanda. |
+| **Artefacto** | Balanceador, instancias del backend, Redis, RabbitMQ y PostgreSQL. |
+| **Entorno** | Carga superior a la operación normal del sistema. |
+| **Respuesta esperada** | El sistema permite incrementar las instancias de la aplicación sin modificar las reglas principales del negocio. |
+| **Medida de la respuesta** | Al duplicar la capacidad de las instancias de aplicación, el sistema deberá mantener el objetivo de rendimiento definido en EQ-01 sin incremento significativo de errores. |
+| **Verificación** | Ejecutar pruebas con diferentes cantidades de instancias y comparar tiempos de respuesta, errores y capacidad procesada. |
+| **Drivers relacionados** | DA01, DA05, DA06, DA14 |
+| **Estado** | Pendiente de validación. |
+
+---
+
+## EQ-10. Auditoría: trazabilidad de operaciones críticas
+
+| Elemento | Descripción |
+|---|---|
+| **Atributo de calidad** | Auditabilidad |
+| **Fuente del estímulo** | Usuario que ejecuta una operación administrativa o comercial. |
+| **Estímulo** | Se crea, modifica, confirma o cancela una operación crítica. |
+| **Artefacto** | Módulos de Reservas, Pagos, Servicios, Administración y sistema de auditoría. |
+| **Entorno** | Operación normal de la plataforma. |
+| **Respuesta esperada** | El sistema registra quién realizó la operación, sobre qué recurso, cuándo se ejecutó y cuál fue el resultado. |
+| **Medida de la respuesta** | El **100 % de las operaciones críticas definidas** deberá generar un registro de auditoría con usuario, empresa, agencia, operación, fecha y resultado. |
+| **Verificación** | Ejecutar las operaciones críticas y comprobar la existencia e integridad de sus registros de auditoría. |
+| **Drivers relacionados** | DA04, DA12, DA13 |
+| **Estado** | Pendiente de validación. |
+
+---
+
+# 11. Resumen de escenarios
+
+| ID | Atributo | Principal riesgo evaluado | Medida principal |
 |---|---|---|---|
-| EC01 | AC01 | DA01 | RF05-RF11 |
-| EC02 | AC02 | DA02 | RF40-RF44 |
-| EC03 | AC03 | DA03 | RF01-RF04 |
-| EC04 | AC04, AC08 | DA04 | RF05-RF19, RF30-RF39 |
-| EC05 | AC05 | DA05 | RF01-RF04, RF20-RF39 |
-| EC06 | AC06 | DA06 | RF37-RF39 |
-| EC07 | AC01 | DA01 | RF13, RF14, RF19 |
-| EC08 | AC07 | DA06 | RF34-RF39 |
+| EQ-01 | Rendimiento | Lentitud en consultas | P95 ≤ 2 s |
+| EQ-02 | Concurrencia | Sobreventa | 0 sobreventas |
+| EQ-03 | Seguridad | Acceso entre agencias | 100 % rechazos no autorizados |
+| EQ-04 | Disponibilidad | Interrupción del servicio | 99,5 % |
+| EQ-05 | Consistencia | Asientos bloqueados indefinidamente | Expiración en 10 min + 30 s |
+| EQ-06 | Integridad | Pagos/reservas inconsistentes | 0 confirmaciones duplicadas |
+| EQ-07 | Asincronía | Fallo de WhatsApp bloqueando operaciones | ≥99 % eventos procesados |
+| EQ-08 | Rendimiento | Sobrecarga de BD | ≥80 % consultas repetitivas desde caché |
+| EQ-09 | Escalabilidad | Incremento de usuarios | Mantener objetivos de EQ-01 |
+| EQ-10 | Auditoría | Falta de trazabilidad | 100 % operaciones críticas auditadas |
 
-## 4. Validación de escenarios
+---
 
-Los escenarios serán evaluados mediante:
+# 12. Relación con la arquitectura
 
-- Pruebas de concurrencia para reservas y pagos.
-- Pruebas de autorización y aislamiento multiempresa.
-- Pruebas de carga y rendimiento.
-- Simulaciones de fallos y restauración.
-- Pruebas de integración y regresión.
-- Verificación de registros de auditoría.
+Los escenarios definidos serán utilizados posteriormente para validar las decisiones arquitectónicas.
 
-Las metas iniciales deberán revisarse según el volumen esperado de operaciones, los recursos disponibles y los resultados de las pruebas.
+```text
+Drivers arquitectónicos
+          ↓
+Decisiones arquitectónicas
+          ↓
+Arquitectura de solución
+          ↓
+Escenarios de calidad
+          ↓
+Pruebas
+          ↓
+Resultados medidos
+```
 
-## 5. Conclusión
-
-Los escenarios EC01-EC08 permiten evaluar los principales riesgos arquitectónicos de la plataforma.
-
-Se prioriza la consistencia de reservas, la seguridad multiempresa y la correcta confirmación de pagos, sin descuidar el rendimiento, la recuperación, la escalabilidad y la mantenibilidad.
+De esta manera, la arquitectura no se plantea únicamente como una estructura conceptual, sino como una solución que deberá demostrar mediante pruebas que puede responder a los principales desafíos del sistema: **concurrencia, sobreventa, aislamiento multiempresa, rendimiento, disponibilidad, pagos, procesamiento asíncrono, caché, escalabilidad y trazabilidad**.

@@ -72,10 +72,10 @@
   <rect x="420" y="377" width="150" height="24" class="pill-bg" />
   <text x="495" y="389" class="pill-text">EF Core / Npgsql [TCP]</text>
 
-  <!-- Backend API -> Object Storage -->
+  <!-- Backend API -> Redis / RabbitMQ -->
   <path d="M 725 355 L 725 425" class="conn-line" marker-end="url(#arrow-down)" />
   <rect x="650" y="377" width="150" height="24" class="pill-bg" />
-  <text x="725" y="389" class="pill-text">S3 API / REST [HTTPS]</text>
+  <text x="725" y="389" class="pill-text">Redis / AMQP [TCP]</text>
 
   <!-- Backend API -> Pasarela de Pagos -->
   <path d="M 830 260 L 935 260" class="conn-line" marker-end="url(#arrow-blue)" />
@@ -107,8 +107,8 @@
     <rect x="385" y="215" width="450" height="140" class="card-api" />
     <text x="610" y="242" class="container-title" fill="#14532d">BACKEND API (MONOLITO MODULAR)</text>
     <text x="610" y="260" class="container-tech" fill="#15803d">[Contenedor: ASP.NET Core 8 · C# · Clean Architecture]</text>
-    <text x="610" y="282" class="container-desc" fill="#166534">Expone endpoints REST. Ejecuta la lógica y reglas de los 8 módulos (MI01–MI08):</text>
-    <text x="610" y="300" class="container-desc" fill="#166534">Reservas sin sobreventa, emisión de pasajes, encomiendas, ventas y flota.</text>
+    <text x="610" y="282" class="container-desc" fill="#166534">Expone endpoints REST. Ejecuta la lógica y reglas de los 7 módulos (MI01–MI07):</text>
+    <text x="610" y="300" class="container-desc" fill="#166534">Reservas sin sobreventa (HELD 10 min), emisión de pasajes, ventas y flota.</text>
     <text x="610" y="322" class="container-desc" fill="#166534">Aplica control transaccional, seguridad multiempresa y autenticación Identity/JWT.</text>
   </g>
 
@@ -120,20 +120,20 @@
     <text x="492.5" y="488" class="container-tech" fill="#b45309">[Contenedor: PostgreSQL 16]</text>
     <text x="492.5" y="512" class="container-desc" fill="#92400e">Fuente única de verdad ACID.</text>
     <text x="492.5" y="528" class="container-desc" fill="#92400e">Almacena viajes, asientos,</text>
-    <text x="492.5" y="544" class="container-desc" fill="#92400e">reservas, pagos, encomiendas</text>
+    <text x="492.5" y="544" class="container-desc" fill="#92400e">reservas, pagos, usuarios</text>
     <text x="492.5" y="560" class="container-desc" fill="#92400e">y pistas de auditoría.</text>
   </g>
 
-  <!-- ================= CONTENEDOR 4: ALMACENAMIENTO DE OBJETOS ================= -->
+  <!-- ================= CONTENEDOR 4: CACHÉ Y COLA ================= -->
   <g id="contenedor-storage">
     <rect x="620" y="425" width="215" height="150" class="card-storage" />
-    <text x="727.5" y="452" class="container-title" fill="#1e293b">ALMACENAMIENTO</text>
-    <text x="727.5" y="468" class="container-title" fill="#1e293b">DE OBJETOS</text>
-    <text x="727.5" y="488" class="container-tech" fill="#475569">[Contenedor: Object Storage S3/Blob]</text>
-    <text x="727.5" y="512" class="container-desc" fill="#334155">Almacén binario desacoplado.</text>
-    <text x="727.5" y="528" class="container-desc" fill="#334155">Guarda comprobantes de pago,</text>
-    <text x="727.5" y="544" class="container-desc" fill="#334155">fotos de buses, guías de</text>
-    <text x="727.5" y="560" class="container-desc" fill="#334155">encomienda y documentos.</text>
+    <text x="727.5" y="452" class="container-title" fill="#1e293b">REDIS Y RABBITMQ</text>
+    <text x="727.5" y="468" class="container-title" fill="#1e293b">SOPORTE</text>
+    <text x="727.5" y="488" class="container-tech" fill="#475569">[Contenedores: Redis / RabbitMQ]</text>
+    <text x="727.5" y="512" class="container-desc" fill="#334155">Redis: caché de lectura</text>
+    <text x="727.5" y="528" class="container-desc" fill="#334155">rápida para catálogos.</text>
+    <text x="727.5" y="544" class="container-desc" fill="#334155">RabbitMQ: cola durable</text>
+    <text x="727.5" y="560" class="container-desc" fill="#334155">para eventos asíncronos.</text>
   </g>
 
   <!-- ================= ACTORES (IZQUIERDA) ================= -->
@@ -141,9 +141,9 @@
   <!-- ACT01 -->
   <g id="act01">
     <rect x="20" y="20" width="215" height="70" class="card-actor" />
-    <text x="127.5" y="43" class="actor-title">ACT01 · PASAJERO / CLIENTE</text>
-    <text x="127.5" y="63" class="actor-desc">Consulta viajes, reserva pasajes</text>
-    <text x="127.5" y="77" class="actor-desc">y gestiona encomiendas</text>
+    <text x="127.5" y="43" class="actor-title">ACT01 · PASAJERO</text>
+    <text x="127.5" y="63" class="actor-desc">Consulta viajes, reserva y</text>
+    <text x="127.5" y="77" class="actor-desc">paga pasajes en línea</text>
   </g>
 
   <!-- ACT02 -->
@@ -151,7 +151,7 @@
     <rect x="20" y="120" width="215" height="70" class="card-actor" />
     <text x="127.5" y="143" class="actor-title">ACT02 · AGENTE / VENDEDOR</text>
     <text x="127.5" y="163" class="actor-desc">Ventas presenciales, reservas</text>
-    <text x="127.5" y="177" class="actor-desc">y operaciones de encomiendas</text>
+    <text x="127.5" y="177" class="actor-desc">y emisión en ventanilla</text>
   </g>
 
   <!-- ACT03 -->
@@ -175,7 +175,7 @@
   <!-- Pasarela de Pagos -->
   <g id="ext-pagos">
     <rect x="935" y="215" width="280" height="90" class="card-ext" />
-    <text x="1075" y="242" class="actor-title">PASARELA DE PAGOS</text>
+    <text x="1075" y="242" class="actor-title">CULQI (PAGOS)</text>
     <text x="1075" y="260" class="container-tech" fill="#2563eb">[Sistema Externo · EXT01]</text>
     <text x="1075" y="282" class="actor-desc">Procesamiento y verificación</text>
     <text x="1075" y="296" class="actor-desc">de pagos electrónicos</text>
@@ -184,9 +184,9 @@
   <!-- Proveedor de Notificaciones -->
   <g id="ext-notificaciones">
     <rect x="935" y="350" width="280" height="90" class="card-ext" />
-    <text x="1075" y="377" class="actor-title">PROVEEDOR DE NOTIFICACIONES</text>
+    <text x="1075" y="377" class="actor-title">WHATSAPP BUSINESS CLOUD API</text>
     <text x="1075" y="395" class="container-tech" fill="#2563eb">[Sistema Externo · EXT02]</text>
-    <text x="1075" y="417" class="actor-desc">Entrega de correos electrónicos,</text>
-    <text x="1075" y="431" class="actor-desc">mensajes SMS y boletos digitales</text>
+    <text x="1075" y="417" class="actor-desc">Confirmaciones, boletos digitales,</text>
+    <text x="1075" y="431" class="actor-desc">recordatorios y alertas de demanda</text>
   </g>
 </svg>

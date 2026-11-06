@@ -84,9 +84,9 @@
     <text x="565" y="206" class="system-title">INTERPROVINCIAL</text>
 
     <text x="565" y="250" class="system-desc">Consulta de servicios · Reservas</text>
-    <text x="565" y="268" class="system-desc">y pasajes</text>
-    <text x="565" y="292" class="system-desc">Ventas y pagos · Gestión de</text>
-    <text x="565" y="310" class="system-desc">encomiendas</text>
+    <text x="565" y="268" class="system-desc">temporales (HELD) y pasajes</text>
+    <text x="565" y="292" class="system-desc">Ventas presenciales y pagos</text>
+    <text x="565" y="310" class="system-desc">electrónicos verificados</text>
     <text x="565" y="336" class="system-desc">Administración multiempresa</text>
   </g>
 
@@ -95,10 +95,10 @@
   <!-- ACT01 -->
   <g id="act01">
     <rect x="20" y="15" width="215" height="80" class="card-actor" />
-    <text x="127.5" y="40" class="actor-title">ACT01 · PASAJERO /</text>
-    <text x="127.5" y="56" class="actor-title">CLIENTE</text>
-    <text x="127.5" y="74" class="actor-desc">Consulta viajes, reserva pasajes</text>
-    <text x="127.5" y="88" class="actor-desc">y gestiona encomiendas</text>
+    <text x="127.5" y="40" class="actor-title">ACT01 · PASAJERO</text>
+    <text x="127.5" y="56" class="actor-title"></text>
+    <text x="127.5" y="74" class="actor-desc">Consulta servicios, reserva y</text>
+    <text x="127.5" y="88" class="actor-desc">paga pasajes en línea</text>
   </g>
 
   <!-- ACT02 -->
@@ -107,7 +107,7 @@
     <text x="127.5" y="165" class="actor-title">ACT02 · AGENTE /</text>
     <text x="127.5" y="181" class="actor-title">VENDEDOR</text>
     <text x="127.5" y="199" class="actor-desc">Ventas presenciales, reservas</text>
-    <text x="127.5" y="213" class="actor-desc">y operaciones de encomiendas</text>
+    <text x="127.5" y="213" class="actor-desc">y emisión en ventanilla</text>
   </g>
 
   <!-- ACT03 -->
@@ -133,7 +133,7 @@
   <!-- Pasarela de Pagos -->
   <g id="ext-pagos">
     <rect x="875" y="145" width="225" height="90" class="card-ext" />
-    <text x="987.5" y="177" class="actor-title">PASARELA DE PAGOS</text>
+    <text x="987.5" y="177" class="actor-title">CULQI (PAGOS)</text>
     <text x="987.5" y="202" class="actor-desc">Procesamiento y verificación</text>
     <text x="987.5" y="218" class="actor-desc">de pagos electrónicos</text>
   </g>
@@ -141,8 +141,8 @@
   <!-- Proveedor de Notificaciones -->
   <g id="ext-notificaciones">
     <rect x="875" y="285" width="225" height="90" class="card-ext" />
-    <text x="987.5" y="320" class="actor-title">PROVEEDOR DE</text>
+    <text x="987.5" y="315" class="actor-title">WHATSAPP CLOUD API</text>
     <text x="987.5" y="337" class="actor-title">NOTIFICACIONES</text>
-    <text x="987.5" y="358" class="actor-desc">Entrega de comunicaciones</text>
+    <text x="987.5" y="358" class="actor-desc">Comunicaciones y alertas</text>
   </g>
 </svg>

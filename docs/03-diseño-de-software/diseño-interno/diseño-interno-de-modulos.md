@@ -10,18 +10,17 @@ Su finalidad es establecer una estructura consistente para desarrollar los módu
 
 ## 2. Organización modular del backend
 
-El backend se organiza en ocho módulos funcionales:
+El backend se organiza en siete módulos funcionales (habiéndose retirado Encomiendas según la restricción RC14):
 
 | Código | Módulo | Responsabilidad |
 |---|---|---|
 | MI01 | Identidad y Acceso | Autenticación, usuarios, roles y permisos. |
 | MI02 | Empresas y Agencias | Registro y administración de empresas y agencias. |
 | MI03 | Transporte y Programación | Rutas, vehículos, horarios, tarifas y servicios. |
-| MI04 | Reservas y Pasajes | Disponibilidad, retenciones, reservas y emisión de pasajes. |
-| MI05 | Ventas y Pagos | Registro de ventas, pagos y confirmaciones verificadas. |
-| MI06 | Encomiendas | Solicitudes, recepción, despacho, seguimiento y entrega. |
-| MI07 | Consultas y Reportes | Búsqueda de servicios e información operativa. |
-| MI08 | Auditoría y Notificaciones | Trazabilidad y comunicación de eventos relevantes. |
+| MI04 | Reservas y Pasajes | Disponibilidad, retenciones temporales (HELD), reservas y emisión de pasajes. |
+| MI05 | Ventas y Pagos | Registro de ventas presenciales, pagos electrónicos (Culqi) y confirmaciones verificadas. |
+| MI06 | Consultas y Reportes | Búsqueda pública de servicios, analítica e información operativa. |
+| MI07 | Auditoría y Notificaciones | Trazabilidad inmutable y comunicación asíncrona de eventos vía WhatsApp. |
 
 Todos los módulos se ejecutan dentro de una única aplicación backend. Su separación es lógica y no implica desplegar microservicios independientes.
 
@@ -62,7 +61,6 @@ src/
     │   │   │   └── ReservationsController.cs
     │   │   └── ReservationsModule.cs
     │   ├── SalesPayments/
-    │   ├── Parcels/
     │   ├── QueriesReports/
     │   └── AuditNotifications/
     └── Shared/
@@ -353,9 +351,8 @@ Los módulos intercambian información mediante contratos internos y servicios d
 | Reservas y Pasajes | Transporte y Programación | Validar servicio y disponibilidad. |
 | Reservas y Pasajes | Ventas y Pagos | Consultar el estado de pago verificado. |
 | Ventas y Pagos | Reservas y Pasajes | Solicitar confirmación de una reserva pagada. |
-| Encomiendas | Empresas y Agencias | Consultar habilitación y políticas del servicio. |
-| Auditoría y Notificaciones | Módulos de negocio | Registrar eventos y coordinar comunicaciones. |
-| Consultas y Reportes | Módulos correspondientes | Obtener información autorizada para consultas. |
+| Auditoría y Notificaciones | Módulos de negocio | Registrar eventos y coordinar comunicaciones asíncronas vía WhatsApp. |
+| Consultas y Reportes | Módulos correspondientes | Obtener información autorizada para consultas y reportes. |
 
 La comunicación inicial es interna al monolito modular. No se requieren llamadas HTTP entre los módulos del mismo backend.
 
@@ -385,6 +382,6 @@ El diseño interno se considera consistente cuando:
 
 ## 11. Conclusión
 
-El diseño interno establece una organización consistente para los ocho módulos de la plataforma y desarrolla el módulo de Reservas y Pasajes como referencia técnica.
+El diseño interno establece una organización consistente para los siete módulos de la plataforma y desarrolla el módulo de Reservas y Pasajes como referencia técnica.
 
 La separación entre dominio, aplicación, infraestructura y presentación permite implementar las funcionalidades del sistema de manera organizada, proteger las reglas críticas del negocio y facilitar su mantenimiento y evolución.

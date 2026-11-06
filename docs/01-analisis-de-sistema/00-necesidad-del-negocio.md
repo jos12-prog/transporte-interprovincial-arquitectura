@@ -1,63 +1,31 @@
-# 00. Necesidad del Negocio
+# Necesidad del negocio
 
-## 1. ¿Qué problema queremos resolver?
+## 1. Situación actual
 
-El transporte interprovincial terrestre en la región de Ayacucho y sus conexiones interregionales (hacia Lima, Ica, Huancayo, Cusco, Apurímac, entre otros) presenta deficiencias estructurales en sus canales de atención y operación:
+En la ciudad de Ayacucho existe una oferta diversa de servicios de transporte hacia diferentes destinos, gestionados por distintas empresas y agencias ubicadas en terminales y puntos de atención como el Terminal Norte, Terminal Sur y otras agencias independientes. Cada empresa puede contar con una o varias agencias o sucursales, con horarios, rutas, tarifas y modalidades de transporte propias.
 
-1. **Venta fragmentada y presencial:** Los pasajeros se ven obligados a desplazarse físicamente a terminales terrestres o agencias dispersas para consultar horarios, precios y disponibilidad, generando congestión, colas y pérdidas de tiempo.
-2. **Falta de visibilidad de la oferta:** No existe una plataforma centralizada que permita a los usuarios comparar itinerarios, tarifas y tipos de servicio entre múltiples empresas de transporte.
-3. **Riesgo crítico de sobreventa (Overbooking):** En temporadas de alta demanda (Semana Santa, Fiestas Patrias, Carnavales, festividades patronales), la asignación simultánea de un mismo asiento o cupo en ventanillas distintas genera conflictos operativos, reclamos y sanciones ante INDECOPI y SUTRAN.
-4. **Ausencia de medios de pago digitales integrados:** Las ventas en agencias dependen mayoritariamente del efectivo, limitando el acceso de usuarios que prefieren transacciones electrónicas seguras.
-5. **Gestión manual y opaca de encomiendas:** El servicio de carga y encomiendas se registra en talonarios físicos o libros de control manuales, imposibilitando el seguimiento en tiempo real para remitentes y destinatarios y aumentando el riesgo de extravíos.
-6. **Aislamiento administrativo de las empresas:** Cada empresa y agencia opera con procesos heterogéneos, sin herramientas digitales para planificar frecuencias, gestionar flotas o auditar ingresos en tiempo real.
+Actualmente, la gestión de estos servicios se encuentra principalmente distribuida entre las diferentes agencias. La consulta de horarios, disponibilidad y reserva de pasajes puede realizarse de manera presencial o mediante llamadas telefónicas, mientras que la información de cada agencia es administrada de forma independiente. Esta situación dificulta que los pasajeros puedan consultar de manera centralizada las alternativas disponibles y comparar horarios, rutas y servicios antes de realizar una compra.
 
----
+Además, durante periodos de alta demanda asociados a festividades, feriados y temporadas de mayor movimiento de pasajeros, la cantidad de consultas y operaciones puede incrementarse considerablemente. Esto puede generar mayor presión sobre los procesos de atención, dificultades para mantener actualizada la disponibilidad de los servicios y riesgos de inconsistencias cuando diferentes canales intentan asignar simultáneamente los mismos espacios disponibles.
 
-## 2. Objetivos del Negocio que Guían el Sistema
+## 2. Problemática
 
-Para solucionar la problemática identificada, la plataforma persigue los siguientes objetivos estratégicos de negocio:
+La ausencia de una plataforma integrada para la gestión y consulta de los servicios de transporte genera dificultades tanto para los pasajeros como para las agencias.
 
-* **OBJ01 — Centralizar la oferta de servicios:** Consolidar en un único canal digital la oferta de viajes, horarios, tarifas y servicios de múltiples empresas de transporte interprovincial.
-* **OBJ02 — Habilitar reservas y ventas digitales 24/7:** Permitir a los pasajeros buscar, reservar y comprar pasajes en cualquier momento desde aplicaciones web o móviles con pasarelas de pago seguras.
-* **OBJ03 — Garantizar cero sobreventas:** Asegurar consistencia absoluta e inmediata en la retención y venta de asientos y cupos, protegiendo la reputación comercial de las empresas asociadas.
-* **OBJ04 — Digitalizar la trazabilidad de encomiendas:** Proporcionar un código único de seguimiento para cada envío, informando estados en tiempo real desde la recepción hasta la entrega.
-* **OBJ05 — Fortalecer la gestión operativa de las empresas:** Dotar a las empresas y agencias de herramientas de administración de flota, programación de viajes, control de agentes y reportes financieros.
+Para los pasajeros, la información se encuentra dispersa entre diferentes empresas y agencias, por lo que deben realizar consultas individuales para conocer horarios, rutas, tarifas y disponibilidad. Asimismo, las reservas realizadas por canales presenciales o telefónicos no necesariamente se encuentran integradas con otros canales de atención.
 
----
+Para las agencias, la administración independiente de sus operaciones dificulta mantener una visión consolidada de sus horarios, disponibilidad, reservas y ventas. Cuando una misma agencia atiende simultáneamente operaciones presenciales y digitales, existe el riesgo de que dos usuarios intenten adquirir el mismo asiento o cupo, generando inconsistencias y posibles casos de sobreventa si no existe un mecanismo adecuado de control de concurrencia.
 
-## 3. Resultados Esperados
+Esta problemática se vuelve más relevante cuando existen múltiples agencias pertenecientes a una misma empresa, debido a que se requiere administrar la información de cada sucursal de manera independiente, evitando que usuarios autorizados de una agencia puedan acceder o modificar información correspondiente a otra empresa o agencia.
 
-```mermaid
-flowchart LR
-    subgraph PROBLEMA["Problemática Actual"]
-        P1["Colas y compra presencial"]
-        P2["Sobreventa en festividades"]
-        P3["Sin seguimiento de encomiendas"]
-        P4["Múltiples terminales dispersos"]
-    end
+Asimismo, la falta de información preventiva sobre periodos de alta demanda puede dificultar que los pasajeros planifiquen sus viajes con anticipación, especialmente durante festividades y fechas en las que aumenta considerablemente el flujo de pasajeros.
 
-    subgraph SISTEMA["Plataforma Centralizada"]
-        S["Reserva Online + Encomiendas<br/>+ Gestión Multiempresa"]
-    end
+## 3. Necesidad identificada
 
-    subgraph RESULTADO["Resultados del Negocio"]
-        R1["Mayor alcance e ingresos comerciales"]
-        R2["Satisfacción y fidelización del cliente"]
-        R3["Cero reclamos por sobreventa"]
-        R4["Control operativo y auditoría 24/7"]
-    end
+Se requiere una plataforma integrada que permita centralizar la consulta y gestión de los servicios de transporte, manteniendo la separación de información entre empresas y agencias y permitiendo atender tanto las operaciones realizadas por pasajeros mediante canales digitales como las operaciones registradas presencialmente por los agentes o vendedores.
 
-    PROBLEMA --> SISTEMA --> RESULTADO
+La solución deberá permitir gestionar rutas, horarios, servicios, unidades de transporte, disponibilidad, reservas, ventas y pagos, manteniendo un control consistente de las operaciones concurrentes.
 
-    classDef prob fill:#FFEBEE,stroke:#E57373,color:#B71C1C
-    classDef sis fill:#E3F2FD,stroke:#64B5F6,color:#0D47A1
-    classDef res fill:#E8F5E9,stroke:#81C784,color:#1B5E20
-    class PROBLEMA,P1,P2,P3,P4 prob
-    class SISTEMA,S sis
-    class RESULTADO,R1,R2,R3,R4 res
-```
+También deberá proporcionar mecanismos de comunicación con los pasajeros para confirmar operaciones, informar modificaciones y emitir recordatorios o alertas preventivas ante situaciones de alta demanda relacionadas con fechas, festividades o eventos que puedan afectar la disponibilidad de los servicios.
 
-* **Mayor alcance y ventas:** Crecimiento en el volumen de pasajes vendidos al captar usuarios fuera de ventanilla.
-* **Reducción del abandono de compra:** Proceso fluido de selección de asiento y pago electrónico verificado.
-* **Eficiencia operativa regional:** Reducción de tiempos de atención en counter para ventas físicas y despachos de encomiendas.
-* **Confianza institucional:** Cumplimiento de normativas de transporte y protección al consumidor mediante comprobantes digitales y auditoría inmutable.
+La necesidad principal consiste, por tanto, en disponer de una plataforma escalable que permita integrar los procesos de las diferentes agencias, mejorar la experiencia del pasajero y mantener la consistencia, seguridad y disponibilidad de la información a medida que aumente la cantidad de usuarios y operaciones.

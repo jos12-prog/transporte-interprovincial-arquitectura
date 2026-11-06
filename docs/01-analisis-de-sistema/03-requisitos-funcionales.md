@@ -1,143 +1,246 @@
+# Requisitos Funcionales
 
+## 1. Introducción
 
-# 03. Requisitos Funcionales
+Los requisitos funcionales definen las capacidades que debe proporcionar la Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial en Ayacucho.
 
-## 1. Descripción
+Estos requisitos se derivan de las historias de usuario definidas para los actores del sistema y constituyen la base para las siguientes etapas de análisis, arquitectura, diseño e implementación.
 
-Los requisitos funcionales establecen las operaciones que debe realizar la Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial.
+La plataforma deberá permitir la operación de múltiples empresas y agencias manteniendo el aislamiento de la información y los permisos correspondientes.
 
-La plataforma centraliza los servicios de diferentes empresas y agencias, incluyendo consulta de viajes, reserva y venta de pasajes, administración de transporte y gestión de encomiendas.
-
-El acceso a las funcionalidades depende de los cuatro roles definidos y del ámbito organizacional autorizado.
+---
 
 ## 2. Requisitos funcionales
 
-### 2.1. Consulta y búsqueda de viajes
+### 2.1 Consulta y búsqueda de viajes
 
-| ID | Requisito funcional | Historia |
-|---|---|---|
-| RF01 | Permitir buscar viajes por origen, destino y fecha. | HU01 |
-| RF02 | Mostrar las empresas que ofrecen viajes para la búsqueda realizada. | HU01 |
-| RF03 | Mostrar horarios, tarifas, tipo de vehículo y disponibilidad de cada servicio. | HU02 |
-| RF04 | Permitir seleccionar un servicio y consultar sus asientos o cupos disponibles. | HU02, HU03 |
-
-### 2.2. Reservas y pasajes
-
-| ID | Requisito funcional | Historia |
-|---|---|---|
-| RF05 | Permitir registrar una reserva asociada a un pasajero y un viaje programado. | HU03 |
-| RF06 | Permitir seleccionar un asiento numerado o un cupo, según la modalidad del servicio. | HU03 |
-| RF07 | Impedir la asignación duplicada de un asiento o la sobreventa de cupos en un mismo viaje. | HU03 |
-| RF08 | Gestionar reservas temporales con vencimiento y liberación de disponibilidad. | HU03 |
-| RF09 | Permitir consultar las reservas propias y sus estados. | HU05 |
-| RF10 | Permitir solicitar cancelaciones y reprogramaciones según las condiciones aplicables. | HU06 |
-| RF11 | Actualizar la disponibilidad al confirmar, vencer, cancelar o reprogramar una reserva. | HU03, HU06 |
-| RF12 | Generar un comprobante o pasaje digital asociado a una venta confirmada. | HU04, HU05 |
-
-### 2.3. Pagos y ventas presenciales
-
-| ID | Requisito funcional | Historia |
-|---|---|---|
-| RF13 | Permitir iniciar pagos electrónicos mediante una pasarela externa. | HU04 |
-| RF14 | Verificar la confirmación del pago antes de registrar una reserva como pagada. | HU04 |
-| RF15 | Permitir al agente consultar viajes, tarifas y disponibilidad. | HU10 |
-| RF16 | Permitir registrar reservas, ventas y cobros presenciales autorizados. | HU11 |
-| RF17 | Identificar al agente y la agencia responsables de cada venta presencial. | HU11 |
-| RF18 | Permitir gestionar reservas dentro de los permisos del agente y las condiciones del servicio. | HU12 |
-| RF19 | Evitar que una misma confirmación de pago se procese más de una vez. | HU04 |
-
-### 2.4. Administración de empresas y agencias
-
-| ID | Requisito funcional | Historia |
-|---|---|---|
-| RF20 | Registrar empresas con nombre comercial, razón social, RUC, logo, fotografías, dirección, ubicación y datos de contacto. | HU21 |
-| RF21 | Registrar y administrar agencias asociadas a cada empresa. | HU22 |
-| RF22 | Activar, suspender y actualizar empresas y agencias. | HU22 |
-| RF23 | Permitir al administrador gestionar los datos operativos de su empresa y agencias autorizadas. | HU14 |
-
-### 2.5. Gestión de rutas, vehículos y programación
-
-| ID | Requisito funcional | Historia |
-|---|---|---|
-| RF24 | Registrar y administrar orígenes, destinos, rutas, recorridos y paradas aplicables. | HU15 |
-| RF25 | Configurar tarifas de pasajes por ruta o servicio de cada empresa. | HU15 |
-| RF26 | Registrar vehículos con placa, tipo, capacidad, distribución de asientos y estado operativo. | HU16 |
-| RF27 | Permitir configurar modalidades de asignación por asiento numerado o cupo. | HU16 |
-| RF28 | Programar viajes asociando empresa, ruta, fecha, horarios, tarifa y vehículo cuando corresponda. | HU17 |
-| RF29 | Permitir modificar la programación identificando reservas afectadas y conservando trazabilidad. | HU17 |
-
-### 2.6. Gestión de encomiendas
-
-| ID | Requisito funcional | Historia |
-|---|---|---|
-| RF30 | Mostrar empresas que ofrecen encomiendas para un origen y destino. | HU07 |
-| RF31 | Mostrar tarifas, condiciones y restricciones de envío de cada empresa. | HU07 |
-| RF32 | Permitir solicitar una encomienda con remitente, destinatario, origen, destino y características del paquete. | HU08 |
-| RF33 | Registrar encomiendas con descripción, peso y demás datos exigidos por la política de la empresa. | HU08, HU13 |
-| RF34 | Generar un código único de seguimiento por encomienda. | HU08, HU09 |
-| RF35 | Permitir consultar el estado de una encomienda mediante su código de seguimiento, protegiendo los datos personales. | HU09 |
-| RF36 | Permitir al agente registrar la recepción, cobro, despacho, llegada y entrega de encomiendas. | HU13 |
-| RF37 | Permitir al administrador configurar rutas habilitadas, tarifas y políticas de encomiendas de su empresa. | HU19 |
-| RF38 | Validar las condiciones de la empresa antes de aceptar una encomienda. | HU08, HU19 |
-| RF39 | Registrar los cambios de estado y la evidencia de entrega de las encomiendas. | HU13 |
-
-### 2.7. Usuarios, permisos y seguridad
-
-| ID | Requisito funcional | Historia |
-|---|---|---|
-| RF40 | Permitir la autenticación de usuarios para acceder a funcionalidades privadas. | HU05, HU11, HU14, HU23 |
-| RF41 | Gestionar usuarios y permisos según los cuatro roles establecidos. | HU18, HU23 |
-| RF42 | Restringir el acceso a información y operaciones según la empresa y agencia autorizadas. | HU18, HU23 |
-| RF43 | Permitir al administrador gestionar vendedores dentro de su ámbito autorizado. | HU18 |
-| RF44 | Registrar auditoría de las operaciones críticas. | HU24 |
-
-### 2.8. Reportes y notificaciones
-
-| ID | Requisito funcional | Historia |
-|---|---|---|
-| RF45 | Generar reportes de ventas, reservas, ocupación y encomiendas por empresa y agencia autorizada. | HU20 |
-| RF46 | Permitir consultar reportes generales de la plataforma y registros de auditoría. | HU24 |
-| RF47 | Generar notificaciones de confirmaciones, cancelaciones y cambios relevantes de reservas. | HU04, HU05, HU06 |
-| RF48 | Generar notificaciones sobre eventos relevantes de encomiendas. | HU08, HU09 |
-
-## 3. Reglas de negocio
-
-| ID | Regla |
+| ID | Requisito funcional |
 |---|---|
-| RN01 | Una empresa puede tener varias agencias y administrar sus servicios de forma independiente. |
-| RN02 | Solo existen cuatro roles humanos: Pasajero/Cliente, Agente/Vendedor, Administrador de Agencia y Superadministrador. |
-| RN03 | Los administradores y agentes solo pueden operar dentro de sus empresas y agencias autorizadas. |
-| RN04 | Un viaje programado pertenece a una empresa y tiene una ruta, fecha y horario definidos. |
-| RN05 | La disponibilidad se controla por viaje programado y por asiento o cupo, según corresponda. |
-| RN06 | Un asiento no puede confirmarse en dos reservas del mismo viaje ni superarse la capacidad de cupos. |
-| RN07 | Una reserva temporal vigente debe retener su asiento o cupo hasta su confirmación o vencimiento. |
-| RN08 | Una reserva solo puede marcarse como pagada después de verificar el pago correspondiente. |
-| RN09 | Las cancelaciones y reprogramaciones deben respetar las condiciones aplicables al servicio. |
-| RN10 | Cada empresa determina si ofrece encomiendas y establece sus rutas, tarifas y políticas. |
-| RN11 | Una encomienda solo puede aceptarse si cumple las condiciones vigentes de la empresa. |
-| RN12 | Cada encomienda debe tener un código de seguimiento único. |
-| RN13 | La entrega de una encomienda debe registrar fecha, responsable y verificación de entrega. |
-| RN14 | Las encomiendas no deben alterar la disponibilidad de asientos de pasajeros. |
-| RN15 | Las ventas presenciales deben identificar al agente y la agencia responsables. |
-| RN16 | Las operaciones críticas deben conservar trazabilidad. |
+| **RF01** | El sistema debe permitir buscar viajes indicando origen, destino y fecha. |
+| **RF02** | El sistema debe permitir filtrar los resultados de búsqueda por empresa, agencia, horario y tarifa. |
+| **RF03** | El sistema debe permitir mostrar y comparar los servicios disponibles de diferentes empresas y agencias. |
+| **RF04** | El sistema debe permitir consultar el detalle de un servicio, incluyendo empresa, agencia, origen, destino, horario, tarifa y condiciones del viaje. |
+| **RF05** | El sistema debe permitir consultar la disponibilidad actualizada de asientos o cupos de cada servicio. |
+| **RF06** | El sistema debe permitir seleccionar un asiento o cupo disponible antes de iniciar una reserva. |
 
-## 4. Requisitos pendientes de parametrización
+### 2.2 Reservas y disponibilidad
 
-Antes de implementar los procesos correspondientes, deben definirse:
+| ID | Requisito funcional |
+|---|---|
+| **RF07** | El sistema debe permitir registrar una reserva temporal asociada al pasajero, servicio y asiento o cupo seleccionado. |
+| **RF08** | El sistema debe bloquear temporalmente el asiento o cupo reservado para impedir que sea asignado a otra operación mientras la reserva se encuentre vigente. |
+| **RF09** | El sistema debe establecer una vigencia inicial de **10 minutos** para las reservas temporales realizadas por el canal digital. |
+| **RF10** | El sistema debe confirmar una reserva únicamente cuando el resultado del pago haya sido validado correctamente. |
+| **RF11** | El sistema debe actualizar la disponibilidad del servicio después de una reserva confirmada, cancelada o expirada. |
+| **RF12** | El sistema debe impedir que dos operaciones concurrentes confirmen simultáneamente el mismo asiento o cupo. |
+| **RF13** | El sistema debe registrar el estado de cada reserva, incluyendo como mínimo los estados temporal, confirmada, cancelada y expirada. |
 
-- Tiempo máximo de vigencia de una reserva temporal.
-- Condiciones de cancelación, reprogramación y devolución.
-- Medios de cobro presencial y procedimiento de confirmación.
-- Límites de peso, dimensiones, artículos restringidos y condiciones de entrega de encomiendas.
-- Modalidades de tarifas y cálculo del costo de envío.
-- Procedimiento de recepción y verificación de entrega.
+### 2.3 Pasajes y operaciones del pasajero
 
-Estos parámetros no deben establecerse arbitrariamente, ya que pueden depender de las políticas de cada empresa.
+| ID | Requisito funcional |
+|---|---|
+| **RF14** | El sistema debe permitir al pasajero consultar sus reservas y pasajes registrados. |
+| **RF15** | El sistema debe permitir cancelar una reserva o pasaje cuando las condiciones establecidas para el servicio lo permitan. |
+| **RF16** | El sistema debe permitir gestionar la reprogramación de una reserva o pasaje cuando las condiciones del servicio lo permitan. |
+| **RF17** | El sistema debe registrar el historial de cancelaciones y reprogramaciones realizadas sobre una reserva o pasaje. |
 
-## 5. Trazabilidad
+### 2.4 Pagos
 
-Los requisitos RF01-RF48 se relacionan con las historias HU01-HU24.
+| ID | Requisito funcional |
+|---|---|
+| **RF18** | El sistema debe permitir iniciar el proceso de pago electrónico asociado a una reserva. |
+| **RF19** | El sistema debe validar el resultado del pago antes de confirmar definitivamente la reserva. |
+| **RF20** | El sistema debe registrar el resultado y estado de cada operación de pago asociada a una reserva o venta. |
+| **RF21** | El sistema debe impedir que una reserva sea confirmada cuando el pago no haya sido validado correctamente. |
 
-Las reglas RN01-RN16 complementan los requisitos funcionales y deben considerarse en el diseño, implementación y pruebas.
+### 2.5 Operación presencial
 
-Los atributos de calidad, escenarios y decisiones arquitectónicas se documentarán posteriormente, tomando como referencia estos requisitos.
+| ID | Requisito funcional |
+|---|---|
+| **RF22** | El sistema debe permitir al Agente/Vendedor consultar los servicios, horarios y disponibilidad de su agencia. |
+| **RF23** | El sistema debe permitir al Agente/Vendedor registrar reservas para pasajeros atendidos presencialmente. |
+| **RF24** | El sistema debe permitir al Agente/Vendedor registrar ventas presenciales de pasajes y su forma de pago. |
+| **RF25** | El sistema debe permitir emitir o registrar el pasaje correspondiente a una venta confirmada. |
+| **RF26** | El sistema debe utilizar la misma disponibilidad de asientos o cupos para las operaciones digitales y presenciales. |
+| **RF27** | El sistema debe permitir al Agente/Vendedor consultar las operaciones realizadas en su agencia. |
+| **RF28** | El sistema debe permitir al Agente/Vendedor cancelar o reprogramar operaciones únicamente cuando cuente con autorización para realizar dichas acciones. |
+
+### 2.6 Gestión de agencias
+
+| ID | Requisito funcional |
+|---|---|
+| **RF29** | El sistema debe permitir al Administrador de Agencia consultar las agencias que tiene asignadas. |
+| **RF30** | El sistema debe permitir al Administrador de Agencia gestionar las rutas y destinos correspondientes a sus agencias autorizadas. |
+| **RF31** | El sistema debe permitir al Administrador de Agencia gestionar los horarios y servicios programados. |
+| **RF32** | El sistema debe permitir al Administrador de Agencia gestionar las tarifas de los servicios autorizados. |
+| **RF33** | El sistema debe permitir al Administrador de Agencia registrar y gestionar las unidades de transporte asociadas a sus servicios. |
+| **RF34** | El sistema debe permitir al Administrador de Agencia gestionar los Agentes/Vendedores asociados a sus agencias autorizadas. |
+| **RF35** | El sistema debe permitir al Administrador de Agencia consultar reservas, ventas, ocupación y operaciones de sus agencias. |
+| **RF36** | El sistema debe generar reportes de ventas, demanda, ocupación y rutas para el Administrador de Agencia. |
+
+### 2.7 Administración global
+
+| ID | Requisito funcional |
+|---|---|
+| **RF37** | El sistema debe permitir al Superadministrador registrar y gestionar empresas de transporte. |
+| **RF38** | El sistema debe permitir al Superadministrador registrar y gestionar agencias o sucursales asociadas a las empresas. |
+| **RF39** | El sistema debe permitir al Superadministrador asignar Administradores de Agencia según la empresa y agencia correspondiente. |
+| **RF40** | El sistema debe permitir al Superadministrador activar o desactivar empresas y agencias. |
+| **RF41** | El sistema debe permitir al Superadministrador configurar los permisos y ámbitos de acceso de los usuarios administrativos. |
+| **RF42** | El sistema debe permitir al Superadministrador consultar indicadores globales de ventas, demanda, ocupación y rutas. |
+| **RF43** | El sistema debe permitir al Superadministrador consultar los registros de auditoría de las operaciones críticas realizadas en la plataforma. |
+
+### 2.8 Alta demanda y alertas
+
+| ID | Requisito funcional |
+|---|---|
+| **RF44** | El sistema debe permitir registrar festividades, eventos y fechas especiales que puedan generar incrementos de demanda. |
+| **RF45** | El sistema debe identificar servicios que alcancen el umbral de alta demanda configurado. |
+| **RF46** | El sistema debe generar alertas preventivas para los pasajeros cuando un servicio o periodo alcance las condiciones de alta demanda establecidas. |
+
+### 2.9 Notificaciones
+
+| ID | Requisito funcional |
+|---|---|
+| **RF47** | El sistema debe permitir enviar notificaciones relacionadas con confirmaciones, pagos, recordatorios, cancelaciones, reprogramaciones y modificaciones de servicios. |
+| **RF48** | El sistema debe procesar las notificaciones de forma independiente de las operaciones principales, de manera que una falla en el servicio de notificaciones no impida completar una reserva, venta o pago confirmado. |
+
+---
+
+## 3. Requisitos transversales de operación
+
+Además de los requisitos anteriores, las operaciones deberán cumplir las siguientes condiciones funcionales:
+
+### 3.1 Control de acceso
+
+El sistema debe restringir las funcionalidades de acuerdo con el rol del usuario y su ámbito organizacional.
+
+Un usuario no deberá acceder a información de empresas o agencias que no estén dentro de su ámbito autorizado.
+
+### 3.2 Aislamiento multiempresa y multiagencia
+
+La plataforma deberá permitir almacenar información de múltiples empresas y agencias en una misma solución, manteniendo separación lógica entre sus operaciones.
+
+El Administrador de Agencia solo podrá gestionar las agencias que tenga asignadas.
+
+El Agente/Vendedor solo podrá realizar operaciones dentro de la agencia a la que se encuentre asociado.
+
+### 3.3 Consistencia de disponibilidad
+
+La disponibilidad de asientos o cupos deberá mantenerse consistente entre los diferentes canales de operación.
+
+El siguiente escenario no deberá ser posible:
+
+```text
+Pasajero web ──────┐
+                   ├──> mismo servicio
+Agente/Vendedor ───┘
+                   ↓
+        mismo asiento/cupo
+                   ↓
+          SOLO UNA CONFIRMACIÓN
+```
+
+### 3.4 Expiración de reservas
+
+Cuando una reserva temporal supere los 10 minutos sin confirmación de pago:
+
+```text
+HELD
+ ↓
+10 minutos
+ ↓
+EXPIRED
+ ↓
+Liberar asiento/cupo
+ ↓
+Disponible nuevamente
+```
+
+### 3.5 Trazabilidad
+
+Las operaciones críticas deberán conservar información suficiente para identificar:
+
+- usuario responsable;
+- empresa;
+- agencia;
+- operación realizada;
+- fecha y hora;
+- estado anterior;
+- estado posterior, cuando corresponda.
+
+---
+
+## 4. Relación entre historias de usuario y requisitos funcionales
+
+| Historia | Requisitos relacionados |
+|---|---|
+| HU01 | RF01 |
+| HU02 | RF02, RF03 |
+| HU03 | RF04 |
+| HU04 | RF05 |
+| HU05 | RF06 |
+| HU06 | RF07, RF08, RF09 |
+| HU07 | RF18, RF19, RF20, RF21 |
+| HU08 | RF10, RF20 |
+| HU09 | RF14 |
+| HU10 | RF15, RF17 |
+| HU11 | RF16, RF17 |
+| HU12 | RF47 |
+| HU13 | RF47 |
+| HU14 | RF44, RF45, RF46 |
+| HU15 | RF22 |
+| HU16 | RF23 |
+| HU17 | RF24 |
+| HU18 | RF25 |
+| HU19 | RF27 |
+| HU20 | RF28 |
+| HU21 | RF26, RF12 |
+| HU22 | RF29 |
+| HU23 | RF30 |
+| HU24 | RF31 |
+| HU25 | RF32 |
+| HU26 | RF33 |
+| HU27 | RF34 |
+| HU28 | RF35 |
+| HU29 | RF36 |
+| HU30 | RF47 |
+| HU31 | RF37 |
+| HU32 | RF38 |
+| HU33 | RF39 |
+| HU34 | RF40 |
+| HU35 | RF41 |
+| HU36 | RF42 |
+| HU37 | RF43 |
+| HU38 | RF44, RF45, RF46 |
+| HU39 | RF41 |
+| HU40 | RF43 |
+| HU41 | RF09, RF11 |
+| HU42 | RF10, RF19, RF21 |
+| HU43 | RF48 |
+| HU44 | RF12, RF26 |
+
+---
+
+## 5. Resumen
+
+La plataforma contempla **48 requisitos funcionales**, derivados de las historias de usuario de los cuatro actores principales.
+
+Los requisitos cubren:
+
+- consulta y búsqueda de viajes;
+- reservas y disponibilidad;
+- pagos;
+- venta presencial;
+- pasajes;
+- empresas y agencias;
+- rutas, horarios, tarifas y vehículos;
+- usuarios y permisos;
+- reportes;
+- auditoría;
+- notificaciones;
+- alta demanda;
+- control de concurrencia;
+- aislamiento multiempresa y multiagencia.
+
+Las **encomiendas no forman parte del alcance funcional actual** y, por tanto, no se incluyen requisitos relacionados con dicho módulo.

@@ -1,75 +1,176 @@
-# 05. Restricciones del Sistema
+# Restricciones Arquitectónicas
 
-## 1. Descripción
+Las restricciones arquitectónicas establecen las condiciones de negocio, operación, seguridad y tecnología que limitan las alternativas de diseño de la Plataforma Integrada de Transporte Interprovincial en Ayacucho.
 
-Las **restricciones (R)** son decisiones de diseño impuestas de manera previa, limitaciones técnicas, normativas, organizacionales o de infraestructura que acotan el espacio de soluciones disponibles para el arquitecto de software.
+Estas restricciones deben ser consideradas en las decisiones arquitectónicas, diseño de componentes, modelo de datos, seguridad, integración con servicios externos y estrategia de pruebas.
 
-A diferencia de los requisitos funcionales (lo que el sistema debe hacer) y de los atributos de calidad (cómo debe comportarse), las restricciones representan **condiciones no negociables** que la solución técnica debe satisfacer obligatoriamente.
+## 1. Restricciones identificadas
 
-> [!NOTE]
-> **Principio de la docente (Paso 2 de Arquitectura):**
-> *No todo requisito se convierte automáticamente en un driver arquitectónico. Las restricciones actúan como fronteras y directrices fijas que canalizan las decisiones arquitectónicas.*
+| ID | Restricción | Descripción |
+|---|---|---|
+| **RC01** | Cuatro actores principales | El sistema contempla únicamente cuatro actores humanos: **Superadmin, Administrador de Agencia, Agente/Vendedor y Pasajero**. Las empresas y agencias son entidades administradas dentro de la plataforma, no actores adicionales. |
+| **RC02** | Modelo multiempresa y multiagencia | Una misma plataforma debe soportar múltiples empresas de transporte y sus respectivas agencias. Cada empresa y agencia debe mantener su información y operación independiente. |
+| **RC03** | Aislamiento de información | La información debe estar aislada por empresa y agencia. Un Administrador de Agencia o Agente/Vendedor no podrá consultar ni modificar información perteneciente a otra agencia. |
+| **RC04** | Base de datos compartida | La solución utilizará una única base de datos PostgreSQL para todas las empresas y agencias. El aislamiento será lógico mediante identificación de empresa y agencia, roles y autorización. |
+| **RC05** | Administración jerárquica | El **Superadmin** administra la plataforma y asigna Administradores de Agencia. Cada Administrador de Agencia gestiona únicamente la información de la agencia que tiene asignada. |
+| **RC06** | Transporte multimodal | La solución no estará limitada a buses. Cada empresa podrá configurar el tipo de unidad utilizado, incluyendo buses, combis, taxis u otros vehículos, según su operación. |
+| **RC07** | Disponibilidad compartida | Las reservas realizadas por pasajeros mediante la plataforma y las ventas realizadas presencialmente por un Agente/Vendedor deben utilizar la misma fuente transaccional de disponibilidad. |
+| **RC08** | Reserva temporal | Una reserva permanecerá temporalmente en estado **HELD durante 10 minutos** mientras el pasajero completa el pago. Si el pago no se confirma dentro de ese periodo, la reserva expirará y el asiento o cupo será liberado. |
+| **RC09** | Prevención de sobreventa | El sistema debe impedir que dos operaciones confirmen simultáneamente el mismo asiento o cupo disponible. La base de datos será la fuente de verdad para la disponibilidad. |
+| **RC10** | Pasarela de pago externa | Los pagos electrónicos se realizarán mediante **Culqi**, utilizando el patrón **Adapter** para mantener desacoplada la lógica de negocio respecto del proveedor externo. |
+| **RC11** | Notificaciones externas | Las notificaciones al pasajero se realizarán mediante **WhatsApp Business Cloud API**. El fallo temporal del servicio de notificaciones no deberá comprometer una reserva o pago ya confirmado. |
+| **RC12** | Caché | La solución deberá incorporar **Redis** para almacenar información de consulta frecuente y reducir la carga sobre la base de datos. La información transaccional crítica no dependerá exclusivamente de la caché. |
+| **RC13** | Procesamiento asíncrono | La solución deberá incorporar **RabbitMQ** como cola durable para procesar eventos y tareas que no necesitan ejecutarse dentro de la transacción principal, como notificaciones y otros procesos secundarios. |
+| **RC14** | Sin módulo de encomiendas | La primera versión del sistema no contempla gestión de encomiendas. El alcance se concentra en rutas, horarios, servicios, disponibilidad, reservas, pagos, pasajes, notificaciones y explotación de información. |
+| **RC15** | Arquitectura inicial | La primera versión se implementará como un **monolito modular con API REST**, organizado bajo **Clean Architecture**, permitiendo una evolución posterior sin acoplar las reglas de negocio a la infraestructura. |
 
----
+## 2. Restricciones de seguridad y aislamiento
 
-## 2. Clasificación de Restricciones del Sistema
+Debido a que diferentes empresas utilizarán la misma plataforma y base de datos, el acceso deberá controlarse considerando tanto el rol como el ámbito organizacional.
 
-| ID | Restricción | Tipo | Justificación / Origen |
-|---|---|---|---|
-| **R01** | Uso de Base de Datos Relacional **PostgreSQL 16+** | Tecnológica / Persistencia | Obligatorio para garantizar consistencia transaccional estricta (propiedades ACID) y control de concurrencia pesimista en reservas de pasajes. |
-| **R02** | Backend desarrollado en **ASP.NET Core 8+ (C#)** | Tecnológica / Plataforma | Lenguaje tipado de alto rendimiento con soporte nativo de inyección de dependencias y concurrencia asíncrona robusta. |
-| **R03** | Frontend Web SPA desarrollado en **React 18+, TypeScript y Vite** | Tecnológica / Cliente | Garantiza renderizado responsivo y dinámico para mapas interactivos de asientos y paneles de ventanilla. |
-| **R04** | Protocolo de comunicación **API REST sobre HTTPS (TLS 1.3)** | Técnica / Protocolo | Estándar de interoperabilidad seguro para el intercambio de datos entre la SPA, clientes móviles y el backend unificado. |
-| **R05** | Integración obligatoria con **Pasarela de Pagos Externa** | Integración / Servicio externo | El sistema no almacena ni procesa tarjetas bancarias directamente (evita certificación PCI-DSS compleja); delega en pasarelas certificadas (Stripe, Culqi, Niubiz). |
-| **R06** | Integración con **Proveedor Externo de Notificaciones** | Integración / Servicio externo | Las comunicaciones de confirmación de boletos y estados de encomienda deben despacharse mediante servicios especializados de Email/SMS. |
-| **R07** | Control de versiones en **Git** y repositorio en **GitHub** | Organizacional / Herramientas | Todo el código, documentación arquitectónica y flujos de integración deben estar versionados en GitHub. |
-| **R08** | Empaquetamiento y despliegue en **Contenedores Docker** | Infraestructura / Despliegue | Los entornos de ejecución deben ser reproducibles, portables y preparados para ejecución sobre servidores Linux. |
-| **R09** | Restricción de modelo de despliegue inicial: **Monolito Modular** | Arquitectónica / Proyecto | Por restricciones presupuestarias y tamaño del equipo de desarrollo, no se admiten arquitecturas de microservicios en la primera fase. |
-| **R10** | Cumplimiento de la **Ley de Protección de Datos Personales (Ley N° 29733 de Perú)** | Legal / Regulatoria | Proteger estrictamente los datos privados de pasajeros, remitentes y destinatarios de encomiendas; anonimizar consultas públicas de tracking. |
+El modelo de autorización será:
 
----
+```text
+Superadmin
+    │
+    ├── administra empresas y agencias
+    │
+    ▼
+Administrador de Agencia
+    │
+    └── gestiona únicamente su agencia
+              │
+              ▼
+       Agente / Vendedor
+              │
+              └── opera únicamente en su agencia
 
-## 3. Matriz de Clasificación de Requisitos y Restricciones (Visión Docente)
-
-Siguiendo el esquema metodológico enseñado, el análisis de requisitos del sistema se estructura en tres dimensiones claras:
-
-```mermaid
-flowchart TD
-    subgraph REQ["Paso 2: Requisitos y Limitaciones del Sistema"]
-        RF["<b>Requisitos Funcionales (RF)</b><br/>RF01 a RF48<br/>• Búsqueda de viajes<br/>• Reserva de asientos/cupos<br/>• Cobro y pasajes<br/>• Registro de encomiendas<br/>• Gestión de empresas/rutas"]
-        RNF["<b>Atributos de Calidad (RNF)</b><br/>AC01 a AC09<br/>• Consistencia transaccional<br/>• Seguridad y aislamiento<br/>• Rendimiento en búsquedas<br/>• Alta disponibilidad<br/>• Mantenibilidad modular<br/>• Observabilidad"]
-        R["<b>Restricciones (R)</b><br/>R01 a R10<br/>• PostgreSQL (ACID)<br/>• ASP.NET Core + React<br/>• API REST / HTTPS<br/>• Pasarela de pagos externa<br/>• Monolito modular (sin microservicios)<br/>• Ley N° 29733"]
-    end
-
-    subgraph FILTRO["Filtro de Relevancia Arquitectónica"]
-        DRIVERS["<b>Paso 4: Drivers Arquitectónicos (DA)</b><br/><i>Requisitos, Atributos o Restricciones con impacto significativo</i>"]
-    end
-
-    RF -->|"Influyen fuertemente"| DRIVERS
-    RNF -->|"Definen métricas y escenarios"| DRIVERS
-    R -->|"Limitan el espacio de diseño"| DRIVERS
-
-    classDef req fill:#E3F2FD,stroke:#1E88E5,color:#0D47A1
-    classDef filt fill:#FFF3E0,stroke:#FB8C00,color:#E65100
-    class RF,RNF,R req
-    class DRIVERS filt
+Pasajero
+    │
+    └── accede únicamente a sus propias reservas y pasajes
 ```
 
----
+Toda información operativa deberá estar asociada a una empresa y agencia cuando corresponda.
 
-## 4. Diferencia entre Reglas de Negocio y Restricciones Arquitectónicas
+Por ejemplo:
 
-Es fundamental no confundir las **Reglas de Negocio (RN)** con las **Restricciones Técnicas (R)**:
+```text
+Empresa A
+ ├── Agencia A1
+ │    ├── Administrador A1
+ │    └── Agentes A1
+ │
+ └── Agencia A2
+      ├── Administrador A2
+      └── Agentes A2
 
-* **Regla de Negocio (ej. RN06):** *"Un asiento no puede confirmarse en dos reservas del mismo viaje"* $\rightarrow$ Es una regla funcional del dominio que describe una política comercial.
-* **Restricción Arquitectónica (ej. R01):** *"Usar PostgreSQL con transacciones ACID y soporte para SELECT FOR UPDATE"* $\rightarrow$ Es la restricción tecnológica que condiciona cómo se implementa dicha regla en el motor de persistencia.
+Empresa B
+ └── Agencia B1
+      ├── Administrador B1
+      └── Agentes B1
+```
 
----
+Un usuario perteneciente a **Empresa A / Agencia A1** no podrá consultar ni modificar información de **Empresa B / Agencia B1**.
 
-## 5. Trazabilidad con Drivers Arquitectónicos
+## 3. Restricciones sobre reservas
 
-Las restricciones R01 a R10 condicionan directamente los siguientes drivers arquitectónicos del sistema:
+La reserva deberá mantener estados controlados para evitar inconsistencias:
 
-* **R01 (PostgreSQL) + R05 (Pasarela externa) $\rightarrow$ DA01 (Consistencia de Reservas y Pagos):** Obliga a utilizar transacciones ACID, índices únicos y mecanismos de verificación idempotente.
-* **R02 (ASP.NET Core) + R09 (Monolito Modular) $\rightarrow$ DA06 (Mantenibilidad y Evolución Modular):** Obliga a implementar Clean Architecture dentro de un único proceso de despliegue.
-* **R04 (API REST) + R10 (Ley de Protección de Datos) $\rightarrow$ DA02 (Seguridad y Aislamiento Multiempresa):** Condiciona el diseño de autorización basada en tokens y la anonimización de endpoints públicos.
+```text
+DISPONIBLE
+     ↓
+   HELD
+     ↓
+PAGO PENDIENTE
+     ↓
+PAGO CONFIRMADO
+     ↓
+CONFIRMADA
+     ↓
+PASaje EMITIDO
+```
+
+Si transcurren los 10 minutos sin confirmación del pago:
+
+```text
+HELD
+  ↓
+10 minutos
+  ↓
+EXPIRED
+  ↓
+Asiento / cupo liberado
+```
+
+La misma regla deberá aplicarse independientemente de que la operación se origine desde el canal web, móvil o desde un Agente/Vendedor.
+
+## 4. Restricciones de integración
+
+Las integraciones externas no deberán formar parte directamente de las reglas centrales del dominio.
+
+Se utilizarán adaptadores:
+
+```text
+                  ┌───────────────┐
+                  │   Aplicación  │
+                  └───────┬───────┘
+                          │
+                 ┌────────▼────────┐
+                 │      Adapter    │
+                 └───────┬─────────┘
+                         │
+             ┌───────────┴───────────┐
+             ▼                       ▼
+           Culqi             WhatsApp Business
+        Pagos externos          Notificaciones
+```
+
+Esto permitirá mantener la lógica de negocio independiente de los proveedores externos.
+
+## 5. Restricciones de alcance
+
+La primera versión contempla principalmente:
+
+- Gestión de usuarios y roles.
+- Gestión de empresas y agencias.
+- Gestión de rutas.
+- Gestión de horarios.
+- Configuración de servicios.
+- Gestión de unidades y tipos de transporte.
+- Consulta de viajes.
+- Consulta de disponibilidad.
+- Reserva temporal.
+- Confirmación de compra.
+- Pagos mediante Culqi.
+- Emisión de pasajes.
+- Actualización de disponibilidad.
+- Notificaciones mediante WhatsApp.
+- Reportes y explotación de información.
+- Auditoría de operaciones críticas.
+
+No se contempla en esta versión:
+
+- Gestión de encomiendas.
+- Servicio de delivery.
+- Integración con múltiples pasarelas simultáneamente.
+- Operación mediante microservicios independientes.
+
+## 6. Restricciones con mayor impacto arquitectónico
+
+Las restricciones que tendrán mayor influencia sobre las decisiones arquitectónicas son:
+
+| Restricción | Impacto arquitectónico |
+|---|---|
+| **RC02 - Multiempresa/multiagencia** | Obliga a diseñar aislamiento lógico y control de ámbito. |
+| **RC03 - Aislamiento de información** | Determina la estrategia de autenticación y autorización. |
+| **RC04 - Base compartida** | Requiere un modelo de datos preparado para múltiples empresas y agencias. |
+| **RC07 - Disponibilidad compartida** | Obliga a utilizar una única fuente transaccional para reservas presenciales y digitales. |
+| **RC08 - Reserva temporal** | Requiere control de estados, expiración y liberación automática. |
+| **RC09 - Prevención de sobreventa** | Requiere control de concurrencia y transacciones. |
+| **RC10 - Culqi mediante Adapter** | Determina el desacoplamiento de la integración de pagos. |
+| **RC11 - WhatsApp** | Requiere integración externa y procesamiento tolerante a fallos. |
+| **RC12 - Redis** | Introduce una capa de caché para mejorar rendimiento. |
+| **RC13 - RabbitMQ** | Introduce procesamiento asíncrono mediante eventos. |
+| **RC15 - Monolito modular + Clean Architecture** | Define la organización inicial de módulos y dependencias. |
+
+Estas restricciones serán utilizadas como entrada para la definición de los **drivers arquitectónicos, decisiones arquitectónicas, estilo, componentes y diseño interno** de la solución.

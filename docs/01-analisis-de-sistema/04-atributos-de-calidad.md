@@ -1,125 +1,296 @@
+# Atributos de Calidad
 
-# 04. Atributos de Calidad
+Los atributos de calidad definen las características no funcionales que debe cumplir la Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial en Ayacucho.
 
-## 1. Descripción
+Estos atributos se priorizan considerando la naturaleza del sistema, la operación simultánea de diferentes agencias, la posibilidad de recibir múltiples solicitudes concurrentes, la necesidad de proteger la información de las empresas y agencias y la integración con servicios externos de pago y notificaciones.
 
-Los atributos de calidad establecen las características no funcionales que debe cumplir la Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial.
+Los valores cuantitativos establecidos en este documento representan objetivos iniciales de diseño y deberán ser validados mediante pruebas durante la implementación.
 
-Orientan el diseño arquitectónico para garantizar operaciones confiables, seguras y eficientes en un entorno con múltiples empresas, agencias, pasajeros y servicios de encomiendas.
+## Atributos de calidad prioritarios
 
-## 2. Atributos de calidad
-
-| ID | Atributo | Descripción | Prioridad |
+| ID | Atributo | Prioridad | Justificación |
 |---|---|---|---|
-| AC01 | Consistencia e integridad | Evitar reservas duplicadas, sobreventa de cupos e inconsistencias en pagos y encomiendas. | Crítica |
-| AC02 | Seguridad | Proteger los datos y restringir las operaciones según rol, empresa y agencia. | Alta |
-| AC03 | Rendimiento | Ofrecer respuestas eficientes en búsquedas, disponibilidad y operaciones frecuentes. | Alta |
-| AC04 | Disponibilidad | Mantener accesibles las funciones esenciales durante los periodos de operación. | Alta |
-| AC05 | Escalabilidad | Soportar el crecimiento de empresas, agencias, usuarios, viajes y transacciones. | Alta |
-| AC06 | Mantenibilidad | Facilitar modificaciones y nuevas funcionalidades sin afectar innecesariamente otros módulos. | Alta |
-| AC07 | Auditabilidad | Registrar y consultar la trazabilidad de operaciones críticas. | Alta |
-| AC08 | Recuperabilidad | Permitir restaurar información y servicios ante fallos. | Alta |
-| AC09 | Interoperabilidad | Facilitar la integración con proveedores externos de pagos y notificaciones. | Media |
+| **AC01** | Rendimiento | Alta | La plataforma debe responder oportunamente durante consultas de viajes, disponibilidad, reservas y ventas. |
+| **AC02** | Escalabilidad | Alta | El sistema debe soportar el crecimiento de empresas, agencias, servicios, pasajeros y operaciones concurrentes sin rediseñar completamente la solución. |
+| **AC03** | Disponibilidad | Alta | La consulta y operación de reservas debe mantenerse disponible durante los periodos normales y de alta demanda. |
+| **AC04** | Seguridad | Crítica | La información de empresas, agencias, usuarios, reservas y pagos debe estar protegida frente a accesos no autorizados. |
+| **AC05** | Concurrencia | Crítica | El sistema debe impedir que dos operaciones confirmen simultáneamente el mismo asiento o cupo. |
+| **AC06** | Integridad y consistencia | Crítica | Las reservas, pagos, disponibilidad y pasajes deben mantener estados coherentes aun cuando ocurran fallos o solicitudes simultáneas. |
+| **AC07** | Mantenibilidad | Alta | La solución debe permitir modificar reglas o integrar nuevos servicios sin afectar innecesariamente otros módulos. |
+| **AC08** | Interoperabilidad | Alta | La plataforma debe integrarse con la pasarela de pagos y el servicio de notificaciones mediante interfaces desacopladas. |
+| **AC09** | Trazabilidad y auditoría | Alta | Las operaciones administrativas y críticas deben poder ser identificadas y consultadas posteriormente. |
+| **AC10** | Usabilidad | Media-Alta | Los pasajeros y usuarios administrativos deben poder realizar sus operaciones sin complejidad innecesaria. |
 
-## 3. Requisitos de calidad
+## Criterios de evaluación de los atributos prioritarios
 
-### AC01 — Consistencia e integridad
+### AC01 - Rendimiento
 
-- Impedir que dos reservas confirmadas ocupen el mismo asiento de un viaje.
-- Evitar que las reservas superen la capacidad disponible de cupos.
-- Mantener la validez y el vencimiento de las reservas temporales.
-- Evitar confirmaciones duplicadas de pagos.
-- Mantener estados coherentes de reservas y encomiendas.
+El sistema debe responder de manera adecuada ante consultas frecuentes de viajes, horarios y disponibilidad.
 
-**Relación:** RF05-RF11, RF14, RF19, RF34, RF36-RF39.
+**Criterio inicial:**
 
-### AC02 — Seguridad
+- Con **100 usuarios concurrentes**, al menos el **95 % de las consultas de disponibilidad y búsqueda** deberá responder en un tiempo menor o igual a **2 segundos**, bajo un escenario de carga representativo.
+- Las operaciones críticas de reserva deberán mantener tiempos de respuesta controlados aun cuando exista concurrencia.
 
-- Autenticar a los usuarios que acceden a funciones privadas.
-- Aplicar autorización según rol y ámbito organizacional.
-- Impedir el acceso no autorizado a información de otras empresas.
-- Proteger los datos personales de pasajeros, remitentes y destinatarios.
-- Proteger las comunicaciones y operaciones sensibles.
+**Verificación:**
 
-**Relación:** RF20-RF23, RF35, RF40-RF44.
+Se realizarán pruebas de carga y rendimiento utilizando herramientas como k6 o equivalente, registrando tiempo de respuesta, tasa de errores y cantidad de solicitudes procesadas.
 
-### AC03 — Rendimiento
+---
 
-- Optimizar la búsqueda de empresas, rutas, horarios y tarifas.
-- Consultar disponibilidad sin generar carga innecesaria.
-- Mantener tiempos de respuesta adecuados ante consultas concurrentes.
-- Evitar que las tareas secundarias bloqueen operaciones críticas.
+### AC02 - Escalabilidad
 
-**Relación:** RF01-RF04, RF07-RF08, RF30-RF31.
+La plataforma debe permitir incorporar nuevas empresas, agencias, rutas, horarios y pasajeros sin realizar cambios estructurales en los módulos existentes.
 
-### AC04 — Disponibilidad
+**Criterio inicial:**
 
-- Mantener operativas las funciones esenciales de consulta y reserva.
-- Detectar fallos de componentes y servicios.
-- Reducir interrupciones durante periodos de alta demanda.
-- Manejar fallos de proveedores externos sin comprometer la integridad de las operaciones.
+- La incorporación de una nueva empresa o agencia deberá realizarse mediante configuración y registro de información.
+- El incremento de usuarios y solicitudes deberá poder atenderse mediante ampliación de recursos de infraestructura y mecanismos de caché y procesamiento asíncrono.
 
-**Relación:** RF01-RF19, RF30-RF39.
+**Verificación:**
 
-### AC05 — Escalabilidad
+Se realizarán pruebas incrementales aumentando progresivamente usuarios concurrentes, solicitudes y datos almacenados.
 
-- Permitir incorporar nuevas empresas y agencias.
-- Soportar el crecimiento de servicios programados y encomiendas.
-- Permitir aumentar la capacidad de procesamiento sin rediseñar la lógica de negocio.
-- Evitar dependencias innecesarias entre módulos.
+---
 
-**Relación:** RF01-RF04, RF20-RF29, RF30-RF39.
+### AC03 - Disponibilidad
 
-### AC06 — Mantenibilidad
+La plataforma deberá mantener disponibles las funciones principales de consulta, disponibilidad y operación de reservas durante el horario de servicio.
 
-- Separar las responsabilidades de administración, reservas, pagos, encomiendas y reportes.
-- Mantener reglas de negocio independientes de interfaces y proveedores externos.
-- Facilitar pruebas automatizadas y modificaciones controladas.
-- Permitir incorporar nuevas modalidades de transporte y políticas empresariales.
+**Criterio inicial:**
 
-**Relación:** RF05-RF48.
+- Las fallas de servicios secundarios, como notificaciones, no deberán impedir la confirmación de operaciones que ya hayan cumplido correctamente sus condiciones.
+- Las operaciones críticas deberán mantener su información aun cuando ocurra una interrupción temporal de componentes secundarios.
 
-### AC07 — Auditabilidad
+**Verificación:**
 
-- Registrar operaciones críticas con fecha, hora y responsable cuando corresponda.
-- Mantener historial de modificaciones de reservas y servicios programados.
-- Registrar cambios de estado de encomiendas.
-- Facilitar la consulta autorizada de eventos de auditoría.
+Se simularán fallos controlados de servicios secundarios y se comprobará que las operaciones principales continúen funcionando y que las fallas sean registradas.
 
-**Relación:** RF17, RF29, RF39, RF44, RF46.
+---
 
-### AC08 — Recuperabilidad
+### AC04 - Seguridad
 
-- Realizar respaldos de la información persistente.
-- Disponer de procedimientos de restauración.
-- Verificar la integridad de los datos recuperados.
-- Evitar la pérdida o duplicación de operaciones críticas durante la recuperación.
+El sistema deberá proteger la información de las diferentes empresas y agencias mediante autenticación, autorización y control del ámbito organizacional.
 
-**Relación:** RF05-RF19, RF30-RF39.
+**Criterio inicial:**
 
-### AC09 — Interoperabilidad
+- El **100 % de las pruebas de autorización definidas** deberá impedir accesos no permitidos.
+- Un Administrador de Agencia no podrá consultar ni modificar información de otra empresa.
+- Un Agente/Vendedor no podrá operar sobre una agencia diferente a la que tiene asignada.
+- Un pasajero únicamente podrá consultar sus propios datos, reservas y pasajes.
 
-- Integrar pasarelas de pago mediante interfaces definidas.
-- Procesar y verificar respuestas de servicios externos.
-- Integrar proveedores de notificaciones sin acoplarlos directamente a las reglas de negocio.
-- Facilitar el reemplazo de proveedores cuando sea necesario.
+**Verificación:**
 
-**Relación:** RF13, RF14, RF19, RF47, RF48.
+Se ejecutarán pruebas de autenticación, autorización basada en roles, aislamiento por empresa/agencia y acceso indebido mediante API.
 
-## 4. Priorización
+---
 
-El atributo AC01 — Consistencia e integridad tiene prioridad crítica debido al riesgo de sobreventa durante reservas simultáneas.
+### AC05 - Concurrencia
 
-Los atributos AC02-AC08 tienen prioridad alta porque influyen en la protección, operación y evolución del sistema.
+La plataforma debe controlar operaciones simultáneas sobre un mismo asiento o cupo.
 
-AC09 tiene prioridad media, aunque la integración de pagos necesaria para confirmar reservas debe funcionar correctamente desde su implementación.
+**Escenario principal:**
 
-## 5. Verificación
+```text
+Pasajero A ─────┐
+                ├──> mismo viaje / mismo asiento
+Pasajero B ─────┘
+                ↓
+        Control de concurrencia
+                ↓
+      Solo una operación confirma
+```
 
-Cada atributo será desarrollado mediante escenarios medibles en:
+**Criterio inicial:**
 
-`08-escenarios-atributos-calidad.md`
+- En el **100 % de las pruebas concurrentes definidas**, no deberá existir más de una confirmación válida para el mismo asiento o cupo.
+- Una operación presencial y una operación digital deberán utilizar la misma fuente transaccional de disponibilidad.
+- Las reservas temporales deberán bloquear el recurso durante su vigencia.
 
-Los escenarios definirán estímulo, entorno, respuesta esperada y medida de respuesta.
+**Verificación:**
 
-Las metas cuantitativas de rendimiento, disponibilidad, concurrencia y recuperación se establecerán como objetivos verificables antes de realizar pruebas de calidad.
+Se ejecutarán solicitudes simultáneas sobre el mismo servicio y asiento, comprobando que solamente una operación pueda confirmar el recurso.
+
+---
+
+### AC06 - Integridad y consistencia
+
+La información de reserva, pago, disponibilidad y pasaje deberá mantenerse coherente durante todo el ciclo de una operación.
+
+**Criterio inicial:**
+
+Una reserva deberá seguir un flujo controlado:
+
+```text
+Disponible
+    ↓
+Reserva temporal
+    ↓
+Pago pendiente
+    ↓
+Pago validado
+    ↓
+Reserva confirmada
+    ↓
+Pasaje emitido
+```
+
+Si el pago no se confirma dentro del periodo establecido:
+
+```text
+Reserva temporal
+       ↓
+    10 minutos
+       ↓
+     Expirada
+       ↓
+Asiento liberado
+```
+
+**Verificación:**
+
+Se realizarán pruebas de interrupción, expiración, pago rechazado, doble confirmación y cancelación para comprobar que no queden reservas o pagos en estados inconsistentes.
+
+---
+
+### AC07 - Mantenibilidad
+
+La arquitectura deberá permitir modificar reglas de negocio o componentes externos sin afectar innecesariamente el resto del sistema.
+
+**Criterio inicial:**
+
+- El cambio de proveedor de pagos deberá concentrarse principalmente en el adaptador correspondiente.
+- El cambio del proveedor de notificaciones no deberá modificar las reglas centrales de reservas.
+- Las reglas de negocio deberán mantenerse separadas de infraestructura y servicios externos.
+
+**Verificación:**
+
+Se realizará una revisión de dependencias y pruebas de regresión después de modificar componentes externos o reglas específicas.
+
+---
+
+### AC08 - Interoperabilidad
+
+El sistema deberá comunicarse con servicios externos mediante interfaces claramente definidas.
+
+Las principales integraciones previstas son:
+
+```text
+Plataforma
+    │
+    ├── Adapter ──> Pasarela de pagos
+    │
+    └── Adaptador ──> WhatsApp Business Cloud API
+```
+
+**Criterio inicial:**
+
+- Los errores de un proveedor externo deberán manejarse sin comprometer la consistencia de las operaciones internas.
+- Las respuestas de los servicios externos deberán validarse antes de modificar estados críticos.
+- Las comunicaciones deberán utilizar protocolos seguros.
+
+**Verificación:**
+
+Se realizarán pruebas con respuestas exitosas, rechazadas, duplicadas, retrasadas y fallidas de los servicios externos.
+
+---
+
+### AC09 - Trazabilidad y auditoría
+
+Las operaciones críticas deberán conservar información suficiente para reconstruir quién realizó una operación, cuándo se realizó y sobre qué empresa y agencia.
+
+**Criterio inicial:**
+
+Las operaciones administrativas y críticas deberán registrar como mínimo:
+
+- usuario;
+- rol;
+- empresa;
+- agencia;
+- operación;
+- fecha y hora;
+- identificador de la entidad afectada;
+- resultado de la operación.
+
+**Verificación:**
+
+Se ejecutarán operaciones de creación, modificación, cancelación y administración y posteriormente se verificará su existencia en los registros de auditoría.
+
+---
+
+### AC10 - Usabilidad
+
+La plataforma deberá permitir que los diferentes actores completen sus operaciones de manera clara y consistente.
+
+**Criterio inicial:**
+
+- Las funciones principales deberán estar organizadas según el rol del usuario.
+- El pasajero deberá poder completar el proceso de búsqueda, selección, reserva y pago sin pasos innecesarios.
+- El Agente/Vendedor deberá poder registrar una operación presencial utilizando la misma disponibilidad del sistema.
+- El Administrador deberá poder seleccionar únicamente las agencias que tiene autorizadas.
+
+**Verificación:**
+
+Se realizarán pruebas de uso con escenarios representativos de cada actor y se registrarán errores, tareas incompletas y tiempos de ejecución.
+
+---
+
+## Priorización arquitectónica
+
+Los atributos con mayor impacto sobre las decisiones arquitectónicas son:
+
+### Prioridad crítica
+
+- **AC04 - Seguridad**
+- **AC05 - Concurrencia**
+- **AC06 - Integridad y consistencia**
+
+Estos atributos determinan principalmente el diseño de autorización, aislamiento de información, transacciones y control de reservas.
+
+### Prioridad alta
+
+- **AC01 - Rendimiento**
+- **AC02 - Escalabilidad**
+- **AC03 - Disponibilidad**
+- **AC07 - Mantenibilidad**
+- **AC08 - Interoperabilidad**
+- **AC09 - Trazabilidad**
+
+Estos atributos determinan la necesidad de mecanismos como caché, procesamiento asíncrono, adaptadores para servicios externos, monitoreo y separación de responsabilidades.
+
+### Prioridad media-alta
+
+- **AC10 - Usabilidad**
+
+Este atributo orienta principalmente el diseño de las interfaces y los flujos de interacción de cada actor.
+
+---
+
+## Relación con la solución arquitectónica
+
+Los atributos de calidad identificados serán utilizados posteriormente para justificar las decisiones arquitectónicas de la plataforma.
+
+| Necesidad | Mecanismo arquitectónico previsto |
+|---|---|
+| Alta concurrencia | Control transaccional y estrategia de concurrencia |
+| Consultas frecuentes | Caché |
+| Procesamiento de notificaciones | Cola de eventos |
+| Integración de pagos | Patrón Adapter |
+| Integración con WhatsApp | Adaptador y procesamiento asíncrono |
+| Aislamiento entre empresas/agencias | Autenticación, autorización y ámbito organizacional |
+| Crecimiento de usuarios | Escalamiento de la aplicación y servicios de soporte |
+| Consistencia de reservas | Transacciones y control de concurrencia |
+| Recuperación ante fallos | Persistencia, reintentos y monitoreo |
+| Trazabilidad | Auditoría y registros estructurados |
+
+Estos mecanismos no constituyen todavía decisiones definitivas de implementación. Su selección y justificación serán desarrolladas en los documentos de drivers y decisiones arquitectónicas.
+
+---
+
+## Resumen
+
+La plataforma prioriza principalmente **seguridad, concurrencia e integridad**, debido a que una inconsistencia en la disponibilidad de un asiento o cupo puede producir una sobreventa y afectar directamente la operación de las agencias.
+
+Asimismo, el sistema debe considerar **rendimiento, escalabilidad y disponibilidad** debido a la posibilidad de recibir un incremento significativo de usuarios y operaciones durante festividades, feriados y temporadas de alta demanda.
+
+Finalmente, la **mantenibilidad, interoperabilidad y trazabilidad** permitirán integrar servicios externos como la pasarela de pagos y WhatsApp, mantener la evolución de la plataforma y conservar evidencia de las operaciones críticas.

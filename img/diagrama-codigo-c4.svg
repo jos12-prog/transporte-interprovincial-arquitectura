@@ -253,24 +253,24 @@
   <path d="M 690 800 L 690 830" class="conn-line" marker-end="url(#arrow)" stroke-dasharray="3 3" />
   <text x="708" y="817" class="conn-text" font-size="8.5">retorna</text>
 
-  <!-- INFRAESTRUCTURA: StripeOrCulqiPaymentAdapter -->
-  <g id="class-stripe-adapter">
+  <!-- INFRAESTRUCTURA: CulqiPaymentAdapter -->
+  <g id="class-culqi-adapter">
     <rect x="910" y="735" width="290" height="65" class="uml-box" />
-    <text x="1055" y="754" class="text-title">StripePaymentAdapter</text>
+    <text x="1055" y="754" class="text-title">CulqiPaymentAdapter</text>
     <line x1="910" y1="761" x2="1200" y2="761" class="uml-line" />
-    <text x="918" y="775" class="text-code">- cliente: PasarelaSDK</text>
+    <text x="918" y="775" class="text-code">- cliente: CulqiApiClient</text>
     <line x1="910" y1="781" x2="1200" y2="781" class="uml-line" />
     <text x="918" y="794" class="text-code">+ cobrar(monto, token)</text>
   </g>
 
-  <!-- Implementación: StripePaymentAdapter -> IPaymentPort -->
+  <!-- Implementación: CulqiPaymentAdapter -> IPaymentPort -->
   <path d="M 910 767 L 855 767" class="conn-impl" marker-end="url(#arrow-impl)" />
 
   <!-- NOTA AMARILLA: Módulo Pagos -->
   <g id="note-pagos">
     <polygon points="910,825 1185,825 1200,840 1200,905 910,905" class="note-box" />
     <polygon points="1185,825 1185,840 1200,840" fill="#fef08a" stroke="#fde047" stroke-width="1" />
-    <text x="920" y="845" class="note-text" font-weight="700">Para otra pasarela (ej. Niubiz o Yape/Plin)</text>
+    <text x="920" y="845" class="note-text" font-weight="700">Para otra pasarela (ej. Niubiz o Stripe)</text>
     <text x="920" y="860" class="note-text">se agrega otro adaptador que implemente</text>
     <text x="920" y="874" class="note-text">IPaymentPort (patrón Adapter).</text>
   </g>
