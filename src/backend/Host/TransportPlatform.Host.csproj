@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\TransportPlatform.Shared.Infrastructure\TransportPlatform.Shared.Infrastructure.csproj" />    <ProjectReference Include="..\Modules\IdentityAccess\Presentation\TransportPlatform.Modules.IdentityAccess.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\IdentityAccess\Infrastructure\TransportPlatform.Modules.IdentityAccess.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\CompaniesAgencies\Presentation\TransportPlatform.Modules.CompaniesAgencies.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\CompaniesAgencies\Infrastructure\TransportPlatform.Modules.CompaniesAgencies.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\TransportScheduling\Presentation\TransportPlatform.Modules.TransportScheduling.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\TransportScheduling\Infrastructure\TransportPlatform.Modules.TransportScheduling.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Reservations\Presentation\TransportPlatform.Modules.Reservations.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\Reservations\Infrastructure\TransportPlatform.Modules.Reservations.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\SalesPayments\Presentation\TransportPlatform.Modules.SalesPayments.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\SalesPayments\Infrastructure\TransportPlatform.Modules.SalesPayments.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\QueriesReports\Presentation\TransportPlatform.Modules.QueriesReports.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\QueriesReports\Infrastructure\TransportPlatform.Modules.QueriesReports.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\AuditNotifications\Presentation\TransportPlatform.Modules.AuditNotifications.Presentation.csproj" />
+    <ProjectReference Include="..\Modules\AuditNotifications\Infrastructure\TransportPlatform.Modules.AuditNotifications.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
+

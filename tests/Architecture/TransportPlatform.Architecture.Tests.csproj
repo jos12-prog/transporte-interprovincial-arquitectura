@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NetArchTest.Rules" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
+    <PackageReference Include="coverlet.collector" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/backend/Modules/IdentityAccess/Domain/TransportPlatform.Modules.IdentityAccess.Domain.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/IdentityAccess/Application/TransportPlatform.Modules.IdentityAccess.Application.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/CompaniesAgencies/Domain/TransportPlatform.Modules.CompaniesAgencies.Domain.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/CompaniesAgencies/Application/TransportPlatform.Modules.CompaniesAgencies.Application.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/TransportScheduling/Domain/TransportPlatform.Modules.TransportScheduling.Domain.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/TransportScheduling/Application/TransportPlatform.Modules.TransportScheduling.Application.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/Reservations/Domain/TransportPlatform.Modules.Reservations.Domain.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/Reservations/Application/TransportPlatform.Modules.Reservations.Application.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/SalesPayments/Domain/TransportPlatform.Modules.SalesPayments.Domain.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/SalesPayments/Application/TransportPlatform.Modules.SalesPayments.Application.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/QueriesReports/Domain/TransportPlatform.Modules.QueriesReports.Domain.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/QueriesReports/Application/TransportPlatform.Modules.QueriesReports.Application.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/AuditNotifications/Domain/TransportPlatform.Modules.AuditNotifications.Domain.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/AuditNotifications/Application/TransportPlatform.Modules.AuditNotifications.Application.csproj" />
+  </ItemGroup>
+</Project>

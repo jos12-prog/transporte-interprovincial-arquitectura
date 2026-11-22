@@ -12,3 +12,20 @@ Thumbs.db
 # Archivos de respaldo
 *.bak
 *~
+# Secretos locales
+.env
+.env.*
+!.env.example
+
+# .NET build/test outputs
+**/bin/
+**/obj/
+**/TestResults/
+**/coverage/
+coverage/
+artifacts/
+
+# JavaScript dependencies and builds
+node_modules/
+**/node_modules/
+dist/
