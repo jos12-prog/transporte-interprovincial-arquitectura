@@ -4,6 +4,7 @@ import { StaffShell } from '@/layouts/StaffShell';
 import { RoleLanding } from '@/pages/RoleLanding';
 import { TripResultsPage } from '@/pages/TripResultsPage';
 import { TripSearchPage } from '@/pages/TripSearchPage';
+import { SeatSelectionPage } from '@/pages/SeatSelectionPage';
 
 export function AppRoutes() {
   return (
@@ -12,6 +13,7 @@ export function AppRoutes() {
       <Route path="/pasajero" element={<PassengerLayout />}>
         <Route index element={<TripSearchPage />} />
         <Route path="resultados" element={<TripResultsPage />} />
+        <Route path="viajes/:tripId/asientos" element={<SeatSelectionPage />} />
         <Route path="*" element={<RoleLanding title="Pasajero" />} />
       </Route>
       <Route path="/agente" element={<StaffShell role="Agente" />}>

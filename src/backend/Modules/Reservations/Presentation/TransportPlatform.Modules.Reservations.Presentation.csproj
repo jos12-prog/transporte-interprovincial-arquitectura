@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="..\Application\TransportPlatform.Modules.Reservations.Application.csproj" />
   </ItemGroup>
 </Project>

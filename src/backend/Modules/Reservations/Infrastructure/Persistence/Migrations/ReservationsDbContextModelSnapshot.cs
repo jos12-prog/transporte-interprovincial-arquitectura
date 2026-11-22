@@ -23,6 +23,87 @@ namespace TransportPlatform.Modules.Reservations.Infrastructure.Persistence.Migr
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("TransportPlatform.Modules.Reservations.Domain.Entities.Reservation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AgencyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("agency_id");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<DateTimeOffset>("ExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at_utc");
+
+                    b.Property<string>("HoldTokenHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("hold_token_hash");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("status");
+
+                    b.Property<Guid>("TripId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("trip_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Status", "ExpiresAtUtc");
+
+                    b.HasIndex("CompanyId", "AgencyId", "TripId");
+
+                    b.ToTable("reservations", "reservations");
+                });
+
+            modelBuilder.Entity("TransportPlatform.Modules.Reservations.Domain.Entities.ReservationSeat", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("ReservationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("reservation_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("status");
+
+                    b.Property<Guid>("TripSeatId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("trip_seat_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TripSeatId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_reservation_seats_active_trip_seat")
+                        .HasFilter("status IN ('Held', 'Confirmed')");
+
+                    b.HasIndex("ReservationId", "Status");
+
+                    b.ToTable("reservation_seats", "reservations");
+                });
+
             modelBuilder.Entity("TransportPlatform.Modules.Reservations.Domain.Entities.TripSeat", b =>
                 {
                     b.Property<Guid>("Id")
@@ -74,6 +155,20 @@ namespace TransportPlatform.Modules.Reservations.Infrastructure.Persistence.Migr
                     b.HasIndex("CompanyId", "AgencyId", "TripId");
 
                     b.ToTable("trip_seats", "reservations");
+                });
+
+            modelBuilder.Entity("TransportPlatform.Modules.Reservations.Domain.Entities.ReservationSeat", b =>
+                {
+                    b.HasOne("TransportPlatform.Modules.Reservations.Domain.Entities.Reservation", null)
+                        .WithMany("Seats")
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TransportPlatform.Modules.Reservations.Domain.Entities.Reservation", b =>
+                {
+                    b.Navigation("Seats");
                 });
 #pragma warning restore 612, 618
         }

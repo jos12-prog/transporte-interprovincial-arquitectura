@@ -131,6 +131,24 @@ jobs:
           API_BASE_URL: http://localhost:8080
         run: npm run test -- --coverage
 
+      - name: Set up k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Run EQ-02 seat hold concurrency
+        env:
+          API_BASE_URL: http://localhost:8080
+          SEARCH_ORIGIN: Ayacucho
+          SEARCH_DESTINATION: Lima
+        run: k6 run --summary-export docs/evidencias/concurrencia-eq02-summary.json tests/performance/seat-hold-concurrency.js
+
+      - name: Upload EQ-02 k6 summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: concurrency-eq02-summary
+          path: docs/evidencias/concurrencia-eq02-summary.json
+          if-no-files-found: warn
+
       - name: Upload API coverage
         if: always()
         uses: actions/upload-artifact@v4

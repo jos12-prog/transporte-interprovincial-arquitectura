@@ -59,4 +59,24 @@ public sealed class TripSeat
         Floor = floor;
         Status = status;
     }
+
+    public void Hold()
+    {
+        if (Status != TripSeatStatus.Available)
+        {
+            throw new InvalidOperationException($"A trip seat cannot be held from {Status}.");
+        }
+
+        Status = TripSeatStatus.Held;
+    }
+
+    public void ReleaseHold()
+    {
+        if (Status != TripSeatStatus.Held)
+        {
+            throw new InvalidOperationException($"A trip seat cannot be released from {Status}.");
+        }
+
+        Status = TripSeatStatus.Available;
+    }
 }

@@ -137,6 +137,18 @@ public sealed class TripSearchApplicationTests
     }
 
     [Fact]
+    public async Task TransportSchedulingApiReturnsNullForMissingTripWithoutCrossModuleAccess()
+    {
+        var repository = new FakeTripSearchReadRepository([]);
+        var api = new TransportSchedulingApi(repository, new FakeReservationsApi(new Dictionary<Guid, int>()));
+
+        var result = await api.GetSeatLayoutAsync(Guid.NewGuid());
+
+        Assert.Null(result);
+        Assert.Equal(1, repository.LayoutLookupCount);
+    }
+
+    [Fact]
     public async Task ModuleApisDeduplicateRequestedIdsAndReturnEmptyWithoutRepositoryCalls()
     {
         var companyId = Guid.NewGuid();
@@ -173,6 +185,9 @@ public sealed class TripSearchApplicationTests
             Criteria = criteria;
             return Task.FromResult(trips);
         }
+
+        public Task<SeatLayoutDto?> GetSeatLayoutAsync(Guid tripId, CancellationToken cancellationToken = default) =>
+            Task.FromResult<SeatLayoutDto?>(null);
     }
 
     private sealed class FakeCompaniesAgenciesApi(IReadOnlyList<PublicAgencySummary> agencies) : ICompaniesAgenciesApi
@@ -222,9 +237,17 @@ public sealed class TripSearchApplicationTests
 
     private sealed class FakeTripSearchReadRepository(IReadOnlyList<ScheduledTripSummary> trips) : ITripSearchReadRepository
     {
+        public int LayoutLookupCount { get; private set; }
+
         public Task<IReadOnlyList<ScheduledTripSummary>> SearchTripsAsync(
             TripSearchCriteria criteria,
             CancellationToken cancellationToken = default) => Task.FromResult(trips);
+
+        public Task<SeatLayoutDto?> GetSeatLayoutAsync(Guid tripId, CancellationToken cancellationToken = default)
+        {
+            LayoutLookupCount++;
+            return Task.FromResult<SeatLayoutDto?>(null);
+        }
     }
 
     private sealed class FakeReservationsApi(IReadOnlyDictionary<Guid, int> counts) : IReservationsApi

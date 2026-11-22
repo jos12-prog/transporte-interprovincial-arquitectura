@@ -37,3 +37,19 @@ docker compose down
 ```
 
 El smoke test solicita `GET /health` una vez y falla si la API no devuelve HTTP 200.
+
+## Concurrencia de retención EQ-02
+
+Con Docker Compose levantado y saludable, k6 encuentra un viaje para la fecha local de Lima, consulta su mapa público y toma el primer asiento libre. A continuación, 50 VUs envían una solicitud cada uno para retener ese mismo asiento. El escenario exige exactamente una respuesta 200, 49 respuestas 409 y cero respuestas inesperadas. El VU ganador libera el hold después de dar tiempo a que concluyan las solicitudes competidoras.
+
+```powershell
+docker compose up --build -d
+docker compose ps
+$env:API_BASE_URL = 'http://localhost:8080'
+$env:SEARCH_ORIGIN = 'Ayacucho'
+$env:SEARCH_DESTINATION = 'Lima'
+k6 run --summary-export docs/evidencias/concurrencia-eq02-summary.json tests/performance/seat-hold-concurrency.js
+docker compose down
+```
+
+Para ejecutar contra una fecha concreta de la semilla, establece `$env:SEARCH_DATE = 'yyyy-MM-dd'` antes de k6. Registra solo resultados observados en `docs/evidencias/concurrencia-eq02.md`, incluyendo fecha, versión k6, máquina y conteos reales.

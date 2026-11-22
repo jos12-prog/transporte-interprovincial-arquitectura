@@ -61,7 +61,9 @@ function TripCard({ trip }: { trip: TripSearchResult }) {
           <p className="font-display text-2xl font-extrabold tabular-nums text-neutral-900">{formatPrice(trip.price, trip.currency)}</p>
           <p className="text-xs text-neutral-600">por pasajero</p>
         </div>
-        <span className="text-xs text-neutral-600">Consulta informativa</span>
+        <Link to={`/pasajero/viajes/${encodeURIComponent(trip.tripId)}/asientos`} className="inline-flex h-10 items-center justify-center rounded-button bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700">
+          Elegir asientos
+        </Link>
       </div>
     </article>
   );

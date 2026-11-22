@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using TransportPlatform.Modules.Reservations.Application.Contracts;
 using TransportPlatform.Modules.Reservations.Application.Services;
+using TransportPlatform.Modules.Reservations.Application.UseCases;
 using TransportPlatform.Modules.Reservations.Infrastructure.Persistence;
 using TransportPlatform.Shared.Contracts.Modules;
 
@@ -18,7 +20,14 @@ public static class InfrastructureRegistration
         services.AddDbContext<ReservationsDbContext>(options => options.UseNpgsql(connectionString,
             postgres => postgres.MigrationsHistoryTable("__EFMigrationsHistory", "reservations")));
         services.AddScoped<ISeatAvailabilityService, EfSeatAvailabilityService>();
+        services.AddScoped<IReservationRepository, EfReservationRepository>();
+        services.AddScoped<GetTripSeatMapUseCase>();
+        services.AddScoped<CreateReservationHoldUseCase>();
+        services.AddScoped<ReleaseReservationHoldUseCase>();
+        services.AddScoped<ExpireReservationHoldsUseCase>();
+        services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IReservationsApi, ReservationsApi>();
+        services.AddHostedService<ReservationHoldExpirationWorker>();
         return services;
     }
 }

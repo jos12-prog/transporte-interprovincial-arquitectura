@@ -77,6 +77,22 @@ internal sealed class EfTripSearchReadRepository(TransportSchedulingDbContext db
             .ToArrayAsync(cancellationToken);
     }
 
+    public async Task<SeatLayoutDto?> GetSeatLayoutAsync(Guid tripId, CancellationToken cancellationToken = default)
+    {
+        var layout = await (from trip in dbContext.Trips.AsNoTracking()
+                            join vehicle in dbContext.Vehicles.AsNoTracking() on trip.VehicleId equals vehicle.Id
+                            join model in dbContext.VehicleModels.AsNoTracking() on vehicle.VehicleModelId equals model.Id
+                            where trip.Id == tripId
+                            select model.SeatLayout)
+            .SingleOrDefaultAsync(cancellationToken);
+
+        return layout is null
+            ? null
+            : new SeatLayoutDto(layout.Seats
+                .Select(seat => new SeatPositionDto(seat.Number, seat.Row, seat.Column, seat.Floor))
+                .ToArray());
+    }
+
     private static string EscapeLikeLiteral(string value) => value
         .Replace("\\", "\\\\", StringComparison.Ordinal)
         .Replace("%", "\\%", StringComparison.Ordinal)

@@ -1,0 +1,166 @@
+{
+    "metrics": {
+        "http_req_duration{expected_response:true}": {
+            "p(90)": 31.893700000000003,
+            "p(95)": 32.7275,
+            "avg": 24.176267924528297,
+            "min": 3.5296,
+            "med": 24.31,
+            "max": 33.5662
+        },
+        "http_req_receiving": {
+            "p(95)": 0,
+            "avg": 0.006967924528301887,
+            "min": 0,
+            "med": 0,
+            "max": 0.3693,
+            "p(90)": 0
+        },
+        "data_sent": {
+            "count": 14460,
+            "rate": 1438.3156690894791
+        },
+        "vus_max": {
+            "value": 50,
+            "min": 50,
+            "max": 50
+        },
+        "iterations": {
+            "count": 50,
+            "rate": 4.973429007916595
+        },
+        "seat_hold_unexpected": {
+            "rate": 0,
+            "count": 0,
+            "thresholds": {
+                "count==0": false
+            }
+        },
+        "data_received": {
+            "count": 22305,
+            "rate": 2218.646680431593
+        },
+        "iteration_duration": {
+            "min": 16.1357,
+            "med": 26.65065,
+            "max": 10031.7377,
+            "p(90)": 33.4473,
+            "p(95)": 33.971,
+            "avg": 226.03022199999998
+        },
+        "seat_hold_conflict": {
+            "count": 49,
+            "rate": 4.873960427758263,
+            "thresholds": {
+                "count==49": false
+            }
+        },
+        "http_req_tls_handshaking": {
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0,
+            "min": 0
+        },
+        "http_req_duration": {
+            "p(90)": 31.893700000000003,
+            "p(95)": 32.7275,
+            "avg": 24.176267924528297,
+            "min": 3.5296,
+            "med": 24.31,
+            "max": 33.5662
+        },
+        "http_req_waiting": {
+            "med": 24.31,
+            "max": 33.5662,
+            "p(90)": 31.893700000000003,
+            "p(95)": 32.7275,
+            "avg": 24.15148301886792,
+            "min": 3.5296
+        },
+        "seat_hold_success": {
+            "count": 1,
+            "rate": 0.09946858015833189,
+            "thresholds": {
+                "count==1": false
+            }
+        },
+        "http_req_sending": {
+            "min": 0,
+            "med": 0,
+            "max": 0.5395,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0.01781698113207547
+        },
+        "http_req_connecting": {
+            "avg": 0.4027339622641512,
+            "min": 0,
+            "med": 0.5223,
+            "max": 1.0618,
+            "p(90)": 0.5395,
+            "p(95)": 0.7484199999999993
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 53,
+            "value": 0
+        },
+        "http_reqs": {
+            "count": 53,
+            "rate": 5.271834748391591
+        },
+        "http_req_blocked": {
+            "avg": 0.6349000000000005,
+            "min": 0,
+            "med": 0.5223,
+            "max": 7.312,
+            "p(90)": 1.0458,
+            "p(95)": 1.0618
+        },
+        "checks": {
+            "passes": 51,
+            "fails": 0,
+            "value": 1
+        },
+        "vus": {
+            "value": 1,
+            "min": 1,
+            "max": 1
+        }
+    },
+    "setup_data": {
+        "tripId": "acb4325a-5e35-111d-5a7a-340331c2fe10",
+        "tripSeatId": "de231772-6144-28e8-9515-9afbd7662f1a"
+    },
+    "root_group": {
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+            "hold winner returns HTTP 200": {
+                "name": "hold winner returns HTTP 200",
+                "path": "::hold winner returns HTTP 200",
+                "id": "dc3c94202217ea9a6cdce750014dda56",
+                "passes": 1,
+                "fails": 0
+            },
+            "contending hold returns HTTP 409": {
+                "id": "caf263318e71b768b09c75968c2a6f40",
+                "passes": 49,
+                "fails": 0,
+                "name": "contending hold returns HTTP 409",
+                "path": "::contending hold returns HTTP 409"
+            },
+            "winning hold cleanup returns HTTP 204": {
+                "fails": 0,
+                "name": "winning hold cleanup returns HTTP 204",
+                "path": "::winning hold cleanup returns HTTP 204",
+                "id": "f0f1e51a0aa84a58aae20dd19e7449ef",
+                "passes": 1
+            }
+        },
+        "name": "",
+        "path": ""
+    }
+}
