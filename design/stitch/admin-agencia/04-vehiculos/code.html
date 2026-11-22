@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · admin-agencia/04-vehiculos
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehículos · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mcard{display:grid;justify-items:center;align-content:start;gap:6px;padding:12px 8px;border:1.5px solid var(--n-200);border-radius:14px;background:#fff;cursor:pointer;font:inherit;color:inherit}
+.mcard.on{border-color:var(--primary-600);box-shadow:0 0 0 4px var(--primary-100)}
+.mcard .seat-mini{transform:scale(.75);transform-origin:top center;height:110px;overflow:hidden}
+.preview{display:grid;justify-items:center;gap:12px;padding:18px;border-radius:14px;background:var(--n-50);border:1px solid var(--n-200)}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Menú">
+    <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <div class="group">Agencia</div><a href="../02-dashboard/code.html"><i data-i="grid"></i><span>Dashboard</span></a><a href="../05-viajes-horarios/code.html"><i data-i="calendar"></i><span>Viajes y horarios</span></a><a href="../03-rutas/code.html"><i data-i="route"></i><span>Rutas</span></a><a href="../04-vehiculos/code.html" class="on" aria-current="page"><i data-i="bus"></i><span>Vehículos</span></a><a href="../06-tarifas/code.html"><i data-i="tag"></i><span>Tarifas</span></a><div class="group">Equipo y análisis</div><a href="../07-agentes/code.html"><i data-i="users"></i><span>Agentes</span></a><a href="../08-reportes/code.html"><i data-i="chart"></i><span>Reportes</span></a><a href="#alertas"><i data-i="bell"></i><span>Alertas</span><b class="count">3</b></a>
+    <div class="me"><span class="avatar">RH</span><div>Rosa Huamán<small>Admin. de agencia</small></div></div>
+  </aside>
+  <div>
+    <header class="top">
+      <button class="agency" aria-haspopup="listbox"><span class="dot"><i data-i="store" class="sm"></i></span><div>Terminal Norte<small>Transportes Qori Ñan S.A.C.</small></div><i data-i="chevron" class="sm"></i></button>
+      <label class="search"><i data-i="search" class="sm"></i><input placeholder="Buscar viaje, pasajero o código" aria-label="Buscar"><kbd>/</kbd></label>
+      <div class="tools">
+        <button class="icon-btn" aria-label="Ayuda"><i data-i="help"></i></button>
+        <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i><span class="pip"></span></button>
+      </div>
+    </header>
+    <main class="main">
+
+<div class="page-head"><div><div class="crumbs">Transportes Qori Ñan</div><h1>Vehículos</h1><p class="muted small">12 vehículos · el plano de asientos de cada uno lo define su modelo.</p></div><a class="btn btn-primary" href="#registrar"><i data-i="plus" class="sm"></i> Registrar vehículo</a></div>
+<section class="card"><div class="table-wrap"><table class="table">
+  <thead><tr><th>Placa</th><th>Modelo</th><th>Categoría</th><th>Asientos</th><th>Estado</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><b class="num">ABC-482</b></td><td>Bus 2 pisos</td><td>Bus</td><td class="num">52</td><td><span class="badge b-success">Operativo</span></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+    <tr><td><b class="num">ABC-310</b></td><td>Bus 1 piso</td><td>Bus</td><td class="num">44</td><td><span class="badge b-success">Operativo</span></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+    <tr><td><b class="num">ABX-114</b></td><td>Van</td><td>Transporte</td><td class="num">15</td><td><span class="badge b-success">Operativo</span></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+    <tr><td><b class="num">ABX-201</b></td><td>Van</td><td>Transporte</td><td class="num">15</td><td><span class="badge b-warning">Mantenimiento</span></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+    <tr><td><b class="num">B4K-552</b></td><td>Minivan</td><td>Familiar</td><td class="num">7</td><td><span class="badge b-success">Operativo</span></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+    <tr><td><b class="num">C7Y-090</b></td><td>Toyota Avanza</td><td>Familiar</td><td class="num">6</td><td><span class="badge b-success">Operativo</span></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+    <tr><td><b class="num">D2M-871</b></td><td>Toyota Yaris</td><td>Sedán</td><td class="num">4</td><td><span class="badge b-neutral">Inactivo</span></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+  </tbody></table></div></section>
+
+    </main>
+  </div>
+</div>
+<div class="state" id="registrar"><a class="drawer-scrim" href="#" aria-label="Cerrar"></a>
+<aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="registrar-t">
+  <div class="drawer-head"><h2 id="registrar-t">Registrar vehículo</h2><a class="more" href="#" aria-label="Cerrar"><i data-i="x"></i></a></div>
+  <div class="drawer-body">
+<div class="field"><label>Placa</label><input class="input num" value="D5R-318" style="text-transform:uppercase"></div>
+<div class="field"><label>Modelo de vehículo</label><div class="mgrid"><button class="mcard" aria-pressed="false"><div class="seat-mini" data-model="yaris"></div><b class="small">Toyota Yaris</b><span class="xs muted">4 asientos</span></button><button class="mcard on" aria-pressed="true"><div class="seat-mini" data-model="avanza"></div><b class="small">Toyota Avanza</b><span class="xs muted">6 asientos</span></button><button class="mcard" aria-pressed="false"><div class="seat-mini" data-model="minivan"></div><b class="small">Minivan</b><span class="xs muted">7 asientos</span></button><button class="mcard" aria-pressed="false"><div class="seat-mini" data-model="van"></div><b class="small">Van</b><span class="xs muted">15 asientos</span></button><button class="mcard" aria-pressed="false"><div class="seat-mini" data-model="bus1"></div><b class="small">Bus 1 piso</b><span class="xs muted">44 asientos</span></button><button class="mcard" aria-pressed="false"><div class="seat-mini" data-model="bus2"></div><b class="small">Bus 2 pisos</b><span class="xs muted">52 asientos</span></button></div></div>
+<div class="preview"><b class="small">Vista previa · Toyota Avanza</b><div data-model="avanza"></div><span class="hint">El plano de asientos se hereda del modelo. Para otro plano, el superadministrador debe crear un modelo nuevo.</span></div>
+</div>
+  <div class="drawer-foot"><a class="btn btn-ghost" href="#">Cancelar</a><a class="btn btn-primary" href="#">Guardar</a></div>
+</aside></div>
+</body>
+</html>

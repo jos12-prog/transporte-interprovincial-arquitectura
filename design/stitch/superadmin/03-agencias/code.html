@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · superadmin/03-agencias
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agencias · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.table tr.grp td{background:var(--n-50)!important;height:40px;font-size:13px;color:var(--n-700)}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Menú">
+    <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <div class="group">Plataforma</div><a href="../01-dashboard-global/code.html"><i data-i="grid"></i><span>Dashboard</span></a><a href="../02-empresas/code.html"><i data-i="building"></i><span>Empresas</span></a><a href="../03-agencias/code.html" class="on" aria-current="page"><i data-i="store"></i><span>Agencias</span></a><a href="../04-usuarios-administrativos/code.html"><i data-i="users"></i><span>Usuarios administrativos</span></a><div class="group">Catálogos</div><a href="../05-modelos-vehiculo/code.html"><i data-i="bus"></i><span>Modelos de vehículo</span></a><a href="../06-festividades-alta-demanda/code.html"><i data-i="flame"></i><span>Festividades</span></a><div class="group">Control</div><a href="../07-auditoria/code.html"><i data-i="log"></i><span>Auditoría</span></a><a href="#configuracion"><i data-i="settings"></i><span>Configuración</span></a>
+    <div class="me"><span class="avatar">JP</span><div>Jorge Pariona<small>Superadministrador</small></div></div>
+  </aside>
+  <div>
+    <header class="top">
+      <div class="agency"><span class="dot"><i data-i="shield" class="sm"></i></span><div>Plataforma RutaAndina<small>Todas las empresas</small></div></div>
+      <label class="search"><i data-i="search" class="sm"></i><input placeholder="Buscar agencia o ciudad" aria-label="Buscar"><kbd>/</kbd></label>
+      <div class="tools">
+        <button class="icon-btn" aria-label="Ayuda"><i data-i="help"></i></button>
+        <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i><span class="pip"></span></button>
+      </div>
+    </header>
+    <main class="main">
+
+<div class="page-head"><div><div class="crumbs">Plataforma</div><h1>Agencias</h1><p class="muted small">Agrupadas por empresa. Cada agencia pertenece a una sola empresa.</p></div><a class="btn btn-primary" href="#nueva"><i data-i="plus" class="sm"></i> Nueva agencia</a></div>
+<section class="card"><div class="table-wrap"><table class="table">
+  <thead><tr><th>Agencia</th><th>Dirección</th><th>Ciudad</th><th>Administradores</th><th>Activa</th></tr></thead>
+  <tbody>
+    <tr class="grp"><td colspan="5"><b>Transportes Qori Ñan S.A.C.</b></td></tr><tr><td style="padding-left:32px"><b>Terminal Norte</b></td><td class="small">Av. Cusco 1220</td><td>Huamanga</td><td><div class="avatars"><span class="avatar sm">RH</span><span class="avatar sm">JC</span></div></td><td><input type="checkbox" class="switch" checked aria-label="Activo"></td></tr><tr><td style="padding-left:32px"><b>Terminal Sur</b></td><td class="small">Jr. Libertad 410</td><td>Huamanga</td><td><div class="avatars"><span class="avatar sm">RH</span></div></td><td><input type="checkbox" class="switch" checked aria-label="Activo"></td></tr><tr><td style="padding-left:32px"><b>Huanta</b></td><td class="small">Jr. Gervasio Santillana 155</td><td>Huanta</td><td><div class="avatars"><span class="avatar sm">RH</span></div></td><td><input type="checkbox" class="switch" checked aria-label="Activo"></td></tr>
+    <tr class="grp"><td colspan="5"><b>Expreso Sachapuyo E.I.R.L.</b></td></tr><tr><td style="padding-left:32px"><b>Terminal Los Libertadores</b></td><td class="small">Av. Javier Pérez de Cuéllar s/n</td><td>Huamanga</td><td><div class="avatars"><span class="avatar sm">MV</span></div></td><td><input type="checkbox" class="switch" checked aria-label="Activo"></td></tr><tr><td style="padding-left:32px"><b>Lima · Plaza Norte</b></td><td class="small">Av. Tomás Valle s/n</td><td>Lima</td><td><div class="avatars"><span class="avatar sm">MV</span><span class="avatar sm">SG</span></div></td><td><input type="checkbox" class="switch" checked aria-label="Activo"></td></tr><tr><td style="padding-left:32px"><b>Andahuaylas</b></td><td class="small">Av. Perú 230</td><td>Andahuaylas</td><td><div class="avatars"><span class="xs muted">Sin asignar</span></div></td><td><input type="checkbox" class="switch" aria-label="Activo"></td></tr>
+  </tbody></table></div></section>
+
+    </main>
+  </div>
+</div>
+<div class="state" id="nueva"><a class="drawer-scrim" href="#" aria-label="Cerrar"></a>
+<aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="nueva-t">
+  <div class="drawer-head"><h2 id="nueva-t">Nueva agencia</h2><a class="more" href="#" aria-label="Cerrar"><i data-i="x"></i></a></div>
+  <div class="drawer-body">
+<div class="field"><label>Empresa</label><select class="input"><option>Transportes Qori Ñan S.A.C.</option><option>Expreso Sachapuyo E.I.R.L.</option></select></div>
+<div class="field"><label>Nombre de la agencia</label><input class="input" placeholder="Ej. Terminal Puquio"></div>
+<div class="field"><label>Dirección</label><div class="control"><i data-i="pin"></i><input class="input"></div></div>
+<div class="grid-2"><div class="field"><label>Ciudad</label><select class="input"><option>Huamanga</option><option>Huanta</option><option>Puquio</option><option>Lima</option></select></div><div class="field"><label>Teléfono</label><div class="prefix"><span>+51</span><input class="input num"></div></div></div>
+</div>
+  <div class="drawer-foot"><a class="btn btn-ghost" href="#">Cancelar</a><a class="btn btn-primary" href="#">Crear agencia</a></div>
+</aside></div>
+</body>
+</html>

@@ -1,32 +1,39 @@
 schema: spec-driven
 
-# Project context (optional)
-# Add only constraints that should guide OpenSpec artifacts and workflows.
-# Include constraints an agent cannot infer by reading the code.
-# Keep general project documentation and discoverable codebase facts out.
-# Example:
-#   context: |
-#     Designs and tasks must cover Windows, macOS, and Linux
-#     Write all artifacts in Spanish
+context: |
+  Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial (Ayacucho, Perú). Curso IS-488, 2026-II.
+  Fuente de verdad funcional: openspec/specs/ (domain-baseline) y docs/ (HU01-HU44, RF01-RF49, AC01-AC10, RC01-RC15, DA01-DA14 drivers, ADR-01..ADR-15 decisiones, EQ-01..EQ-10).
+  Arquitectura: monolito modular + Clean Architecture con 7 módulos (MI01 Identidad y Acceso, MI02 Empresas y Agencias, MI03 Transporte y Programación, MI04 Reservas y Pasajes, MI05 Ventas y Pagos, MI06 Consultas y Reportes, MI07 Auditoría y Notificaciones).
+  Stack: .NET 8 (ASP.NET Core, EF Core + Npgsql), PostgreSQL 16, Redis, RabbitMQ, React 18 + TypeScript + Vite + Tailwind, Docker Compose, GitHub Actions.
+  Integraciones: Culqi (pagos) y WhatsApp Business Cloud API (notificaciones), siempre mediante interfaz + adaptador.
+  Idioma: artefactos OpenSpec y documentación en español; código, clases, tablas y endpoints en inglés.
+  Zona horaria America/Lima; fechas persistidas en UTC.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always state what is out of scope
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+rules:
+  proposal:
+    - Citar los IDs HU, RF, RC, EQ y ADR que cubre el cambio.
+    - Indicar el módulo (MI01-MI07) afectado y lo que queda fuera del alcance.
+    - Un change por funcionalidad; no mezclar módulos sin justificarlo.
+  specs:
+    - Requisitos con SHALL o MUST y al menos un escenario WHEN/THEN por requisito.
+    - Incluir escenarios de error, de autorización entre agencias y de concurrencia cuando apliquen.
+    - No contradecir openspec/specs/domain-baseline; si hay que cambiarlo, usar MODIFIED Requirements.
+  design:
+    - Respetar la regla de dependencias (Domain sin dependencias; Application solo depende de Domain e interfaces).
+    - Detallar entidades, tablas (esquema del módulo), endpoints, eventos Outbox y transacciones.
+    - Para pantallas, referenciar la carpeta correspondiente de design/stitch/ y design/stitch/DESIGN.md.
+  tasks:
+    - Tareas pequeñas y verificables, ordenadas Domain, Application, Infrastructure, Presentation, Frontend, Tests.
+    - Incluir siempre tareas de pruebas unitarias e integración; agregar prueba concurrente si el change toca TripSeat, pagos o expiración.
+    - Última tarea obligatoria, verificar build, tests y openspec validate --strict.
 
-# Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+operations:
+  apply:
+    guidance:
+      - Implementar solo lo que dice tasks.md y marcar cada tarea al terminarla.
+      - Seguir AGENTS.md; si una tarea contradice la spec, detenerse y reportarlo.
+      - Ejecutar dotnet build y dotnet test (y npm run build en frontend) antes de declarar terminado.
+  archive:
+    guidance:
+      - Sincronizar siempre las delta specs con openspec/specs antes de archivar.
+      - Resumir qué requisitos quedaron cubiertos y qué quedó pendiente.

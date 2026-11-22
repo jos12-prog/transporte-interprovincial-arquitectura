@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · agente/02-venta-asientos
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Venta de asientos · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.sale{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start}
+.mapcol{padding:20px;display:grid;gap:16px;justify-items:center}
+.paxcard{display:grid;gap:12px;padding:16px;border:1px solid var(--n-200);border-radius:14px}
+.seatno{width:30px;height:30px;border-radius:8px;background:var(--primary-600);color:#fff;display:grid;place-items:center;font:700 12.5px var(--body)}
+.live{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--success-600);font-weight:600}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--success-600);box-shadow:0 0 0 4px var(--success-100)}
+.tripbar{display:flex;gap:28px;align-items:center;padding:14px 20px;flex-wrap:wrap}
+.tripbar div{font-size:13px;color:var(--n-500)} .tripbar b{display:block;color:var(--n-900);font-size:15px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Menú">
+    <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <div class="group">Operación</div><a href="../01-panel-ventanilla/code.html"><i data-i="store"></i><span>Ventanilla</span></a><a href="../02-venta-asientos/code.html" class="on" aria-current="page"><i data-i="ticket"></i><span>Nueva venta</span></a><a href="../04-operaciones-del-dia/code.html"><i data-i="receipt"></i><span>Mis operaciones</span></a><div class="group">Soporte</div><a href="#pasajeros"><i data-i="users"></i><span>Pasajeros</span></a><a href="#ayuda"><i data-i="help"></i><span>Ayuda</span></a>
+    <div class="me"><span class="avatar">LM</span><div>Luis Mendoza<small>Agente de ventanilla</small></div></div>
+  </aside>
+  <div>
+    <header class="top">
+      <div class="agency" title="Su agencia asignada"><span class="dot"><i data-i="store" class="sm"></i></span><div>Terminal Norte<small>Transportes Qori Ñan S.A.C.</small></div></div>
+      <label class="search"><i data-i="search" class="sm"></i><input placeholder="Buscar viaje, pasajero o código" aria-label="Buscar"><kbd>/</kbd></label>
+      <div class="tools">
+        <button class="icon-btn" aria-label="Ayuda"><i data-i="help"></i></button>
+        <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i><span class="pip"></span></button>
+      </div>
+    </header>
+    <main class="main">
+
+<div class="page-head"><div><div class="crumbs"><a href="../01-panel-ventanilla/code.html">Ventanilla</a> / Nueva venta</div><h1>Venta en ventanilla</h1></div><span class="live">Disponibilidad en tiempo real</span></div>
+<section class="card tripbar" style="margin-bottom:20px">
+  <div>Salida<b class="num">22:30</b></div><div>Ruta<b>Ayacucho → Lima</b></div><div>Vehículo<b>Bus 2 pisos · ABC-482</b></div><div>Precio<b class="num">S/ 85.00</b></div><div>Libres<b class="num">14 de 52</b></div>
+  <button class="btn btn-ghost btn-sm" style="margin-left:auto">Cambiar viaje</button>
+</section>
+<div class="sale">
+  <section class="card mapcol">
+    <div class="segmented"><button aria-pressed="false">Piso 1</button><button aria-pressed="true">Piso 2</button></div>
+    <div data-model="bus2" data-floor="1" data-sel="35,36" data-held="18,27" data-taken="13,14,15,16,21,22,25,26,29,31,32,33,34,37,41,42,45,46,49,50,51"></div>
+    <div data-legend="agente" class="col2"></div>
+  </section>
+  <section class="card">
+    <div class="card-head"><h3>Pasajeros</h3><span class="xs muted"><kbd>F4</kbd> buscar por DNI · se autocompleta si ya está registrado</span></div>
+    <div class="card-pad stack">
+      <div class="paxcard">
+  <div class="row"><span class="seatno">35</span><b>Asiento 35</b><span class="badge b-success" style="margin-left:auto">Pasajero registrado</span></div>
+  <div class="grid-2">
+    <div class="field"><label>DNI</label><div class="row" style="gap:8px"><input class="input num" value="45871236" placeholder="8 dígitos"><button class="btn btn-ghost" style="height:46px"><i data-i="search" class="sm"></i></button></div></div>
+    <div class="field"><label>Celular</label><div class="prefix"><span>+51</span><input class="input num" value="987 654 321"></div></div>
+    <div class="field"><label>Nombres</label><input class="input" value="Ana Lucía"></div>
+    <div class="field"><label>Apellidos</label><input class="input" value="Quispe Palomino"></div>
+  </div>
+</div>
+      <div class="paxcard">
+  <div class="row"><span class="seatno">36</span><b>Asiento 36</b><span class="badge b-neutral" style="margin-left:auto">Nuevo</span></div>
+  <div class="grid-2">
+    <div class="field"><label>DNI</label><div class="row" style="gap:8px"><input class="input num" value="47002318" placeholder="8 dígitos"><button class="btn btn-ghost" style="height:46px"><i data-i="search" class="sm"></i></button></div></div>
+    <div class="field"><label>Celular</label><div class="prefix"><span>+51</span><input class="input num"></div></div>
+    <div class="field"><label>Nombres</label><input class="input" value="Julio César"></div>
+    <div class="field"><label>Apellidos</label><input class="input" value="Cárdenas Huamán"></div>
+  </div>
+</div>
+      <hr class="divider">
+      <div class="row between"><span class="muted">2 pasajes × S/ 85.00</span><b class="num" style="font:800 26px var(--display)">S/ 170.00</b></div>
+      <div class="row" style="justify-content:flex-end"><button class="btn btn-ghost">Cancelar <kbd>Esc</kbd></button><a class="btn btn-primary btn-lg" href="../03-cobro-emision/code.html">Cobrar <kbd style="margin-left:4px">F9</kbd></a></div>
+    </div>
+  </section>
+</div>
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

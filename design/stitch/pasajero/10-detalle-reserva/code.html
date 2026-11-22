@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · pasajero/10-detalle-reserva
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detalle de reserva · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.layout{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start}
+.tl{list-style:none;display:grid;gap:0}
+.tl li{display:grid;grid-template-columns:24px 1fr;gap:12px;padding-bottom:18px;position:relative}
+.tl li::before{content:"";position:absolute;left:11px;top:22px;bottom:0;width:2px;background:var(--primary-100)}
+.tl li:last-child::before{display:none}
+.tl b.d{width:24px;height:24px;border-radius:50%;background:var(--primary-600);color:#fff;display:grid;place-items:center}
+@media (max-width:1000px){.layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="../03-inicio-busqueda/code.html"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <nav class="nav-links" aria-label="Principal"><a href="../03-inicio-busqueda/code.html">Buscar viajes</a><a href="../09-mis-viajes/code.html" class="on" aria-current="page">Mis viajes</a><a href="#ayuda">Ayuda</a></nav>
+    <div class="nav-user">
+      <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i></button>
+      <span class="avatar">AQ</span><span class="name">Ana Quispe</span>
+    </div>
+  </div>
+</header>
+<nav class="tabbar" aria-label="Navegación inferior"><a href="../03-inicio-busqueda/code.html"><i data-i="search"></i>Buscar</a><a href="../09-mis-viajes/code.html" class="on"><i data-i="ticket"></i>Mis viajes</a><a href="#ayuda"><i data-i="help"></i>Ayuda</a><a href="#cuenta"><i data-i="user"></i>Cuenta</a></nav>
+
+<main class="container page" style="max-width:1040px">
+  <div class="crumbs"><a href="../09-mis-viajes/code.html">Mis viajes</a> / RA-7K2P9</div>
+  <div class="page-head"><div class="row wrap"><h1>Reserva RA-7K2P9</h1><span class="badge b-success">Confirmado</span></div>
+    <div class="row"><button class="btn btn-ghost"><i data-i="refresh" class="sm"></i> Reprogramar</button><a class="btn btn-ghost" style="color:var(--danger-600)" href="#cancelar"><i data-i="x" class="sm"></i> Cancelar reserva</a></div></div>
+  <div class="layout">
+    <div class="stack">
+      <section class="card card-pad stack"><h3>Viaje</h3>
+        <div class="route"><div><div class="t">22:30</div><div class="c">Ayacucho · Terminal Norte</div></div><div class="line"><span>8 h 45 min</span></div><div style="text-align:right"><div class="t">07:15</div><div class="c">Lima · Terminal Plaza Norte</div></div></div>
+        <div class="row wrap small muted"><span>sáb 21 nov 2026</span>·<span>Transportes Qori Ñan</span>·<span>Bus 2 pisos · ABC-482</span></div></section>
+      <section class="card"><div class="card-head"><h3>Pasajeros y asientos</h3></div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Asiento</th><th>Pasajero</th><th>Documento</th><th>Pasaje</th></tr></thead><tbody>
+          <tr><td><b>31</b> · Piso 2</td><td>Ana Lucía Quispe Palomino</td><td class="num">DNI 45871236</td><td><span class="badge b-success">Emitido</span></td></tr>
+          <tr><td><b>32</b> · Piso 2</td><td>Marco Antonio Quispe Rojas</td><td class="num">DNI 46120985</td><td><span class="badge b-success">Emitido</span></td></tr>
+        </tbody></table></div></section>
+      <section class="card card-pad stack"><h3>Pago</h3>
+        <div class="grid-3 small"><div><div class="muted">Método</div><b>Tarjeta Visa •••• 4242</b></div><div><div class="muted">Procesador</div><b>Culqi</b></div><div><div class="muted">Total pagado</div><b class="num">S/ 170.00</b></div></div></section>
+    </div>
+    <aside class="card card-pad stack"><h3>Historial</h3>
+      <ol class="tl">
+        <li><b class="d"><i data-i="check" class="sm"></i></b><div><b class="small">Asientos retenidos</b><div class="xs muted">vie 20 nov · 22:01</div></div></li>
+        <li><b class="d"><i data-i="check" class="sm"></i></b><div><b class="small">Pago aprobado</b><div class="xs muted">vie 20 nov · 22:04 · Culqi</div></div></li>
+        <li><b class="d"><i data-i="check" class="sm"></i></b><div><b class="small">Pasajes emitidos</b><div class="xs muted">vie 20 nov · 22:04</div></div></li>
+      </ol>
+    </aside>
+  </div>
+</main>
+<div class="scrim state" id="cancelar" role="dialog" aria-modal="true" aria-labelledby="ct">
+  <div class="modal stack">
+    <span style="width:44px;height:44px;border-radius:12px;background:var(--danger-100);color:var(--danger-600);display:grid;place-items:center"><i data-i="alert"></i></span>
+    <div class="stack-sm"><h2 id="ct">¿Cancelar tu reserva?</h2><p class="muted small">Se anularán los pasajes de los asientos 31 y 32. Las condiciones de devolución dependen de la política de Transportes Qori Ñan.</p></div>
+    <div class="alert alert-warning small"><i data-i="clock" class="sm"></i><div>Antes de confirmar te mostraremos el monto de devolución que corresponde según la política vigente de la empresa.</div></div>
+    <div class="row" style="justify-content:flex-end"><a class="btn btn-ghost" href="#">Mantener reserva</a><button class="btn btn-danger">Sí, cancelar</button></div>
+  </div>
+</div>
+
+<footer class="footer"><div class="container row between wrap"><span>© 2026 RutaAndina · Ayacucho, Perú</span><span class="row"><a href="#terminos">Términos</a><a href="#privacidad">Privacidad</a><a href="#libro">Libro de reclamaciones</a></span></div></footer>
+</body>
+</html>

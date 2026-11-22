@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · pasajero/06-datos-pasajeros
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datos de pasajeros · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.layout{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start}
+.sum{position:sticky;top:88px}
+.seatno{width:32px;height:32px;border-radius:9px;background:var(--primary-600);color:#fff;display:grid;place-items:center;font:700 13px var(--body)}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mode{display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:14px;border:1.5px solid var(--n-200);background:#fff;color:inherit;text-decoration:none;transition:border-color .15s,background .15s}
+.mode:hover{border-color:var(--primary-500)}
+.mode .radio{flex:none;width:20px;height:20px;border-radius:50%;border:2px solid var(--n-300);margin-top:2px;display:grid;place-items:center}
+.mode b{display:block;font:700 15px var(--body);color:var(--n-900)} .mode span{font-size:13px;color:var(--n-500)}
+.mode .ico-wrap{flex:none;width:40px;height:40px;border-radius:12px;background:var(--n-100);color:var(--n-600);display:grid;place-items:center}
+.mode.on{border-color:var(--primary-600);background:var(--primary-50)}
+.mode.on .radio{border-color:var(--primary-600)} .mode.on .radio::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--primary-600)}
+.mode.on .ico-wrap{background:var(--primary-600);color:#fff}
+/* Sin #un-titular: cada asiento con su pasajero. Con #un-titular: un solo formulario para todos */
+main:has(#un-titular:target) .mode-each{border-color:var(--n-200);background:#fff}
+main:has(#un-titular:target) .mode-each .radio{border-color:var(--n-300)} main:has(#un-titular:target) .mode-each .radio::after{display:none}
+main:has(#un-titular:target) .mode-each .ico-wrap{background:var(--n-100);color:var(--n-600)}
+main:has(#un-titular:target) .mode-one{border-color:var(--primary-600);background:var(--primary-50)}
+main:has(#un-titular:target) .mode-one .radio{border-color:var(--primary-600)} main:has(#un-titular:target) .mode-one .radio::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--primary-600)}
+main:has(#un-titular:target) .mode-one .ico-wrap{background:var(--primary-600);color:#fff}
+main:has(#un-titular:target) .per-seat{display:none}
+.seatchips{display:flex;gap:6px;flex-wrap:wrap} .seatchips .seatno{width:auto;padding:0 10px;height:28px;font-size:12.5px}
+@media (max-width:1000px){.layout{grid-template-columns:1fr}}
+@media (max-width:640px){.modes{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="../03-inicio-busqueda/code.html"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <nav class="nav-links" aria-label="Principal"><a href="../03-inicio-busqueda/code.html" class="on" aria-current="page">Buscar viajes</a><a href="../09-mis-viajes/code.html">Mis viajes</a><a href="#ayuda">Ayuda</a></nav>
+    <div class="nav-user">
+      <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i></button>
+      <span class="avatar">AQ</span><span class="name">Ana Quispe</span>
+    </div>
+  </div>
+</header>
+<nav class="tabbar" aria-label="Navegación inferior"><a href="../03-inicio-busqueda/code.html" class="on"><i data-i="search"></i>Buscar</a><a href="../09-mis-viajes/code.html"><i data-i="ticket"></i>Mis viajes</a><a href="#ayuda"><i data-i="help"></i>Ayuda</a><a href="#cuenta"><i data-i="user"></i>Cuenta</a></nav>
+
+<main class="container page">
+  <nav class="stepper" aria-label="Pasos de compra"><div class="stepper-top"><p>Paso 2 de 4 · <b>Pasajeros</b></p><span class="pill-timer" data-hold="582" role="timer" aria-label="Tiempo de retención"><i data-i="clock" class="sm"></i>Tus asientos están reservados <b>09:42</b></span></div><ol class="steps"><li class="done"><b>✓</b><span>Asientos<small>Asientos 31 y 32</small></span></li><li class="now" aria-current="step"><b>2</b><span>Pasajeros<small>Datos de cada viajero</small></span></li><li class=""><b>3</b><span>Pago<small>Paga seguro con Culqi</small></span></li><li class=""><b>4</b><span>Pasaje<small>Recibe tu boleto con QR</small></span></li></ol></nav>
+  <h1 style="margin-bottom:6px">¿Quiénes viajan?</h1>
+  <p class="muted" style="margin-bottom:24px">Los datos deben coincidir con el documento que presentarán al abordar.</p>
+  <div class="layout">
+    <div class="stack">
+      <section class="stack" style="gap:10px" aria-label="Cómo llenar los datos">
+        <b class="small">¿Cómo quieres llenar los datos?</b>
+        <div class="modes" role="radiogroup">
+          <a class="mode mode-each on" href="#" role="radio" aria-checked="true"><span class="radio"></span><span><b>Un pasajero por asiento</b><span>Escribe el nombre y DNI de cada persona que viaja.</span></span><span class="ico-wrap" style="margin-left:auto"><i data-i="users" class="sm"></i></span></a>
+          <a class="mode mode-one" href="#un-titular" role="radio" aria-checked="false"><span class="radio"></span><span><b>Un solo nombre para todos</b><span>Usa los datos de una persona en los 2 asientos. Más rápido.</span></span><span class="ico-wrap" style="margin-left:auto"><i data-i="user" class="sm"></i></span></a>
+        </div>
+      </section>
+      <div class="per-seat stack">
+        <section class="card">
+  <div class="card-head"><div class="row"><span class="seatno">31</span><b>Asiento 31</b><span class="xs muted">Piso 2</span></div><label class="row small" style="gap:8px">Soy yo <input type="checkbox" class="switch" checked></label></div>
+  <div class="card-pad grid-2">
+    <div class="field"><label>Tipo de documento</label><select class="input"><option>DNI</option><option>Carné de extranjería</option><option>Pasaporte</option></select></div>
+    <div class="field"><label>Número de documento</label><input class="input num" inputmode="numeric" value="45871236" placeholder="8 dígitos"></div>
+    <div class="field"><label>Nombres</label><input class="input" value="Ana Lucía"></div>
+    <div class="field"><label>Apellidos</label><input class="input" value="Quispe Palomino"></div>
+  </div>
+</section>
+        <section class="card">
+  <div class="card-head"><div class="row"><span class="seatno">32</span><b>Asiento 32</b><span class="xs muted">Piso 2</span></div></div>
+  <div class="card-pad grid-2">
+    <div class="field"><label>Tipo de documento</label><select class="input"><option>DNI</option><option>Carné de extranjería</option><option>Pasaporte</option></select></div>
+    <div class="field"><label>Número de documento</label><input class="input num" inputmode="numeric" placeholder="8 dígitos"></div>
+    <div class="field"><label>Nombres</label><input class="input"></div>
+    <div class="field"><label>Apellidos</label><input class="input"></div>
+  </div>
+</section>
+      </div>
+      <section class="card state" id="un-titular">
+        <div class="card-head"><div class="row"><span class="ico-wrap" style="width:32px;height:32px;border-radius:9px;background:var(--primary-600);color:#fff;display:grid;place-items:center"><i data-i="user" class="sm"></i></span><b>Titular de los asientos</b></div><div class="seatchips"><span class="seatno">Asiento 31</span><span class="seatno">Asiento 32</span></div></div>
+        <div class="card-pad stack">
+          <div class="grid-2">
+            <div class="field"><label>Tipo de documento</label><select class="input"><option>DNI</option><option>Carné de extranjería</option><option>Pasaporte</option></select></div>
+            <div class="field"><label>Número de documento</label><input class="input num" inputmode="numeric" value="45871236"></div>
+            <div class="field"><label>Nombres</label><input class="input" value="Ana Lucía"></div>
+            <div class="field"><label>Apellidos</label><input class="input" value="Quispe Palomino"></div>
+          </div>
+          <p class="small row" style="margin:0;gap:6px;color:var(--primary-700)"><i data-i="check" class="sm"></i><span>Este nombre se usará en los <b>2 asientos</b> (31 y 32).</span></p>
+          <div class="alert alert-warning small"><i data-i="id" class="sm"></i><span>Al abordar, la empresa puede pedir el DNI de cada viajero para la lista de pasajeros. Si viajan personas distintas, te recomendamos <a href="#">un pasajero por asiento</a>.</span></div>
+        </div>
+      </section>
+      <section class="card card-pad stack">
+        <div><h3>Contacto para el pasaje</h3><p class="small muted">Te enviaremos el pasaje y el código de reserva.</p></div>
+        <div class="grid-2">
+          <div class="field"><label>Celular</label><div class="prefix"><span>+51</span><input class="input num" value="987 654 321"></div></div>
+          <div class="field"><label>Correo</label><input class="input" value="ana.quispe@gmail.com"></div>
+        </div>
+        <label class="check"><input type="checkbox"> <span>Enviarme el pasaje y recordatorios por WhatsApp <span class="muted">(opcional)</span></span></label>
+      </section>
+      <div class="row between"><a class="btn btn-ghost" href="../05-seleccion-asiento/code.html"><i data-i="back" class="sm"></i> Volver</a><a class="btn btn-primary btn-lg" href="../07-pago/code.html">Ir a pagar <i data-i="arrow"></i></a></div>
+    </div>
+    <aside class="card card-pad stack sum">
+  <div class="stack-sm">
+    <span class="xs muted" style="text-transform:uppercase;letter-spacing:.08em;font-weight:600">Tu viaje</span>
+    <h3>Ayacucho → Lima</h3>
+    <span class="small muted">sáb 21 nov 2026 · 22:30 → 07:15 · Bus 2 pisos</span>
+    <span class="small muted">Transportes Qori Ñan · Terminal Norte</span>
+  </div>
+  <hr class="divider">
+  <div class="row between"><span class="muted">Asiento 31</span><span class="num">S/ 85.00</span></div><div class="row between"><span class="muted">Asiento 32</span><span class="num">S/ 85.00</span></div>
+  <hr class="divider">
+  <div class="row between"><b>Total</b><b class="num" style="font:700 22px var(--display)">S/ 170.00</b></div>
+
+</aside>
+  </div>
+</main>
+
+<footer class="footer"><div class="container row between wrap"><span>© 2026 RutaAndina · Ayacucho, Perú</span><span class="row"><a href="#terminos">Términos</a><a href="#privacidad">Privacidad</a><a href="#libro">Libro de reclamaciones</a></span></div></footer>
+</body>
+</html>

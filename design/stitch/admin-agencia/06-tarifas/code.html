@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · admin-agencia/06-tarifas
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarifas · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Menú">
+    <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <div class="group">Agencia</div><a href="../02-dashboard/code.html"><i data-i="grid"></i><span>Dashboard</span></a><a href="../05-viajes-horarios/code.html"><i data-i="calendar"></i><span>Viajes y horarios</span></a><a href="../03-rutas/code.html"><i data-i="route"></i><span>Rutas</span></a><a href="../04-vehiculos/code.html"><i data-i="bus"></i><span>Vehículos</span></a><a href="../06-tarifas/code.html" class="on" aria-current="page"><i data-i="tag"></i><span>Tarifas</span></a><div class="group">Equipo y análisis</div><a href="../07-agentes/code.html"><i data-i="users"></i><span>Agentes</span></a><a href="../08-reportes/code.html"><i data-i="chart"></i><span>Reportes</span></a><a href="#alertas"><i data-i="bell"></i><span>Alertas</span><b class="count">3</b></a>
+    <div class="me"><span class="avatar">RH</span><div>Rosa Huamán<small>Admin. de agencia</small></div></div>
+  </aside>
+  <div>
+    <header class="top">
+      <button class="agency" aria-haspopup="listbox"><span class="dot"><i data-i="store" class="sm"></i></span><div>Terminal Norte<small>Transportes Qori Ñan S.A.C.</small></div><i data-i="chevron" class="sm"></i></button>
+      <label class="search"><i data-i="search" class="sm"></i><input placeholder="Buscar viaje, pasajero o código" aria-label="Buscar"><kbd>/</kbd></label>
+      <div class="tools">
+        <button class="icon-btn" aria-label="Ayuda"><i data-i="help"></i></button>
+        <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i><span class="pip"></span></button>
+      </div>
+    </header>
+    <main class="main">
+
+<div class="page-head"><div><div class="crumbs">Transportes Qori Ñan · tarifas de la empresa</div><h1>Tarifas</h1><p class="muted small">Un precio único por viaje. Las fechas especiales reemplazan el precio base en su rango.</p></div><a class="btn btn-primary" href="#editar"><i data-i="plus" class="sm"></i> Nueva tarifa</a></div>
+<section class="card"><div class="table-wrap"><table class="table">
+  <thead><tr><th>Ruta</th><th>Precio base</th><th>Vigente desde</th><th>Hasta</th><th>Fechas especiales</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><b>Ayacucho → Lima</b></td><td class="num"><b>S/ 85.00</b></td><td class="num">01 nov 2026</td><td class="num">—</td><td><span class="demand"><i data-i="flame" class="sm"></i>Semana Santa · S/ 110.00</span> <span class="demand"><i data-i="flame" class="sm"></i>Fiestas Patrias · S/ 105.00</span></td><td class="right"><a class="more" href="#editar" aria-label="Editar"><i data-i="edit" class="sm"></i></a></td></tr>
+    <tr><td><b>Ayacucho → Huanta</b></td><td class="num"><b>S/ 25.00</b></td><td class="num">01 oct 2026</td><td class="num">—</td><td></td><td class="right"><a class="more" href="#editar" aria-label="Editar"><i data-i="edit" class="sm"></i></a></td></tr>
+    <tr><td><b>Ayacucho → Huancayo</b></td><td class="num"><b>S/ 45.00</b></td><td class="num">01 oct 2026</td><td class="num">—</td><td><span class="demand"><i data-i="flame" class="sm"></i>Semana Santa · S/ 60.00</span></td><td class="right"><a class="more" href="#editar" aria-label="Editar"><i data-i="edit" class="sm"></i></a></td></tr>
+    <tr><td><b>Ayacucho → Andahuaylas</b></td><td class="num"><b>S/ 50.00</b></td><td class="num">15 oct 2026</td><td class="num">—</td><td></td><td class="right"><a class="more" href="#editar" aria-label="Editar"><i data-i="edit" class="sm"></i></a></td></tr>
+    <tr><td><b>Ayacucho → Cusco</b></td><td class="num"><b>S/ 90.00</b></td><td class="num">01 nov 2026</td><td class="num">31 dic 2026</td><td></td><td class="right"><a class="more" href="#editar" aria-label="Editar"><i data-i="edit" class="sm"></i></a></td></tr>
+  </tbody></table></div></section>
+
+    </main>
+  </div>
+</div>
+<div class="state" id="editar"><a class="drawer-scrim" href="#" aria-label="Cerrar"></a>
+<aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="editar-t">
+  <div class="drawer-head"><h2 id="editar-t">Editar tarifa</h2><a class="more" href="#" aria-label="Cerrar"><i data-i="x"></i></a></div>
+  <div class="drawer-body">
+<div class="field"><label>Ruta</label><select class="input"><option>Ayacucho → Lima</option></select></div>
+<div class="grid-2"><div class="field"><label>Precio base</label><div class="prefix"><span>S/</span><input class="input num" value="85.00"></div></div><div class="field"><label>Vigente desde</label><div class="control"><i data-i="calendar"></i><input class="input" value="01 nov 2026"></div></div></div>
+<hr class="divider">
+<div class="row between"><b>Fechas especiales</b><button class="btn btn-ghost btn-sm"><i data-i="plus" class="sm"></i> Agregar</button></div>
+<div class="card card-pad stack" style="background:var(--accent-100);border-color:#F6D49A">
+  <div class="row between"><b class="small">Semana Santa</b><button class="more" aria-label="Quitar"><i data-i="trash" class="sm"></i></button></div>
+  <div class="grid-2"><div class="field"><label>Rango</label><input class="input" value="29 mar – 5 abr 2026"></div><div class="field"><label>Precio</label><div class="prefix"><span>S/</span><input class="input num" value="110.00"></div></div></div>
+</div>
+<p class="hint">El cambio no afecta reservas ya pagadas.</p>
+</div>
+  <div class="drawer-foot"><a class="btn btn-ghost" href="#">Cancelar</a><a class="btn btn-primary" href="#">Guardar</a></div>
+</aside></div>
+</body>
+</html>

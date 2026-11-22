@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · superadmin/07-auditoria
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoría · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.filters{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr auto;gap:12px;align-items:end;padding:18px 20px}
+code{font:500 12.5px ui-monospace,Menlo,monospace;background:var(--n-100);padding:3px 7px;border-radius:6px;color:var(--n-700)}
+.table tr.sel td{background:var(--primary-50)!important}
+.diff{font:12.5px/1.6 ui-monospace,Menlo,monospace;border:1px solid var(--n-200);border-radius:12px;overflow:hidden}
+.diff div{padding:0 12px;white-space:pre-wrap;word-break:break-word}
+.diff .h{background:var(--n-100);color:var(--n-600);padding:6px 12px;font-family:var(--body);font-weight:600;font-size:12px}
+.diff .rm{background:#FEF2F2;color:#991B1B} .diff .ad{background:#F0FDF4;color:#166534}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Menú">
+    <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <div class="group">Plataforma</div><a href="../01-dashboard-global/code.html"><i data-i="grid"></i><span>Dashboard</span></a><a href="../02-empresas/code.html"><i data-i="building"></i><span>Empresas</span></a><a href="../03-agencias/code.html"><i data-i="store"></i><span>Agencias</span></a><a href="../04-usuarios-administrativos/code.html"><i data-i="users"></i><span>Usuarios administrativos</span></a><div class="group">Catálogos</div><a href="../05-modelos-vehiculo/code.html"><i data-i="bus"></i><span>Modelos de vehículo</span></a><a href="../06-festividades-alta-demanda/code.html"><i data-i="flame"></i><span>Festividades</span></a><div class="group">Control</div><a href="../07-auditoria/code.html" class="on" aria-current="page"><i data-i="log"></i><span>Auditoría</span></a><a href="#configuracion"><i data-i="settings"></i><span>Configuración</span></a>
+    <div class="me"><span class="avatar">JP</span><div>Jorge Pariona<small>Superadministrador</small></div></div>
+  </aside>
+  <div>
+    <header class="top">
+      <div class="agency"><span class="dot"><i data-i="shield" class="sm"></i></span><div>Plataforma RutaAndina<small>Todas las empresas</small></div></div>
+      <label class="search"><i data-i="search" class="sm"></i><input placeholder="Buscar en el registro" aria-label="Buscar"><kbd>/</kbd></label>
+      <div class="tools">
+        <button class="icon-btn" aria-label="Ayuda"><i data-i="help"></i></button>
+        <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i><span class="pip"></span></button>
+      </div>
+    </header>
+    <main class="main">
+
+<div class="page-head"><div><div class="crumbs">Control</div><h1>Auditoría</h1><p class="muted small">Registro inmutable de operaciones administrativas y de venta.</p></div><button class="btn btn-ghost"><i data-i="download" class="sm"></i> Exportar CSV</button></div>
+<section class="card" style="margin-bottom:20px"><form class="filters">
+  <div class="field"><label>Rango</label><div class="control"><i data-i="calendar"></i><input class="input" value="15 – 21 nov 2026"></div></div>
+  <div class="field"><label>Usuario</label><select class="input"><option>Todos</option></select></div>
+  <div class="field"><label>Operación</label><select class="input"><option>Todas</option><option>Venta</option><option>Cancelación</option><option>Cambio de tarifa</option></select></div>
+  <div class="field"><label>Resultado</label><select class="input"><option>Todos</option><option>Éxito</option><option>Denegado</option></select></div>
+  <button class="btn btn-primary" style="height:46px">Filtrar</button>
+</form></section>
+<section class="card"><div class="table-wrap"><table class="table">
+  <thead><tr><th>Fecha y hora</th><th>Usuario</th><th>Empresa</th><th>Agencia</th><th>Operación</th><th>Recurso</th><th>Resultado</th></tr></thead>
+  <tbody>
+    <tr><td class="num small">21/11 14:08:12</td><td><b>Luis Mendoza</b><div class="xs muted">Agente</div></td><td class="small">Qori Ñan</td><td class="small">Terminal Norte</td><td><code>SALE_CONFIRMED</code></td><td class="small">Reserva RA-V8821</td><td><span class="badge b-success">Éxito</span></td></tr>
+    <tr class="sel"><td class="num small">21/11 13:47:55</td><td><b>Rosa Huamán</b><div class="xs muted">Admin. de agencia</div></td><td class="small">Qori Ñan</td><td class="small">Terminal Norte</td><td><code>FARE_UPDATED</code></td><td class="small">Tarifa Ayacucho → Lima</td><td><span class="badge b-success">Éxito</span></td></tr>
+    <tr><td class="num small">21/11 13:41:03</td><td><b>Karina Cisneros</b><div class="xs muted">Agente</div></td><td class="small">Qori Ñan</td><td class="small">Terminal Norte</td><td><code>SALE_CANCEL</code></td><td class="small">Reserva RA-V8810</td><td><span class="badge b-danger">Denegado</span></td></tr>
+    <tr><td class="num small">21/11 12:30:40</td><td><b>Jorge Pariona</b><div class="xs muted">Superadmin</div></td><td class="small">—</td><td class="small">—</td><td><code>AGENCY_ASSIGNED</code></td><td class="small">Usuario Jhon Cárdenas</td><td><span class="badge b-success">Éxito</span></td></tr>
+    <tr><td class="num small">21/11 11:02:19</td><td><b>Maribel Vargas</b><div class="xs muted">Admin. de agencia</div></td><td class="small">Sachapuyo</td><td class="small">Plaza Norte</td><td><code>TRIP_SCHEDULED</code></td><td class="small">14 viajes Lima → Ayacucho</td><td><span class="badge b-success">Éxito</span></td></tr>
+    <tr><td class="num small">21/11 10:15:08</td><td><b>Sistema</b><div class="xs muted">Proceso automático</div></td><td class="small">—</td><td class="small">—</td><td><code>HOLD_EXPIRED</code></td><td class="small">Reserva RA-3M8QX</td><td><span class="badge b-success">Éxito</span></td></tr>
+  </tbody></table></div></section>
+
+    </main>
+  </div>
+</div>
+<div class="state" id="detalle"><a class="drawer-scrim" href="#" aria-label="Cerrar"></a>
+<aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="detalle-t">
+  <div class="drawer-head"><h2 id="detalle-t">FARE_UPDATED · 21/11 13:47:55</h2><a class="more" href="#" aria-label="Cerrar"><i data-i="x"></i></a></div>
+  <div class="drawer-body">
+<dl class="kv" style="grid-template-columns:repeat(2,auto)"><div><dt>Usuario</dt><dd>Rosa Huamán</dd></div><div><dt>Agencia</dt><dd>Terminal Norte</dd></div><div><dt>IP</dt><dd>190.42.118.7</dd></div><div><dt>Correlación</dt><dd>c7f1…9a2e</dd></div></dl>
+<div class="diff"><div class="h">Antes → después</div><div>{</div><div>  "route": "AYA-LIM",</div><div class="rm">-  "specialPrices": []</div><div class="ad">+  "specialPrices": [{ "name": "Semana Santa",</div><div class="ad">+     "from": "2026-03-29", "to": "2026-04-05", "price": 110.00 }]</div><div>  "basePrice": 85.00</div><div>}</div></div>
+</div>
+  <div class="drawer-foot"><a class="btn btn-ghost" href="#">Cerrar</a></div>
+</aside></div>
+</body>
+</html>

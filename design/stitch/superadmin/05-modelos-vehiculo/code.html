@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · superadmin/05-modelos-vehiculo
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modelos de vehículo · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.models{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mc{padding:20px;display:grid;justify-items:center;gap:14px}
+.mc .seat-mini{min-height:150px;display:grid;place-items:center}
+.mc:nth-child(n+5) .seat-mini .vehicle{--s:12px}
+.mc:nth-child(n+5) .seat-mini .gap.aisle{width:6px}
+.mc:nth-child(n+5) .seat-mini .vrow{gap:3px}.mc:nth-child(n+5) .seat-mini .vehicle{gap:3px}
+.editor{display:grid;grid-template-columns:auto 1fr;gap:20px}
+.palette{display:grid;gap:8px;align-content:start}
+.palette button{display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border-radius:10px;border:1px solid var(--n-200);background:#fff;font:500 13.5px var(--body);cursor:pointer}
+.palette button.on{border-color:var(--primary-600);background:var(--primary-50)}
+.palette i.sw{width:18px;height:18px;border-radius:5px;display:inline-block}
+.canvas{display:grid;grid-template-columns:repeat(5,44px);gap:8px;padding:24px 18px 18px;border:2px solid var(--n-300);border-radius:44px 44px 18px 18px;justify-self:center;background:var(--n-50)}
+.cell{width:44px;height:44px;border-radius:9px;display:grid;place-items:center;font:600 13px var(--body);cursor:pointer}
+.cell.s{background:#fff;border:1.5px solid var(--primary-600);color:var(--primary-700)}
+.cell.c{background:var(--n-200);color:var(--n-600)}
+.cell.p{background:repeating-linear-gradient(45deg,transparent 0 5px,var(--n-200) 5px 6px)}
+.cell.v{border:1.5px dashed var(--n-300)}
+@media (max-width:1200px){.models{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Menú">
+    <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <div class="group">Plataforma</div><a href="../01-dashboard-global/code.html"><i data-i="grid"></i><span>Dashboard</span></a><a href="../02-empresas/code.html"><i data-i="building"></i><span>Empresas</span></a><a href="../03-agencias/code.html"><i data-i="store"></i><span>Agencias</span></a><a href="../04-usuarios-administrativos/code.html"><i data-i="users"></i><span>Usuarios administrativos</span></a><div class="group">Catálogos</div><a href="../05-modelos-vehiculo/code.html" class="on" aria-current="page"><i data-i="bus"></i><span>Modelos de vehículo</span></a><a href="../06-festividades-alta-demanda/code.html"><i data-i="flame"></i><span>Festividades</span></a><div class="group">Control</div><a href="../07-auditoria/code.html"><i data-i="log"></i><span>Auditoría</span></a><a href="#configuracion"><i data-i="settings"></i><span>Configuración</span></a>
+    <div class="me"><span class="avatar">JP</span><div>Jorge Pariona<small>Superadministrador</small></div></div>
+  </aside>
+  <div>
+    <header class="top">
+      <div class="agency"><span class="dot"><i data-i="shield" class="sm"></i></span><div>Plataforma RutaAndina<small>Todas las empresas</small></div></div>
+      <label class="search"><i data-i="search" class="sm"></i><input placeholder="Buscar modelo" aria-label="Buscar"><kbd>/</kbd></label>
+      <div class="tools">
+        <button class="icon-btn" aria-label="Ayuda"><i data-i="help"></i></button>
+        <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i><span class="pip"></span></button>
+      </div>
+    </header>
+    <main class="main">
+
+<div class="page-head"><div><div class="crumbs">Catálogos</div><h1>Modelos de vehículo</h1><p class="muted small">Cada modelo define el plano de asientos que heredan sus vehículos. Lo usan todas las empresas.</p></div><a class="btn btn-primary" href="#nuevo"><i data-i="plus" class="sm"></i> Nuevo modelo</a></div>
+<div class="models">
+  <article class="card mc"><div class="seat-mini" data-model="yaris"></div><div class="row between" style="width:100%"><div><b>Toyota Yaris</b><div class="xs muted">Sedán</div></div><span class="badge b-primary plain num">4 asientos</span></div><div class="xs muted" style="width:100%">En uso por 3 vehículos</div></article>
+  <article class="card mc"><div class="seat-mini" data-model="avanza"></div><div class="row between" style="width:100%"><div><b>Toyota Avanza</b><div class="xs muted">Familiar</div></div><span class="badge b-primary plain num">6 asientos</span></div><div class="xs muted" style="width:100%">En uso por 8 vehículos</div></article>
+  <article class="card mc"><div class="seat-mini" data-model="minivan"></div><div class="row between" style="width:100%"><div><b>Minivan</b><div class="xs muted">Familiar</div></div><span class="badge b-primary plain num">7 asientos</span></div><div class="xs muted" style="width:100%">En uso por 5 vehículos</div></article>
+  <article class="card mc"><div class="seat-mini" data-model="van"></div><div class="row between" style="width:100%"><div><b>Van</b><div class="xs muted">Transporte</div></div><span class="badge b-primary plain num">15 asientos</span></div><div class="xs muted" style="width:100%">En uso por 21 vehículos</div></article>
+  <article class="card mc"><div class="seat-mini" data-model="bus1"></div><div class="row between" style="width:100%"><div><b>Bus 1 piso</b><div class="xs muted">Bus</div></div><span class="badge b-primary plain num">44 asientos</span></div><div class="xs muted" style="width:100%">En uso por 14 vehículos</div></article>
+  <article class="card mc"><div class="seat-mini" data-model="bus2"></div><div class="row between" style="width:100%"><div><b>Bus 2 pisos</b><div class="xs muted">Bus · 2 pisos</div></div><span class="badge b-primary plain num">52 asientos</span></div><div class="xs muted" style="width:100%">En uso por 9 vehículos</div></article>
+</div>
+
+    </main>
+  </div>
+</div>
+<div class="state" id="nuevo"><a class="drawer-scrim" href="#" aria-label="Cerrar"></a>
+<aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="nuevo-t">
+  <div class="drawer-head"><h2 id="nuevo-t">Nuevo modelo de vehículo</h2><a class="more" href="#" aria-label="Cerrar"><i data-i="x"></i></a></div>
+  <div class="drawer-body">
+<div class="grid-2"><div class="field"><label>Nombre</label><input class="input" value="Van 19"></div><div class="field"><label>Categoría</label><select class="input"><option>Transporte</option><option>Sedán</option><option>Familiar</option><option>Bus</option></select></div></div>
+<div class="row between"><div class="segmented"><button aria-pressed="true">Piso 1</button><button aria-pressed="false">+ Piso 2</button></div><span class="badge b-primary plain num">Capacidad: 22 asientos</span></div>
+<div class="editor">
+  <div class="palette"><button class="on"><i class="sw" style="border:1.5px solid #0E6B5C"></i>Asiento</button><button><i class="sw" style="background:repeating-linear-gradient(45deg,transparent 0 3px,#E2E8F0 3px 4px)"></i>Pasillo</button><button><i class="sw" style="background:#E2E8F0"></i>Conductor</button><button><i class="sw" style="border:1.5px dashed #CBD5E1"></i>Vacío</button><span class="hint" style="margin-top:6px">Clic en una celda para cambiarla. Los asientos se numeran solos, de adelante hacia atrás.</span></div>
+  <div class="canvas"><span class="cell c">C</span><span class="cell v"></span><span class="cell p"></span><span class="cell s">1</span><span class="cell s">2</span><span class="cell s">3</span><span class="cell s">4</span><span class="cell p"></span><span class="cell s">5</span><span class="cell s">6</span><span class="cell s">7</span><span class="cell s">8</span><span class="cell p"></span><span class="cell s">9</span><span class="cell s">10</span><span class="cell s">11</span><span class="cell s">12</span><span class="cell p"></span><span class="cell s">13</span><span class="cell s">14</span><span class="cell s">15</span><span class="cell s">16</span><span class="cell p"></span><span class="cell s">17</span><span class="cell v"></span><span class="cell s">18</span><span class="cell s">19</span><span class="cell s">20</span><span class="cell s">21</span><span class="cell s">22</span></div>
+</div>
+</div>
+  <div class="drawer-foot"><a class="btn btn-ghost" href="#">Cancelar</a><a class="btn btn-primary" href="#">Guardar modelo</a></div>
+</aside></div>
+</body>
+</html>

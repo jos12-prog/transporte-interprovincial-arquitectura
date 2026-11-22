@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · admin-agencia/01-selector-agencia
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elegir agencia · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+body{background:var(--n-50)}
+.wrap-sel{min-height:100vh;display:grid;place-items:center;padding:40px 16px;background:radial-gradient(60% 50% at 50% 0%,var(--primary-50),transparent)}
+.box{width:100%;max-width:920px;display:grid;gap:28px;justify-items:center;text-align:center}
+.agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%}
+.agcard{position:relative;display:grid;justify-items:start;gap:4px;text-align:left;padding:22px;border-radius:18px;border:1.5px solid var(--n-200);background:#fff;cursor:pointer;font:inherit;color:inherit;box-shadow:var(--sh-sm);transition:border-color .15s,box-shadow .15s,transform .15s}
+.agcard:hover{transform:translateY(-2px);box-shadow:var(--sh-md)}
+.agcard.on{border-color:var(--primary-600);box-shadow:0 0 0 4px var(--primary-100)}
+.agcard .ic{width:44px;height:44px;border-radius:12px;background:var(--primary-50);color:var(--primary-700);display:grid;place-items:center;margin-bottom:10px}
+.agcard b{font:700 18px var(--display)}
+.agcard .tick{position:absolute;top:16px;right:16px;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--n-300);display:grid;place-items:center;color:transparent}
+.agcard.on .tick{background:var(--primary-600);border-color:var(--primary-600);color:#fff}
+@media (max-width:760px){.agrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="wrap-sel">
+  <div class="box enter">
+    <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <div class="stack-sm"><span class="badge b-primary plain" style="justify-self:center">Transportes Qori Ñan S.A.C.</span><h1 style="font-size:32px">¿En qué agencia trabajará hoy?</h1><p class="muted">Rosa, tiene acceso a 3 agencias. Todo lo que vea y registre se aplicará a la agencia elegida.</p></div>
+    <div class="agrid">
+      <button class="agcard on" aria-pressed="true">
+  <span class="tick"><i data-i="check" class="sm"></i></span>
+  <span class="ic"><i data-i="store"></i></span>
+  <b>Terminal Norte</b><span class="small muted">Av. Cusco 1220, Huamanga</span>
+  <div class="row between" style="width:100%;margin-top:8px"><div class="small"><b class="num">18</b> salidas hoy</div><div data-donut="73" style="width:56px"></div></div>
+</button>
+      <button class="agcard" aria-pressed="false">
+  <span class="tick"><i data-i="check" class="sm"></i></span>
+  <span class="ic"><i data-i="store"></i></span>
+  <b>Terminal Sur</b><span class="small muted">Jr. Libertad 410, Huamanga</span>
+  <div class="row between" style="width:100%;margin-top:8px"><div class="small"><b class="num">11</b> salidas hoy</div><div data-donut="48" style="width:56px"></div></div>
+</button>
+      <button class="agcard" aria-pressed="false">
+  <span class="tick"><i data-i="check" class="sm"></i></span>
+  <span class="ic"><i data-i="store"></i></span>
+  <b>Huanta</b><span class="small muted">Jr. Gervasio Santillana 155, Huanta</span>
+  <div class="row between" style="width:100%;margin-top:8px"><div class="small"><b class="num">7</b> salidas hoy</div><div data-donut="35" style="width:56px"></div></div>
+</button>
+    </div>
+    <a class="btn btn-primary btn-lg" style="min-width:240px" href="../02-dashboard/code.html">Continuar <i data-i="arrow"></i></a>
+    <p class="small muted"><i data-i="swap" class="sm" style="display:inline;vertical-align:-3px"></i> Podrá cambiar de agencia en cualquier momento desde la barra superior.</p>
+  </div>
+</main>
+</body>
+</html>

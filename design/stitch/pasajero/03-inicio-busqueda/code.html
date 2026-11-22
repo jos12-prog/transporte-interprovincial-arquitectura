@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · pasajero/03-inicio-busqueda
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buscar viajes · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.hero{position:relative;background:#063F36 url('../../_assets/login/fondo.jpg') center 70%/cover;color:#fff;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,63,54,.94) 0%,rgba(6,63,54,.72) 45%,rgba(6,63,54,.25) 100%),linear-gradient(0deg,rgba(6,63,54,.6),transparent 40%)}
+.hero .container{position:relative;padding-top:56px;padding-bottom:120px}
+.hero h1{font-size:40px;font-weight:800;max-width:560px;letter-spacing:-.03em}
+.hero p{color:rgba(255,255,255,.8);margin-top:10px;max-width:480px;font-size:16px}
+.searchbox{position:relative;margin-top:-84px;z-index:2;padding:20px;display:grid;grid-template-columns:1.2fr auto 1.2fr 1fr .8fr auto;gap:12px;align-items:end}
+.swap{width:40px;height:46px;border-radius:12px;border:1px solid var(--n-300);background:#fff;color:var(--primary-700);display:grid;place-items:center;cursor:pointer}
+.dest{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:4/3;color:#fff;display:flex;align-items:flex-end;padding:16px;background:#0B5C4E center/cover;text-decoration:none!important}
+.dest::before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(4,20,18,.85),rgba(4,20,18,0) 60%)}
+.dest > *{position:relative}
+.dest b{font:700 18px var(--display);display:block}
+.dest span{font-size:13px;color:rgba(255,255,255,.85)}
+.dest:hover{transform:translateY(-2px);transition:transform .2s}
+.next{display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;padding:20px}
+.next .date{width:64px;text-align:center;border-radius:12px;background:var(--primary-50);color:var(--primary-700);padding:8px 0}
+.next .date b{display:block;font:800 24px var(--display)}
+@media (max-width:900px){.searchbox{grid-template-columns:1fr auto 1fr}.searchbox .wide{grid-column:1/-1}}
+@media (max-width:560px){.hero h1{font-size:28px}.hero .container{padding-top:28px;padding-bottom:110px}.searchbox{grid-template-columns:1fr;margin-top:-90px}.swap{justify-self:end;margin:-6px 0;rotate:90deg}.next{grid-template-columns:auto 1fr}.next .btn{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="../03-inicio-busqueda/code.html"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <nav class="nav-links" aria-label="Principal"><a href="../03-inicio-busqueda/code.html" class="on" aria-current="page">Buscar viajes</a><a href="../09-mis-viajes/code.html">Mis viajes</a><a href="#ayuda">Ayuda</a></nav>
+    <div class="nav-user">
+      <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i></button>
+      <span class="avatar">AQ</span><span class="name">Ana Quispe</span>
+    </div>
+  </div>
+</header>
+<nav class="tabbar" aria-label="Navegación inferior"><a href="../03-inicio-busqueda/code.html" class="on"><i data-i="search"></i>Buscar</a><a href="../09-mis-viajes/code.html"><i data-i="ticket"></i>Mis viajes</a><a href="#ayuda"><i data-i="help"></i>Ayuda</a><a href="#cuenta"><i data-i="user"></i>Cuenta</a></nav>
+
+<section class="hero">
+  <div class="container">
+    <p class="small" style="color:var(--accent-500);font-weight:600;margin:0">Hola, Ana</p>
+    <h1>¿A dónde viajamos esta vez?</h1>
+    <p>Compara horarios de varias empresas, elige tu asiento en el plano y recibe tu pasaje con QR.</p>
+  </div>
+</section>
+<main class="container">
+  <form class="card searchbox" action="../04-resultados/code.html">
+    <div class="field"><label for="o">Origen</label><div class="control"><i data-i="pin"></i><select id="o" class="input"><option>Ayacucho</option><option>Lima</option><option>Huanta</option></select></div></div>
+    <button type="button" class="swap" aria-label="Intercambiar origen y destino"><i data-i="swap"></i></button>
+    <div class="field"><label for="d">Destino</label><div class="control"><i data-i="pin"></i><select id="d" class="input"><option>Lima</option><option>Huancayo</option><option>Andahuaylas</option><option>Cusco</option></select></div></div>
+    <div class="field"><label for="f">Fecha de viaje</label><div class="control"><i data-i="calendar"></i><input id="f" class="input" value="sáb 21 nov 2026"></div></div>
+    <div class="field"><label>Pasajeros</label><div class="stepper-num"><button type="button" aria-label="Quitar">−</button><span class="num">1</span><button type="button" aria-label="Agregar">+</button></div></div>
+    <button class="btn btn-primary btn-lg wide" type="submit">Buscar viajes <i data-i="arrow"></i></button>
+  </form>
+
+  <div class="alert alert-warning" style="margin-top:20px">
+    <i data-i="flame"></i>
+    <div><b>Alta demanda por Semana Santa (29 mar – 5 abr 2026).</b> Las salidas a Lima se llenan rápido: reserva con anticipación.</div>
+  </div>
+
+  <section style="margin-top:40px" class="stack">
+    <div class="row between"><h2>Rutas frecuentes desde Ayacucho</h2><a href="../04-resultados/code.html" class="small">Ver todas</a></div>
+    <div class="grid-4">
+      <a class="dest" href="../04-resultados/code.html" style="background-image:url('../../_assets/login/fondo-2.jpg')"><div><b>Lima</b><span>8 h 45 min · desde S/ 60.00</span></div></a>
+      <a class="dest" href="../04-resultados/code.html" style="background-image:url('../../_assets/login/fondo-3.jpg')"><div><b>Huancayo</b><span>6 h · desde S/ 45.00</span></div></a>
+      <a class="dest" href="../04-resultados/code.html" style="background-image:url('../../_assets/login/fondo-4.jpg')"><div><b>Andahuaylas</b><span>6 h 30 min · desde S/ 50.00</span></div></a>
+      <a class="dest" href="../04-resultados/code.html" style="background-image:url('../../_assets/login/fondo.jpg');background-position:center 80%"><div><b>Cusco</b><span>14 h · desde S/ 90.00</span></div></a>
+    </div>
+  </section>
+
+  <section style="margin:40px 0 56px" class="stack">
+    <h2>Tu próximo viaje</h2>
+    <div class="card next">
+      <div class="date"><span class="xs">NOV</span><b>21</b><span class="xs">sáb</span></div>
+      <div class="stack-sm">
+        <div class="row wrap"><b style="font:700 17px var(--display)">Ayacucho → Lima</b><span class="badge b-success">Confirmado</span></div>
+        <span class="small muted">22:30 · Transportes Qori Ñan · Bus 2 pisos · Asientos 31 y 32 · Código RA-7K2P9</span>
+      </div>
+      <a class="btn btn-secondary" href="../08-pasaje-emitido/code.html"><i data-i="ticket"></i> Ver pasaje</a>
+    </div>
+  </section>
+</main>
+
+<footer class="footer"><div class="container row between wrap"><span>© 2026 RutaAndina · Ayacucho, Perú</span><span class="row"><a href="#terminos">Términos</a><a href="#privacidad">Privacidad</a><a href="#libro">Libro de reclamaciones</a></span></div></footer>
+</body>
+</html>

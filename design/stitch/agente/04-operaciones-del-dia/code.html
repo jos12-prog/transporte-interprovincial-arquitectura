@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · agente/04-operaciones-del-dia
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis operaciones · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.more[disabled]{opacity:.35;cursor:not-allowed}
+.tot{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--n-200)}
+.tot div{padding:16px 20px;border-right:1px solid var(--n-200)} .tot div:last-child{border:0;background:var(--primary-50)}
+.tot span{font-size:12.5px;color:var(--n-500)} .tot b{display:block;font:700 20px var(--display);font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Menú">
+    <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <div class="group">Operación</div><a href="../01-panel-ventanilla/code.html"><i data-i="store"></i><span>Ventanilla</span></a><a href="../02-venta-asientos/code.html"><i data-i="ticket"></i><span>Nueva venta</span></a><a href="../04-operaciones-del-dia/code.html" class="on" aria-current="page"><i data-i="receipt"></i><span>Mis operaciones</span></a><div class="group">Soporte</div><a href="#pasajeros"><i data-i="users"></i><span>Pasajeros</span></a><a href="#ayuda"><i data-i="help"></i><span>Ayuda</span></a>
+    <div class="me"><span class="avatar">LM</span><div>Luis Mendoza<small>Agente de ventanilla</small></div></div>
+  </aside>
+  <div>
+    <header class="top">
+      <div class="agency" title="Su agencia asignada"><span class="dot"><i data-i="store" class="sm"></i></span><div>Terminal Norte<small>Transportes Qori Ñan S.A.C.</small></div></div>
+      <label class="search"><i data-i="search" class="sm"></i><input placeholder="Buscar viaje, pasajero o código" aria-label="Buscar"><kbd>/</kbd></label>
+      <div class="tools">
+        <button class="icon-btn" aria-label="Ayuda"><i data-i="help"></i></button>
+        <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i><span class="pip"></span></button>
+      </div>
+    </header>
+    <main class="main">
+
+<div class="page-head"><div><div class="crumbs">Ventanilla · Terminal Norte</div><h1>Mis operaciones de hoy</h1><p class="muted small">sáb 21 nov 2026 · 41 pasajes · solo se muestran sus ventas</p></div>
+  <div class="row"><select class="input" style="height:40px;width:190px"><option>Todos los estados</option><option>Emitido</option><option>Anulado</option></select><select class="input" style="height:40px;width:200px"><option>Todos los métodos</option><option>Efectivo</option><option>Yape / Plin</option><option>Tarjeta POS</option></select><button class="btn btn-ghost"><i data-i="download" class="sm"></i> Exportar</button></div></div>
+<section class="card">
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th>Hora</th><th>Código</th><th>Pasajero</th><th>Viaje</th><th>Asientos</th><th>Método</th><th class="right">Monto</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+      <tr><td class="num">14:08</td><td class="num"><b>RA-V8821</b></td><td>Ana L. Quispe Palomino</td><td>22:30 Lima</td><td class="num">35, 36</td><td>Efectivo</td><td class="right num"><b>S/ 170.00</b></td><td><span class="badge b-success">Emitido</span></td><td class="right"><div class="row" style="gap:4px;justify-content:flex-end"><button class="more" title="Ver"><i data-i="eye" class="sm"></i></button><button class="more" title="Reimprimir"><i data-i="print" class="sm"></i></button><button class="more" title="Cancelar o reprogramar"><i data-i="refresh" class="sm"></i></button></div></td></tr>
+      <tr><td class="num">13:55</td><td class="num"><b>RA-V8817</b></td><td>Rosa Mendoza Ccori</td><td>14:30 Huanta</td><td class="num">9</td><td>Yape / Plin</td><td class="right num"><b>S/ 25.00</b></td><td><span class="badge b-success">Emitido</span></td><td class="right"><div class="row" style="gap:4px;justify-content:flex-end"><button class="more" title="Ver"><i data-i="eye" class="sm"></i></button><button class="more" title="Reimprimir"><i data-i="print" class="sm"></i></button><button class="more" title="Cancelar o reprogramar"><i data-i="refresh" class="sm"></i></button></div></td></tr>
+      <tr><td class="num">13:41</td><td class="num"><b>RA-V8810</b></td><td>Pedro Alanya Gómez</td><td>15:00 Andahuaylas</td><td class="num">3, 4, 5</td><td>Tarjeta POS</td><td class="right num"><b>S/ 150.00</b></td><td><span class="badge b-success">Emitido</span></td><td class="right"><div class="row" style="gap:4px;justify-content:flex-end"><button class="more" title="Ver"><i data-i="eye" class="sm"></i></button><button class="more" title="Reimprimir"><i data-i="print" class="sm"></i></button><button class="more" title="Cancelar o reprogramar" disabled title="Requiere autorización del administrador"><i data-i="refresh" class="sm"></i></button></div></td></tr>
+      <tr><td class="num">13:20</td><td class="num"><b>RA-V8802</b></td><td>Carmen Rojas Vila</td><td>20:00 Lima</td><td class="num">12</td><td>Efectivo</td><td class="right num"><b>S/ 60.00</b></td><td><span class="badge b-info">Reprogramado</span></td><td class="right"><div class="row" style="gap:4px;justify-content:flex-end"><button class="more" title="Ver"><i data-i="eye" class="sm"></i></button><button class="more" title="Reimprimir"><i data-i="print" class="sm"></i></button><button class="more" title="Cancelar o reprogramar" disabled title="Requiere autorización del administrador"><i data-i="refresh" class="sm"></i></button></div></td></tr>
+      <tr><td class="num">12:47</td><td class="num"><b>RA-V8794</b></td><td>Hugo Taype Ñaupa</td><td>13:30 Huancayo</td><td class="num">7</td><td>Efectivo</td><td class="right num"><b>S/ 45.00</b></td><td><span class="badge b-danger">Anulado</span></td><td class="right"><div class="row" style="gap:4px;justify-content:flex-end"><button class="more" title="Ver"><i data-i="eye" class="sm"></i></button><button class="more" title="Reimprimir"><i data-i="print" class="sm"></i></button><button class="more" title="Cancelar o reprogramar" disabled title="Requiere autorización del administrador"><i data-i="refresh" class="sm"></i></button></div></td></tr>
+      <tr><td class="num">12:30</td><td class="num"><b>RA-V8790</b></td><td>Lucía Sulca Prado</td><td>22:30 Lima</td><td class="num">40</td><td>Yape / Plin</td><td class="right num"><b>S/ 85.00</b></td><td><span class="badge b-success">Emitido</span></td><td class="right"><div class="row" style="gap:4px;justify-content:flex-end"><button class="more" title="Ver"><i data-i="eye" class="sm"></i></button><button class="more" title="Reimprimir"><i data-i="print" class="sm"></i></button><button class="more" title="Cancelar o reprogramar"><i data-i="refresh" class="sm"></i></button></div></td></tr>
+    </tbody>
+  </table></div>
+  <div class="tot"><div><span>Efectivo</span><b>S/ 2,465.00</b></div><div><span>Yape / Plin</span><b>S/ 765.00</b></div><div><span>Tarjeta POS</span><b>S/ 250.00</b></div><div><span>Total del día</span><b>S/ 3,480.00</b></div></div>
+</section>
+<p class="hint" style="margin-top:12px"><i data-i="lock" class="sm" style="display:inline;vertical-align:-3px"></i> Cancelar o reprogramar requiere el permiso que asigna el administrador de la agencia.</p>
+
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

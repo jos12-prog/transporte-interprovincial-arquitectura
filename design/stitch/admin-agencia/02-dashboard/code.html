@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · admin-agencia/02-dashboard
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.dash{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-top:20px}
+.alertlist{display:grid}
+.alertlist a{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:14px 20px;border-bottom:1px solid var(--n-100);color:inherit;font-weight:400}
+.alertlist a:hover{background:var(--n-50);text-decoration:none}
+.alertlist .ic{width:32px;height:32px;border-radius:10px;display:grid;place-items:center}
+@media (max-width:1200px){.dash{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Menú">
+    <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <div class="group">Agencia</div><a href="../02-dashboard/code.html" class="on" aria-current="page"><i data-i="grid"></i><span>Dashboard</span></a><a href="../05-viajes-horarios/code.html"><i data-i="calendar"></i><span>Viajes y horarios</span></a><a href="../03-rutas/code.html"><i data-i="route"></i><span>Rutas</span></a><a href="../04-vehiculos/code.html"><i data-i="bus"></i><span>Vehículos</span></a><a href="../06-tarifas/code.html"><i data-i="tag"></i><span>Tarifas</span></a><div class="group">Equipo y análisis</div><a href="../07-agentes/code.html"><i data-i="users"></i><span>Agentes</span></a><a href="../08-reportes/code.html"><i data-i="chart"></i><span>Reportes</span></a><a href="#alertas"><i data-i="bell"></i><span>Alertas</span><b class="count">3</b></a>
+    <div class="me"><span class="avatar">RH</span><div>Rosa Huamán<small>Admin. de agencia</small></div></div>
+  </aside>
+  <div>
+    <header class="top">
+      <button class="agency" aria-haspopup="listbox"><span class="dot"><i data-i="store" class="sm"></i></span><div>Terminal Norte<small>Transportes Qori Ñan S.A.C.</small></div><i data-i="chevron" class="sm"></i></button>
+      <label class="search"><i data-i="search" class="sm"></i><input placeholder="Buscar viaje, pasajero o código" aria-label="Buscar"><kbd>/</kbd></label>
+      <div class="tools">
+        <button class="icon-btn" aria-label="Ayuda"><i data-i="help"></i></button>
+        <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i><span class="pip"></span></button>
+      </div>
+    </header>
+    <main class="main">
+
+<div class="page-head"><div><div class="crumbs">Terminal Norte</div><h1>Dashboard</h1><p class="muted small">Últimos 30 días · actualizado hace 2 min</p></div>
+  <div class="row"><div class="segmented"><button aria-pressed="false">7 días</button><button aria-pressed="true">30 días</button><button aria-pressed="false">Año</button></div><button class="btn btn-ghost"><i data-i="download" class="sm"></i> Exportar</button></div></div>
+<div class="grid-4">
+  <div class="card kpi"><div class="row between"><div class="lbl"><i data-i="cash" class="sm"></i>Ventas del mes</div><div data-spark="52,55,58,54,61,66,70,68,74,79" data-color="#0E6B5C" style="width:90px"></div></div><div class="val" data-count="84320" data-pre="S/ ">S/ 84,320</div><div class="delta up">+8.4 % vs. mes anterior</div></div>
+  <div class="card kpi"><div class="row between"><div class="lbl"><i data-i="users" class="sm"></i>Ocupación promedio</div><div data-spark="60,62,61,64,63,66,65,67,69,68" data-color="#0E6B5C" style="width:90px"></div></div><div class="val" data-count="68" data-suf=" %">68 %</div><div class="delta up">+3 pts</div></div>
+  <div class="card kpi"><div class="row between"><div class="lbl"><i data-i="ticket" class="sm"></i>Pasajes emitidos</div><div data-spark="80,90,88,95,99,104,101,108,112,114" data-color="#0E6B5C" style="width:90px"></div></div><div class="val" data-count="1142">1,142</div><div class="delta up">+5.1 %</div></div>
+  <div class="card kpi"><div class="row between"><div class="lbl"><i data-i="refresh" class="sm"></i>Cancelaciones</div><div data-spark="2,3,2,4,3,3,5,4,5,6" data-color="#DC2626" style="width:90px"></div></div><div class="val">37</div><div class="delta down">+6 vs. mes anterior</div></div>
+</div>
+<div class="dash">
+  <section class="card"><div class="card-head"><div><h3>Ventas diarias por canal</h3><span class="xs muted">Soles</span></div><div class="row"><span class="legend-dot"><i style="background:#0E6B5C"></i>Ventanilla</span><span class="legend-dot"><i style="background:#F2A93B"></i>Web</span></div></div>
+    <div class="card-pad" data-line='[{"data": [1520, 1480, 1600, 1550, 1700, 1980, 2200, 1580, 1530, 1600, 1660, 1720, 2050, 2300, 1640, 1600, 1690, 1760, 1810, 2140, 2380, 1700, 1660, 1720, 1830, 1990, 2420, 2610, 1880, 1820], "color": "#0E6B5C", "area": true}, {"data": [820, 760, 900, 880, 1010, 1240, 1380, 940, 870, 920, 990, 1060, 1300, 1460, 1010, 960, 1040, 1120, 1180, 1420, 1590, 1100, 1020, 1090, 1210, 1330, 1650, 1820, 1260, 1190], "color": "#F2A93B"}]' data-labels="22 oct,,,,,,,29 oct,,,,,,,5 nov,,,,,,,12 nov,,,,,,,19 nov,"></div></section>
+  <section class="card"><div class="card-head"><h3>Alertas</h3><span class="badge b-warning">3 nuevas</span></div>
+    <div class="alertlist">
+      <a href="#"><span class="ic" style="background:var(--accent-100);color:#9A5B00"><i data-i="flame" class="sm"></i></span><div><b class="small">Salida 22:30 a Lima supera el 70 %</b><div class="xs muted">38 de 52 asientos vendidos · hace 12 min</div></div></a>
+      <a href="#"><span class="ic" style="background:var(--accent-100);color:#9A5B00"><i data-i="calendar" class="sm"></i></span><div><b class="small">Semana Santa: alta demanda prevista</b><div class="xs muted">29 mar – 5 abr · programe salidas extra</div></div></a>
+      <a href="#"><span class="ic" style="background:var(--danger-100);color:var(--danger-600)"><i data-i="alert" class="sm"></i></span><div><b class="small">Pago web rechazado 3 veces</b><div class="xs muted">Reserva RA-3M8QX · expiró y liberó el asiento</div></div></a>
+      <a href="#"><span class="ic" style="background:var(--primary-50);color:var(--primary-700)"><i data-i="bus" class="sm"></i></span><div><b class="small">Vehículo C7Y-090 sin viajes esta semana</b><div class="xs muted">Toyota Avanza · revise la programación</div></div></a>
+    </div></section>
+  <section class="card" style="grid-column:1/-1"><div class="card-head"><div><h3>Ocupación promedio por ruta</h3><span class="xs muted">En ámbar, rutas sobre el umbral de alta demanda (70 %)</span></div></div>
+    <div class="card-pad" data-bars='[{"k": "Ayacucho \u2192 Lima", "v": 82}, {"k": "Ayacucho \u2192 Huanta", "v": 74}, {"k": "Ayacucho \u2192 Huancayo", "v": 63}, {"k": "Ayacucho \u2192 Andahuaylas", "v": 51}, {"k": "Ayacucho \u2192 Cusco", "v": 44}]' data-max="100" data-suffix="%"></div></section>
+</div>
+
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

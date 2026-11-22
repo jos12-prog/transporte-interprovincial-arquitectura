@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · admin-agencia/07-agentes
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentes · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Menú">
+    <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <div class="group">Agencia</div><a href="../02-dashboard/code.html"><i data-i="grid"></i><span>Dashboard</span></a><a href="../05-viajes-horarios/code.html"><i data-i="calendar"></i><span>Viajes y horarios</span></a><a href="../03-rutas/code.html"><i data-i="route"></i><span>Rutas</span></a><a href="../04-vehiculos/code.html"><i data-i="bus"></i><span>Vehículos</span></a><a href="../06-tarifas/code.html"><i data-i="tag"></i><span>Tarifas</span></a><div class="group">Equipo y análisis</div><a href="../07-agentes/code.html" class="on" aria-current="page"><i data-i="users"></i><span>Agentes</span></a><a href="../08-reportes/code.html"><i data-i="chart"></i><span>Reportes</span></a><a href="#alertas"><i data-i="bell"></i><span>Alertas</span><b class="count">3</b></a>
+    <div class="me"><span class="avatar">RH</span><div>Rosa Huamán<small>Admin. de agencia</small></div></div>
+  </aside>
+  <div>
+    <header class="top">
+      <button class="agency" aria-haspopup="listbox"><span class="dot"><i data-i="store" class="sm"></i></span><div>Terminal Norte<small>Transportes Qori Ñan S.A.C.</small></div><i data-i="chevron" class="sm"></i></button>
+      <label class="search"><i data-i="search" class="sm"></i><input placeholder="Buscar viaje, pasajero o código" aria-label="Buscar"><kbd>/</kbd></label>
+      <div class="tools">
+        <button class="icon-btn" aria-label="Ayuda"><i data-i="help"></i></button>
+        <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i><span class="pip"></span></button>
+      </div>
+    </header>
+    <main class="main">
+
+<div class="page-head"><div><div class="crumbs">Terminal Norte</div><h1>Agentes de ventanilla</h1><p class="muted small">Defina qué puede hacer cada agente además de vender.</p></div><a class="btn btn-primary" href="#nuevo"><i data-i="plus" class="sm"></i> Nuevo agente</a></div>
+<section class="card"><div class="table-wrap"><table class="table">
+  <thead><tr><th>Agente</th><th>Agencia</th><th>Estado</th><th>Último ingreso</th><th>Puede cancelar</th><th>Puede reprogramar</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><div class="row"><span class="avatar sm">LM</span><div><b>Luis Mendoza</b><div class="xs muted">luis.mendoza@qorinan.pe</div></div></div></td><td>Terminal Norte</td><td><span class="badge b-success">Activo</span></td><td class="small muted">hoy 13:58</td><td><input type="checkbox" class="switch" checked aria-label="Activo"></td><td><input type="checkbox" class="switch" checked aria-label="Activo"></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+    <tr><td><div class="row"><span class="avatar sm">KC</span><div><b>Karina Cisneros</b><div class="xs muted">karina.cisneros@qorinan.pe</div></div></div></td><td>Terminal Norte</td><td><span class="badge b-success">Activo</span></td><td class="small muted">hoy 07:02</td><td><input type="checkbox" class="switch" aria-label="Activo"></td><td><input type="checkbox" class="switch" checked aria-label="Activo"></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+    <tr><td><div class="row"><span class="avatar sm">WT</span><div><b>Wilber Tineo</b><div class="xs muted">wilber.tineo@qorinan.pe</div></div></div></td><td>Terminal Norte</td><td><span class="badge b-success">Activo</span></td><td class="small muted">vie 20 nov 21:40</td><td><input type="checkbox" class="switch" aria-label="Activo"></td><td><input type="checkbox" class="switch" aria-label="Activo"></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+    <tr><td><div class="row"><span class="avatar sm">MP</span><div><b>Milagros Pariona</b><div class="xs muted">milagros.pariona@qorinan.pe</div></div></div></td><td>Terminal Norte</td><td><span class="badge b-neutral">Inactivo</span></td><td class="small muted">12 nov</td><td><input type="checkbox" class="switch" aria-label="Activo"></td><td><input type="checkbox" class="switch" aria-label="Activo"></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+  </tbody></table></div></section>
+
+    </main>
+  </div>
+</div>
+<div class="state" id="nuevo"><a class="drawer-scrim" href="#" aria-label="Cerrar"></a>
+<aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="nuevo-t">
+  <div class="drawer-head"><h2 id="nuevo-t">Nuevo agente</h2><a class="more" href="#" aria-label="Cerrar"><i data-i="x"></i></a></div>
+  <div class="drawer-body">
+<div class="grid-2"><div class="field"><label>Nombres</label><input class="input"></div><div class="field"><label>Apellidos</label><input class="input"></div></div>
+<div class="field"><label>Correo corporativo</label><div class="control"><i data-i="mail"></i><input class="input" placeholder="nombre@qorinan.pe"></div><span class="hint">Recibirá un enlace para crear su contraseña.</span></div>
+<div class="field"><label>Agencia</label><select class="input"><option>Terminal Norte</option><option>Terminal Sur</option><option>Huanta</option></select></div>
+<div class="card card-pad stack"><b class="small">Permisos</b>
+  <label class="row between small">Puede cancelar ventas <input type="checkbox" class="switch"></label>
+  <label class="row between small">Puede reprogramar ventas <input type="checkbox" class="switch"></label>
+</div>
+</div>
+  <div class="drawer-foot"><a class="btn btn-ghost" href="#">Cancelar</a><a class="btn btn-primary" href="#">Crear agente</a></div>
+</aside></div>
+</body>
+</html>

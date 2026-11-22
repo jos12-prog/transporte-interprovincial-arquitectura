@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · agente/01-panel-ventanilla
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ventanilla · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.quick{display:grid;grid-template-columns:1.3fr 1fr .8fr auto;gap:12px;align-items:end;padding:18px 20px}
+.hints{display:flex;gap:18px;font-size:12.5px;color:var(--n-500);padding:0 20px 16px}
+.clock{font:700 15px var(--body);font-variant-numeric:tabular-nums;color:var(--n-700)}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Menú">
+    <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <div class="group">Operación</div><a href="../01-panel-ventanilla/code.html" class="on" aria-current="page"><i data-i="store"></i><span>Ventanilla</span></a><a href="../02-venta-asientos/code.html"><i data-i="ticket"></i><span>Nueva venta</span></a><a href="../04-operaciones-del-dia/code.html"><i data-i="receipt"></i><span>Mis operaciones</span></a><div class="group">Soporte</div><a href="#pasajeros"><i data-i="users"></i><span>Pasajeros</span></a><a href="#ayuda"><i data-i="help"></i><span>Ayuda</span></a>
+    <div class="me"><span class="avatar">LM</span><div>Luis Mendoza<small>Agente de ventanilla</small></div></div>
+  </aside>
+  <div>
+    <header class="top">
+      <div class="agency" title="Su agencia asignada"><span class="dot"><i data-i="store" class="sm"></i></span><div>Terminal Norte<small>Transportes Qori Ñan S.A.C.</small></div></div>
+      <label class="search"><i data-i="search" class="sm"></i><input placeholder="Buscar viaje, pasajero o código" aria-label="Buscar"><kbd>/</kbd></label>
+      <div class="tools">
+        <button class="icon-btn" aria-label="Ayuda"><i data-i="help"></i></button>
+        <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i><span class="pip"></span></button>
+      </div>
+    </header>
+    <main class="main">
+
+<div class="page-head"><div><div class="crumbs">Ventanilla · Terminal Norte</div><h1>Buenas tardes, Luis</h1><p class="muted small">sáb 21 nov 2026 · Turno 14:00 – 22:00</p></div>
+  <div class="row"><span class="clock"><i data-i="clock" class="sm" style="display:inline;vertical-align:-3px"></i> 14:12</span><a class="btn btn-primary" href="../02-venta-asientos/code.html"><i data-i="plus" class="sm"></i> Nueva venta <kbd style="margin-left:4px">F2</kbd></a></div></div>
+<div class="grid-3" style="margin-bottom:20px">
+  <div class="card kpi"><div class="lbl"><i data-i="cash" class="sm"></i>Ventas de hoy</div><div class="val" data-count="3480" data-pre="S/ " data-dec="2">S/ 3,480.00</div><div class="delta up">+12 % que el sábado pasado</div></div>
+  <div class="card kpi"><div class="lbl"><i data-i="ticket" class="sm"></i>Pasajes emitidos</div><div class="val" data-count="41">41</div><div class="delta muted">29 efectivo · 9 Yape/Plin · 3 POS</div></div>
+  <div class="card kpi"><div class="lbl"><i data-i="bus" class="sm"></i>Próxima salida</div><div class="val">14:30</div><div class="delta muted">Huanta · Van ABX-114 · 4 libres</div></div>
+</div>
+<section class="card" style="margin-bottom:20px">
+  <form class="quick">
+    <div class="field"><label>Destino</label><div class="control"><i data-i="pin"></i><select class="input"><option>Todos los destinos</option><option>Lima</option><option>Huanta</option><option>Huancayo</option></select></div></div>
+    <div class="field"><label>Fecha</label><div class="control"><i data-i="calendar"></i><input class="input" value="Hoy, sáb 21 nov"></div></div>
+    <div class="field"><label>Desde</label><div class="control"><i data-i="clock"></i><input class="input num" value="14:00"></div></div>
+    <button class="btn btn-primary" style="height:46px"><i data-i="search" class="sm"></i> Buscar</button>
+  </form>
+  <div class="hints"><span><kbd>F2</kbd> Nueva venta</span><span><kbd>F4</kbd> Buscar pasajero por DNI</span><span><kbd>F9</kbd> Cobrar</span><span><kbd>Esc</kbd> Cancelar</span></div>
+</section>
+<section class="card">
+  <div class="card-head"><div><h3>Salidas de hoy</h3><span class="xs muted">Se actualiza en tiempo real</span></div><div class="segmented"><button aria-pressed="true">Pendientes</button><button aria-pressed="false">Todas</button></div></div>
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th>Hora</th><th>Destino</th><th>Vehículo</th><th>Ocupación</th><th>Libres</th><th></th></tr></thead>
+    <tbody>
+      <tr style="opacity:.55"><td><b class="num" style="font-size:16px">13:30</b></td><td><b>Huancayo</b><div class="xs muted">Directo</div></td><td>Van · 15<div class="xs muted">ABX-201</div></td><td><div class="row" style="gap:10px;min-width:170px"><div class="progress grow full"><i style="width:100%"></i></div><b class="small num" style="width:38px;text-align:right">100%</b></div></td><td class="num"><b>0</b></td><td class="right"><span class="badge b-neutral">Partió</span></td></tr>
+      <tr><td><b class="num" style="font-size:16px">14:30</b></td><td><b>Huanta</b><div class="xs muted"><span class="demand"><i data-i="flame" class="sm"></i>Alta demanda</span></div></td><td>Van · 15<div class="xs muted">ABX-114</div></td><td><div class="row" style="gap:10px;min-width:170px"><div class="progress grow warn"><i style="width:73%"></i></div><b class="small num" style="width:38px;text-align:right">73%</b></div></td><td class="num"><b>4</b></td><td class="right"><a class="btn btn-primary btn-sm" href="../02-venta-asientos/code.html">Vender</a></td></tr>
+      <tr><td><b class="num" style="font-size:16px">15:00</b></td><td><b>Andahuaylas</b><div class="xs muted">Directo</div></td><td>Minivan · 7<div class="xs muted">B4K-552</div></td><td><div class="row" style="gap:10px;min-width:170px"><div class="progress grow"><i style="width:43%"></i></div><b class="small num" style="width:38px;text-align:right">43%</b></div></td><td class="num"><b>4</b></td><td class="right"><a class="btn btn-primary btn-sm" href="../02-venta-asientos/code.html">Vender</a></td></tr>
+      <tr><td><b class="num" style="font-size:16px">16:00</b></td><td><b>Huanta</b><div class="xs muted">Directo</div></td><td>Toyota Avanza · 6<div class="xs muted">C7Y-090</div></td><td><div class="row" style="gap:10px;min-width:170px"><div class="progress grow"><i style="width:33%"></i></div><b class="small num" style="width:38px;text-align:right">33%</b></div></td><td class="num"><b>4</b></td><td class="right"><a class="btn btn-primary btn-sm" href="../02-venta-asientos/code.html">Vender</a></td></tr>
+      <tr><td><b class="num" style="font-size:16px">20:00</b></td><td><b>Lima</b><div class="xs muted">Directo</div></td><td>Bus 1 piso · 44<div class="xs muted">ABC-310</div></td><td><div class="row" style="gap:10px;min-width:170px"><div class="progress grow"><i style="width:52%"></i></div><b class="small num" style="width:38px;text-align:right">52%</b></div></td><td class="num"><b>21</b></td><td class="right"><a class="btn btn-primary btn-sm" href="../02-venta-asientos/code.html">Vender</a></td></tr>
+      <tr><td><b class="num" style="font-size:16px">22:30</b></td><td><b>Lima</b><div class="xs muted"><span class="demand"><i data-i="flame" class="sm"></i>Alta demanda</span></div></td><td>Bus 2 pisos · 52<div class="xs muted">ABC-482</div></td><td><div class="row" style="gap:10px;min-width:170px"><div class="progress grow warn"><i style="width:73%"></i></div><b class="small num" style="width:38px;text-align:right">73%</b></div></td><td class="num"><b>14</b></td><td class="right"><a class="btn btn-primary btn-sm" href="../02-venta-asientos/code.html">Vender</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

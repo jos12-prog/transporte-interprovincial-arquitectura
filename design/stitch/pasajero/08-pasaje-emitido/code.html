@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · pasajero/08-pasaje-emitido
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pasaje emitido · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.logo-co{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font:800 14px var(--display);color:#fff;background:var(--primary-700)}
+.done-mark{width:72px;height:72px}
+.done-mark circle{stroke-dasharray:190;stroke-dashoffset:190;animation:draw .6s var(--ease) .1s forwards}
+.done-mark path{stroke-dasharray:40;stroke-dashoffset:40;animation:draw .4s var(--ease) .6s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.print{animation:print .6s var(--ease) .8s both}
+@keyframes print{from{clip-path:inset(0 0 100% 0);transform:translateY(-12px)}to{clip-path:inset(0 0 0 0)}}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="../03-inicio-busqueda/code.html"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <nav class="nav-links" aria-label="Principal"><a href="../03-inicio-busqueda/code.html" class="on" aria-current="page">Buscar viajes</a><a href="../09-mis-viajes/code.html">Mis viajes</a><a href="#ayuda">Ayuda</a></nav>
+    <div class="nav-user">
+      <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i></button>
+      <span class="avatar">AQ</span><span class="name">Ana Quispe</span>
+    </div>
+  </div>
+</header>
+<nav class="tabbar" aria-label="Navegación inferior"><a href="../03-inicio-busqueda/code.html" class="on"><i data-i="search"></i>Buscar</a><a href="../09-mis-viajes/code.html"><i data-i="ticket"></i>Mis viajes</a><a href="#ayuda"><i data-i="help"></i>Ayuda</a><a href="#cuenta"><i data-i="user"></i>Cuenta</a></nav>
+
+<main class="container page" style="max-width:880px">
+  <nav class="stepper" aria-label="Pasos de compra"><div class="stepper-top"><p>¡Compra completa!</p></div><ol class="steps"><li class="done"><b>✓</b><span>Asientos<small>Asientos 31 y 32</small></span></li><li class="done"><b>✓</b><span>Pasajeros<small>2 viajeros</small></span></li><li class="done"><b>✓</b><span>Pago<small>S/ 170.00 pagado</small></span></li><li class="done"><b>✓</b><span>Pasaje<small>Enviado a tu correo</small></span></li></ol></nav>
+  <div style="display:grid;justify-items:center;text-align:center;gap:10px;margin-bottom:28px">
+    <svg class="done-mark" viewBox="0 0 72 72" fill="none" aria-hidden="true"><circle cx="36" cy="36" r="30" stroke="#16A34A" stroke-width="4"/><path d="m24 37 8 8 16-18" stroke="#16A34A" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h1>Listo, Ana. Tu viaje está confirmado</h1>
+    <p class="muted">Enviamos los pasajes a ana.quispe@gmail.com. Muestra el código QR al abordar.</p>
+  </div>
+  <div class="stack print">
+    <article class="ticket">
+  <div class="main stack">
+    <div class="row between"><div class="row"><span class="logo-co">QÑ</span><div><b>Transportes Qori Ñan</b><div class="xs muted">Bus 2 pisos · Placa ABC-482</div></div></div><span class="badge b-success">Emitido</span></div>
+    <div class="route"><div><div class="t" style="font-size:30px">22:30</div><div class="c">AYC · Ayacucho</div></div><div class="line"><span>8 h 45 min</span></div><div style="text-align:right"><div class="t" style="font-size:30px">07:15</div><div class="c">LIM · Lima</div></div></div>
+    <dl class="kv"><div><dt>Pasajero</dt><dd>Ana Lucía Quispe Palomino</dd></div><div><dt>Documento</dt><dd>DNI 45871236</dd></div><div><dt>Fecha</dt><dd>sáb 21 nov 2026</dd></div><div><dt>Embarque</dt><dd>Terminal Norte</dd></div></dl>
+  </div>
+  <div class="stub"><span class="xs muted" style="letter-spacing:.1em">ASIENTO</span><b style="font:800 40px var(--display);color:var(--primary-700);line-height:1">31</b><span class="xs muted">Piso 2</span><div data-qr="RA-7K2P9-31" data-size="128"></div><span class="code">RA-7K2P9</span></div>
+</article>
+    <article class="ticket">
+  <div class="main stack">
+    <div class="row between"><div class="row"><span class="logo-co">QÑ</span><div><b>Transportes Qori Ñan</b><div class="xs muted">Bus 2 pisos · Placa ABC-482</div></div></div><span class="badge b-success">Emitido</span></div>
+    <div class="route"><div><div class="t" style="font-size:30px">22:30</div><div class="c">AYC · Ayacucho</div></div><div class="line"><span>8 h 45 min</span></div><div style="text-align:right"><div class="t" style="font-size:30px">07:15</div><div class="c">LIM · Lima</div></div></div>
+    <dl class="kv"><div><dt>Pasajero</dt><dd>Marco Antonio Quispe Rojas</dd></div><div><dt>Documento</dt><dd>DNI 46120985</dd></div><div><dt>Fecha</dt><dd>sáb 21 nov 2026</dd></div><div><dt>Embarque</dt><dd>Terminal Norte</dd></div></dl>
+  </div>
+  <div class="stub"><span class="xs muted" style="letter-spacing:.1em">ASIENTO</span><b style="font:800 40px var(--display);color:var(--primary-700);line-height:1">32</b><span class="xs muted">Piso 2</span><div data-qr="RA-7K2P9-32" data-size="128"></div><span class="code">RA-7K2P9</span></div>
+</article>
+  </div>
+  <div class="row wrap" style="justify-content:center;margin-top:28px">
+    <button class="btn btn-primary"><i data-i="download" class="sm"></i> Descargar PDF</button>
+    <button class="btn btn-ghost"><i data-i="calendar" class="sm"></i> Agregar al calendario</button>
+    <a class="btn btn-secondary" href="../09-mis-viajes/code.html">Ir a mis viajes</a>
+  </div>
+</main>
+
+<footer class="footer"><div class="container row between wrap"><span>© 2026 RutaAndina · Ayacucho, Perú</span><span class="row"><a href="#terminos">Términos</a><a href="#privacidad">Privacidad</a><a href="#libro">Libro de reclamaciones</a></span></div></footer>
+</body>
+</html>

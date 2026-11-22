@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · superadmin/04-usuarios-administrativos
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usuarios administrativos · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.ms{display:flex;flex-wrap:wrap;gap:6px;padding:8px;min-height:46px;border:1px solid var(--primary-600);box-shadow:0 0 0 4px var(--primary-100);border-radius:12px}
+.ms .chip{height:28px;background:var(--primary-50);border-color:var(--primary-100);color:var(--primary-700)}
+.opts{border:1px solid var(--n-200);border-radius:12px;overflow:hidden}
+.opts label{display:flex;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--n-100);font-size:14px}
+.opts label.dis{color:var(--n-400)}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Menú">
+    <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <div class="group">Plataforma</div><a href="../01-dashboard-global/code.html"><i data-i="grid"></i><span>Dashboard</span></a><a href="../02-empresas/code.html"><i data-i="building"></i><span>Empresas</span></a><a href="../03-agencias/code.html"><i data-i="store"></i><span>Agencias</span></a><a href="../04-usuarios-administrativos/code.html" class="on" aria-current="page"><i data-i="users"></i><span>Usuarios administrativos</span></a><div class="group">Catálogos</div><a href="../05-modelos-vehiculo/code.html"><i data-i="bus"></i><span>Modelos de vehículo</span></a><a href="../06-festividades-alta-demanda/code.html"><i data-i="flame"></i><span>Festividades</span></a><div class="group">Control</div><a href="../07-auditoria/code.html"><i data-i="log"></i><span>Auditoría</span></a><a href="#configuracion"><i data-i="settings"></i><span>Configuración</span></a>
+    <div class="me"><span class="avatar">JP</span><div>Jorge Pariona<small>Superadministrador</small></div></div>
+  </aside>
+  <div>
+    <header class="top">
+      <div class="agency"><span class="dot"><i data-i="shield" class="sm"></i></span><div>Plataforma RutaAndina<small>Todas las empresas</small></div></div>
+      <label class="search"><i data-i="search" class="sm"></i><input placeholder="Buscar usuario o correo" aria-label="Buscar"><kbd>/</kbd></label>
+      <div class="tools">
+        <button class="icon-btn" aria-label="Ayuda"><i data-i="help"></i></button>
+        <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i><span class="pip"></span></button>
+      </div>
+    </header>
+    <main class="main">
+
+<div class="page-head"><div><div class="crumbs">Plataforma</div><h1>Usuarios administrativos</h1><p class="muted small">Los roles son fijos. Un administrador solo puede tener agencias de una misma empresa.</p></div><a class="btn btn-primary" href="#asignar"><i data-i="plus" class="sm"></i> Asignar administrador</a></div>
+<section class="card"><div class="table-wrap"><table class="table">
+  <thead><tr><th>Usuario</th><th>Rol</th><th>Empresa</th><th>Agencias autorizadas</th><th>Estado</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><div class="row"><span class="avatar sm">RH</span><b>Rosa Huamán</b></div></td><td><span class="badge b-primary plain">Admin. de agencia</span></td><td>Transportes Qori Ñan</td><td><div class="row wrap" style="gap:6px"><span class="chip" style="height:26px;cursor:default">Terminal Norte</span> <span class="chip" style="height:26px;cursor:default">Terminal Sur</span> <span class="chip" style="height:26px;cursor:default">Huanta</span></div></td><td><span class="badge b-success">Activo</span></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+    <tr><td><div class="row"><span class="avatar sm">JC</span><b>Jhon Cárdenas</b></div></td><td><span class="badge b-primary plain">Admin. de agencia</span></td><td>Transportes Qori Ñan</td><td><div class="row wrap" style="gap:6px"><span class="chip" style="height:26px;cursor:default">Terminal Norte</span></div></td><td><span class="badge b-success">Activo</span></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+    <tr><td><div class="row"><span class="avatar sm">MV</span><b>Maribel Vargas</b></div></td><td><span class="badge b-primary plain">Admin. de agencia</span></td><td>Expreso Sachapuyo</td><td><div class="row wrap" style="gap:6px"><span class="chip" style="height:26px;cursor:default">Los Libertadores</span> <span class="chip" style="height:26px;cursor:default">Plaza Norte</span></div></td><td><span class="badge b-success">Activo</span></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+    <tr><td><div class="row"><span class="avatar sm">LM</span><b>Luis Mendoza</b></div></td><td><span class="badge b-neutral plain">Agente</span></td><td>Transportes Qori Ñan</td><td><div class="row wrap" style="gap:6px"><span class="chip" style="height:26px;cursor:default">Terminal Norte</span></div></td><td><span class="badge b-success">Activo</span></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+    <tr><td><div class="row"><span class="avatar sm">SG</span><b>Saúl Gutiérrez</b></div></td><td><span class="badge b-neutral plain">Agente</span></td><td>Expreso Sachapuyo</td><td><div class="row wrap" style="gap:6px"><span class="chip" style="height:26px;cursor:default">Plaza Norte</span></div></td><td><span class="badge b-neutral">Suspendido</span></td><td class="right"><button class="more" aria-label="Acciones"><i data-i="more"></i></button></td></tr>
+  </tbody></table></div></section>
+
+    </main>
+  </div>
+</div>
+<div class="state" id="asignar"><a class="drawer-scrim" href="#" aria-label="Cerrar"></a>
+<aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="asignar-t">
+  <div class="drawer-head"><h2 id="asignar-t">Asignar administrador de agencia</h2><a class="more" href="#" aria-label="Cerrar"><i data-i="x"></i></a></div>
+  <div class="drawer-body">
+<div class="field"><label>Usuario</label><div class="control"><i data-i="user"></i><input class="input" value="Jhon Cárdenas · jhon.cardenas@qorinan.pe"></div></div>
+<div class="field"><label>Empresa</label><select class="input"><option>Transportes Qori Ñan S.A.C.</option></select></div>
+<div class="field"><label>Agencias autorizadas</label>
+  <div class="ms"><span class="chip">Terminal Norte <i data-i="x" class="sm"></i></span><span class="chip">Huanta <i data-i="x" class="sm"></i></span></div>
+  <div class="opts"><label><input type="checkbox" class="switch" checked> Terminal Norte</label><label><input type="checkbox" class="switch"> Terminal Sur</label><label><input type="checkbox" class="switch" checked> Huanta</label><label class="dis"><i data-i="lock" class="sm"></i> Plaza Norte · Expreso Sachapuyo</label></div>
+</div>
+<div class="alert alert-warning small"><i data-i="alert" class="sm"></i><div>Solo puede asignar agencias de la misma empresa. Las de otras empresas aparecen bloqueadas.</div></div>
+</div>
+  <div class="drawer-foot"><a class="btn btn-ghost" href="#">Cancelar</a><a class="btn btn-primary" href="#">Guardar asignación</a></div>
+</aside></div>
+</body>
+</html>

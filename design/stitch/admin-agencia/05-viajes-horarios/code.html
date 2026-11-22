@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--
+  RutaAndina · admin-agencia/05-viajes-horarios
+  Maqueta de referencia (no es código de producción). Sistema de diseño: ../../DESIGN.md
+  Estilos y utilidades compartidas: ../../_assets/app.css y ../../_assets/app.js
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viajes y horarios · RutaAndina</title>
+<link rel="stylesheet" href="../../_assets/app.css">
+<script src="../../_assets/app.js" defer></script>
+<style>
+.cal{display:grid;grid-template-columns:56px repeat(7,1fr);border-top:1px solid var(--n-200)}
+.hcol{position:relative;margin-top:44px;height:432px}
+.hcol span{position:absolute;right:10px;font-size:11px;color:var(--n-500);translate:0 -6px}
+.dcol{border-left:1px solid var(--n-200)}
+.dh{height:44px;display:grid;place-items:center;font:600 13px var(--body);color:var(--n-600);border-bottom:1px solid var(--n-200)}
+.dh.today{color:var(--primary-700);background:var(--primary-50)}
+.dbody{position:relative;height:432px;background:repeating-linear-gradient(180deg,transparent 0 47px,var(--n-100) 47px 48px)}
+.tb{position:absolute;left:4px;right:4px;border-radius:8px;border-left:3px solid;padding:4px 6px;font-size:11.5px;line-height:1.25;overflow:hidden;color:var(--n-900)}
+.tb span{display:block;font-weight:600;color:var(--n-600)}
+.wiz{list-style:none;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:6px}
+.wiz li{font-size:12px;color:var(--n-500);padding-top:8px;border-top:3px solid var(--n-200)}
+.wiz li.done{border-color:var(--primary-600);color:var(--n-700)} .wiz li.now{border-color:var(--primary-600);color:var(--n-900);font-weight:600}
+.rev{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;font-size:14px}
+.rev dt{color:var(--n-500)} .rev dd{font-weight:600}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Menú">
+    <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
+    <div class="group">Agencia</div><a href="../02-dashboard/code.html"><i data-i="grid"></i><span>Dashboard</span></a><a href="../05-viajes-horarios/code.html" class="on" aria-current="page"><i data-i="calendar"></i><span>Viajes y horarios</span></a><a href="../03-rutas/code.html"><i data-i="route"></i><span>Rutas</span></a><a href="../04-vehiculos/code.html"><i data-i="bus"></i><span>Vehículos</span></a><a href="../06-tarifas/code.html"><i data-i="tag"></i><span>Tarifas</span></a><div class="group">Equipo y análisis</div><a href="../07-agentes/code.html"><i data-i="users"></i><span>Agentes</span></a><a href="../08-reportes/code.html"><i data-i="chart"></i><span>Reportes</span></a><a href="#alertas"><i data-i="bell"></i><span>Alertas</span><b class="count">3</b></a>
+    <div class="me"><span class="avatar">RH</span><div>Rosa Huamán<small>Admin. de agencia</small></div></div>
+  </aside>
+  <div>
+    <header class="top">
+      <button class="agency" aria-haspopup="listbox"><span class="dot"><i data-i="store" class="sm"></i></span><div>Terminal Norte<small>Transportes Qori Ñan S.A.C.</small></div><i data-i="chevron" class="sm"></i></button>
+      <label class="search"><i data-i="search" class="sm"></i><input placeholder="Buscar viaje, pasajero o código" aria-label="Buscar"><kbd>/</kbd></label>
+      <div class="tools">
+        <button class="icon-btn" aria-label="Ayuda"><i data-i="help"></i></button>
+        <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i><span class="pip"></span></button>
+      </div>
+    </header>
+    <main class="main">
+
+<div class="page-head"><div><div class="crumbs">Terminal Norte</div><h1>Viajes y horarios</h1><p class="muted small">Semana del 16 al 22 nov 2026 · color por ocupación (ámbar ≥ 70 %)</p></div>
+  <div class="row"><div class="segmented"><button aria-pressed="true"><i data-i="calendar" class="sm"></i>Semana</button><button aria-pressed="false"><i data-i="log" class="sm"></i>Lista</button></div><button class="btn btn-ghost btn-icon"><i data-i="back" class="sm"></i></button><button class="btn btn-ghost btn-icon"><i data-i="right" class="sm"></i></button><a class="btn btn-primary" href="#programar"><i data-i="plus" class="sm"></i> Programar viaje</a></div></div>
+<section class="card" style="overflow:hidden"><div class="cal"><div class="hcol"><span style="top:0px">06:00</span><span style="top:48px">08:00</span><span style="top:96px">10:00</span><span style="top:144px">12:00</span><span style="top:192px">14:00</span><span style="top:240px">16:00</span><span style="top:288px">18:00</span><span style="top:336px">20:00</span><span style="top:384px">22:00</span></div><div class="dcol"><div class="dh">lun 16</div><div class="dbody"><div class="tb" style="top:24px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>07:00</b> Huanta<span>52%</span></div><div class="tb" style="top:396px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>22:30</b> Lima<span>61%</span></div></div></div><div class="dcol"><div class="dh">mar 17</div><div class="dbody"><div class="tb" style="top:24px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>07:00</b> Huanta<span>48%</span></div><div class="tb" style="top:84px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>09:30</b> Huancayo<span>55%</span></div><div class="tb" style="top:396px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>22:30</b> Lima<span>58%</span></div></div></div><div class="dcol"><div class="dh">mié 18</div><div class="dbody"><div class="tb" style="top:24px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>07:00</b> Huanta<span>50%</span></div><div class="tb" style="top:396px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>22:30</b> Lima<span>64%</span></div></div></div><div class="dcol"><div class="dh">jue 19</div><div class="dbody"><div class="tb" style="top:24px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>07:00</b> Huanta<span>57%</span></div><div class="tb" style="top:84px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>09:30</b> Huancayo<span>66%</span></div><div class="tb" style="top:396px;height:34px;border-left-color:#F2A93B;background:#FDF1DC"><b>22:30</b> Lima<span>70%</span></div></div></div><div class="dcol"><div class="dh">vie 20</div><div class="dbody"><div class="tb" style="top:24px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>07:00</b> Huanta<span>69%</span></div><div class="tb" style="top:216px;height:34px;border-left-color:#F2A93B;background:#FDF1DC"><b>15:00</b> Andahuaylas<span>72%</span></div><div class="tb" style="top:396px;height:34px;border-left-color:#F2A93B;background:#FDF1DC"><b>22:30</b> Lima<span>88%</span></div></div></div><div class="dcol"><div class="dh today">sáb 21</div><div class="dbody"><div class="tb" style="top:24px;height:34px;border-left-color:#F2A93B;background:#FDF1DC"><b>07:00</b> Huanta<span>73%</span></div><div class="tb" style="top:84px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>09:30</b> Huancayo<span>64%</span></div><div class="tb" style="top:216px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>15:00</b> Andahuaylas<span>43%</span></div><div class="tb" style="top:336px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>20:00</b> Lima<span>52%</span></div><div class="tb" style="top:396px;height:34px;border-left-color:#F2A93B;background:#FDF1DC"><b>22:30</b> Lima<span>73%</span></div></div></div><div class="dcol"><div class="dh">dom 22</div><div class="dbody"><div class="tb" style="top:24px;height:34px;border-left-color:#0E6B5C;background:#EFF8F5"><b>07:00</b> Huanta<span>41%</span></div><div class="tb" style="top:396px;height:34px;border-left-color:#F2A93B;background:#FDF1DC"><b>22:30</b> Lima<span>79%</span></div></div></div></div></section>
+
+    </main>
+  </div>
+</div>
+<div class="scrim state" id="programar" role="dialog" aria-modal="true" aria-labelledby="pv">
+  <div class="modal stack" style="max-width:560px">
+    <div class="row between"><h2 id="pv">Programar viaje</h2><a class="more" href="#" aria-label="Cerrar"><i data-i="x"></i></a></div>
+    <ol class="wiz"><li class="done">1 Ruta</li><li class="done">2 Fecha y hora</li><li class="done">3 Vehículo</li><li class="done">4 Tarifa</li><li class="now">5 Revisión</li></ol>
+    <dl class="rev"><dt>Ruta</dt><dd>Ayacucho → Lima</dd><dt>Salida</dt><dd>22:30 · diario del 23 nov al 6 dic</dd><dt>Vehículo</dt><dd>ABX-114 · Van (15 asientos)</dd><dt>Tarifa</dt><dd class="num">S/ 95.00 por pasajero</dd></dl>
+    <div class="row" style="align-items:flex-start;gap:16px;padding:16px;border-radius:14px;background:var(--n-50);border:1px solid var(--n-200)"><div class="seat-mini" data-model="van"></div><div class="stack-sm"><b>Se generarán 15 asientos por viaje</b><span class="small muted">14 viajes · 210 asientos en total. El plano se toma del modelo Van y no se puede editar por viaje.</span></div></div>
+    <div class="row" style="justify-content:flex-end"><a class="btn btn-ghost" href="#">Atrás</a><a class="btn btn-primary" href="#">Programar 14 viajes</a></div>
+  </div>
+</div>
+</body>
+</html>
