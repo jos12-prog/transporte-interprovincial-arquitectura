@@ -79,6 +79,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{135F12
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransportPlatform.Shared.Infrastructure", "Shared\TransportPlatform.Shared.Infrastructure\TransportPlatform.Shared.Infrastructure.csproj", "{8B3B2B98-DE2E-444C-992B-F23700B6FB51}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransportPlatform.Shared.Contracts", "Shared\TransportPlatform.Shared.Contracts\TransportPlatform.Shared.Contracts.csproj", "{D17F832E-4FBF-4DE0-B08D-1C0FC018897A}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransportPlatform.Host", "Host\TransportPlatform.Host.csproj", "{8B95936E-D70D-4A2D-86DC-7876D8EDC124}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransportPlatform.Unit.Tests", "..\..\tests\Unit\TransportPlatform.Unit.Tests.csproj", "{EAC972A9-74B0-4E72-804B-3407CFB1FEAB}"
@@ -228,6 +230,10 @@ Global
 		{536F5D99-9FD5-4E66-8AD2-93B4CFB53308}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{536F5D99-9FD5-4E66-8AD2-93B4CFB53308}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{536F5D99-9FD5-4E66-8AD2-93B4CFB53308}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D17F832E-4FBF-4DE0-B08D-1C0FC018897A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D17F832E-4FBF-4DE0-B08D-1C0FC018897A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D17F832E-4FBF-4DE0-B08D-1C0FC018897A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D17F832E-4FBF-4DE0-B08D-1C0FC018897A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8F486665-FB25-4B50-AE56-E1D7639AFF8D} = {57BCF03D-86EF-41CF-9754-88124280B4BD}

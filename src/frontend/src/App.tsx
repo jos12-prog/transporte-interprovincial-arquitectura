@@ -2,13 +2,16 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { PassengerLayout } from '@/layouts/PassengerLayout';
 import { StaffShell } from '@/layouts/StaffShell';
 import { RoleLanding } from '@/pages/RoleLanding';
+import { TripResultsPage } from '@/pages/TripResultsPage';
+import { TripSearchPage } from '@/pages/TripSearchPage';
 
 export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/pasajero" replace />} />
       <Route path="/pasajero" element={<PassengerLayout />}>
-        <Route index element={<RoleLanding title="Pasajero" />} />
+        <Route index element={<TripSearchPage />} />
+        <Route path="resultados" element={<TripResultsPage />} />
         <Route path="*" element={<RoleLanding title="Pasajero" />} />
       </Route>
       <Route path="/agente" element={<StaffShell role="Agente" />}>

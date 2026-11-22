@@ -4,7 +4,6 @@ import { AppRoutes } from '@/App';
 
 describe('role routes and layouts', () => {
   it.each([
-    ['/pasajero', 'Pasajero'],
     ['/agente', 'Agente'],
     ['/admin-agencia', 'Administrador de agencia'],
     ['/superadmin', 'Superadministrador'],
@@ -16,6 +15,17 @@ describe('role routes and layouts', () => {
     );
 
     expect(screen.getByRole('heading', { level: 1, name: title })).toBeInTheDocument();
+  });
+
+  it('renders trip search as the passenger landing screen', () => {
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={['/pasajero']}>
+        <AppRoutes />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('heading', { level: 1, name: '¿A dónde viajamos esta vez?' })).toBeInTheDocument();
+    expect(screen.getByRole('form', { name: 'Buscar viajes' })).toBeInTheDocument();
   });
 
   it('renders the passenger navigation layout and staff brand shell', () => {

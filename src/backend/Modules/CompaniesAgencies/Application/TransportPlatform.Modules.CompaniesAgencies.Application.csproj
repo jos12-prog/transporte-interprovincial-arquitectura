@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\TransportPlatform.Modules.CompaniesAgencies.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\TransportPlatform.Shared.Contracts\TransportPlatform.Shared.Contracts.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
