@@ -9,6 +9,7 @@ using Xunit;
 
 namespace TransportPlatform.Integration.Tests;
 
+[Collection(HostIntegrationCollection.Name)]
 public sealed class HealthEndpointTests : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()

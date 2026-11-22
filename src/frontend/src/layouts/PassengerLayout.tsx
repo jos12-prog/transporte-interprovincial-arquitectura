@@ -1,4 +1,4 @@
-import { BusFront, Menu, Ticket } from 'lucide-react';
+import { BusFront, CircleHelp, Menu, Search, Ticket } from 'lucide-react';
 import { Link, Outlet } from 'react-router-dom';
 import logo from '@/assets/brand/logo-horizontal.svg';
 
@@ -23,9 +23,15 @@ export function PassengerLayout() {
           </button>
         </div>
       </header>
-      <main className="mx-auto max-w-container px-page-gutter py-10">
+      <main className="min-h-[calc(100vh-72px)] pb-20 sm:pb-0">
         <Outlet />
       </main>
+      <nav aria-label="Navegación inferior pasajero" className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-neutral-200 bg-white px-2 py-2 shadow-md sm:hidden">
+        <Link to="/pasajero" className="flex flex-col items-center gap-1 py-1 text-xs font-medium text-primary-700"><Search aria-hidden="true" size={19} />Buscar</Link>
+        <Link to="/pasajero/pasajes" className="flex flex-col items-center gap-1 py-1 text-xs text-neutral-600"><Ticket aria-hidden="true" size={19} />Mis pasajes</Link>
+        <Link to="#ayuda" className="flex flex-col items-center gap-1 py-1 text-xs text-neutral-600"><CircleHelp aria-hidden="true" size={19} />Ayuda</Link>
+        <Link to="#cuenta" className="flex flex-col items-center gap-1 py-1 text-xs text-neutral-600"><Menu aria-hidden="true" size={19} />Cuenta</Link>
+      </nav>
     </div>
   );
 }

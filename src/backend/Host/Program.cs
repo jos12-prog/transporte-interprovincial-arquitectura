@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Reflection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Serilog;
 using TransportPlatform.Modules.AuditNotifications.Infrastructure;
@@ -38,11 +39,26 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile), includeControllerXmlComments: true);
+    var documentedAssemblies = new[]
+    {
+        Assembly.GetExecutingAssembly(),
+        typeof(TransportPlatform.Modules.QueriesReports.Presentation.PresentationAssemblyMarker).Assembly
+    };
+    foreach (var assembly in documentedAssemblies)
+    {
+        var xmlPath = Path.ChangeExtension(assembly.Location, ".xml");
+        if (File.Exists(xmlPath))
+        {
+            options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+        }
+    }
 });
 
 var app = builder.Build();
+if (app.Environment.IsDevelopment())
+{
+    await TransportPlatform.Host.DevelopmentDatabaseMigrator.ApplyAsync(app.Services);
+}
 app.UseSerilogRequestLogging();
 app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())

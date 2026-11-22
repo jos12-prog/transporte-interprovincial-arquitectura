@@ -9,11 +9,11 @@ public sealed class LayeringTests
     private static readonly (string Name, Assembly Domain, Assembly Application)[] Modules =
     [
         ("IdentityAccess", typeof(TransportPlatform.Modules.IdentityAccess.Domain.Class1).Assembly, typeof(TransportPlatform.Modules.IdentityAccess.Application.Class1).Assembly),
-        ("CompaniesAgencies", typeof(TransportPlatform.Modules.CompaniesAgencies.Domain.Class1).Assembly, typeof(TransportPlatform.Modules.CompaniesAgencies.Application.Class1).Assembly),
-        ("TransportScheduling", typeof(TransportPlatform.Modules.TransportScheduling.Domain.Class1).Assembly, typeof(TransportPlatform.Modules.TransportScheduling.Application.Class1).Assembly),
-        ("Reservations", typeof(TransportPlatform.Modules.Reservations.Domain.Class1).Assembly, typeof(TransportPlatform.Modules.Reservations.Application.Class1).Assembly),
+        ("CompaniesAgencies", typeof(TransportPlatform.Modules.CompaniesAgencies.Domain.Entities.Company).Assembly, typeof(TransportPlatform.Modules.CompaniesAgencies.Application.Services.CompaniesAgenciesApi).Assembly),
+        ("TransportScheduling", typeof(TransportPlatform.Modules.TransportScheduling.Domain.Entities.Route).Assembly, typeof(TransportPlatform.Modules.TransportScheduling.Application.Services.TransportSchedulingApi).Assembly),
+        ("Reservations", typeof(TransportPlatform.Modules.Reservations.Domain.Entities.TripSeat).Assembly, typeof(TransportPlatform.Modules.Reservations.Application.Services.ReservationsApi).Assembly),
         ("SalesPayments", typeof(TransportPlatform.Modules.SalesPayments.Domain.Class1).Assembly, typeof(TransportPlatform.Modules.SalesPayments.Application.Class1).Assembly),
-        ("QueriesReports", typeof(TransportPlatform.Modules.QueriesReports.Domain.Class1).Assembly, typeof(TransportPlatform.Modules.QueriesReports.Application.Class1).Assembly),
+        ("QueriesReports", typeof(TransportPlatform.Modules.QueriesReports.Domain.Class1).Assembly, typeof(TransportPlatform.Modules.QueriesReports.Application.UseCases.SearchTripsUseCase).Assembly),
         ("AuditNotifications", typeof(TransportPlatform.Modules.AuditNotifications.Domain.Class1).Assembly, typeof(TransportPlatform.Modules.AuditNotifications.Application.Class1).Assembly),
     ];
 
