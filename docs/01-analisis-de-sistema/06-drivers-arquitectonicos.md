@@ -9,11 +9,11 @@ Los drivers identificados permiten justificar posteriormente el estilo arquitect
 | ID | Driver arquitectónico | Origen | ¿Por qué influye en la arquitectura? |
 |---|---|---|---|
 | **DA01** | El sistema debe soportar múltiples pasajeros, agentes y administradores realizando operaciones simultáneamente. | AC01, AC02, AC05 | Influye en la estrategia de concurrencia, procesamiento de solicitudes, rendimiento y escalabilidad. |
-| **DA02** | El sistema debe impedir la confirmación simultánea del mismo asiento o cupo. | RF12, RF26, AC05, AC06 | Obliga a definir mecanismos transaccionales y de control de concurrencia para evitar sobreventas. |
+| **DA02** | El sistema debe impedir la confirmación simultánea del mismo asiento numerado de un viaje. | RF12, RF26, AC05, AC06 | Obliga a definir mecanismos transaccionales y de control de concurrencia para evitar sobreventas. |
 | **DA03** | El sistema debe mantener consistencia entre reservas, pagos, disponibilidad y pasajes. | RF10, RF11, RF19, RF21, AC06 | Determina el manejo de transacciones, estados de reserva y confirmación de operaciones. |
 | **DA04** | El sistema debe aislar la información de las diferentes empresas y agencias que utilizan la plataforma. | RF35, RF39, RC02, RC03, AC04 | Influye directamente en autenticación, autorización, modelo de datos y control del ámbito organizacional. |
 | **DA05** | El sistema debe permitir el crecimiento de empresas, agencias, pasajeros, servicios y operaciones sin modificar completamente la solución. | AC02, RC02 | Influye en la modularidad, escalabilidad y organización de los componentes. |
-| **DA06** | El sistema debe mantener tiempos de respuesta adecuados durante periodos de alta demanda. | AC01, AC03, RC12 | Influye en la utilización de caché, optimización de consultas y distribución de carga. |
+| **DA06** | El sistema debe mantener tiempos de respuesta adecuados durante periodos de alta demanda. | AC01, AC02, RC12 | Influye en la utilización de caché, optimización de consultas y distribución de carga. |
 | **DA07** | El sistema debe permitir que las operaciones digitales y presenciales utilicen una disponibilidad común. | RF23, RF24, RF26, RC07 | Obliga a centralizar la disponibilidad y evitar fuentes independientes que puedan generar inconsistencias. |
 | **DA08** | El sistema debe mantener una reserva temporal durante un periodo limitado y liberarla automáticamente si no se confirma el pago. | RF07–RF13, RC08 | Influye en la gestión de estados, expiración de reservas, tareas programadas y actualización de disponibilidad. |
 | **DA09** | El sistema debe integrar una pasarela de pago externa sin acoplar la lógica de negocio al proveedor. | RF18–RF21, RC10, AC08 | Determina el uso de un adaptador para aislar la integración de Culqi y facilitar una futura sustitución del proveedor. |
@@ -31,7 +31,7 @@ No todos los drivers tienen el mismo impacto sobre la solución. Los siguientes 
 
 ### DA02 — Control de concurrencia
 
-Es uno de los principales drivers del proyecto debido a que diferentes pasajeros y agentes pueden intentar adquirir el mismo asiento o cupo simultáneamente.
+Es uno de los principales drivers del proyecto debido a que diferentes pasajeros y agentes pueden intentar adquirir el mismo asiento numerado simultáneamente.
 
 La arquitectura debe garantizar que solamente una operación pueda confirmar el recurso.
 
@@ -223,20 +223,22 @@ Se deberá identificar como mínimo:
 
 | Driver | Mecanismo arquitectónico |
 |---|---|
-| **DA01 - Concurrencia de usuarios** | API REST, control de concurrencia y escalabilidad horizontal. |
-| **DA02 - Evitar sobreventa** | Transacciones, restricciones de BD y control de concurrencia. |
-| **DA03 - Consistencia** | Transacciones, estados controlados y validación de operaciones. |
-| **DA04 - Aislamiento** | RBAC + ámbito empresa/agencia + autorización en backend. |
-| **DA05 - Escalabilidad** | Monolito modular, separación de módulos y escalamiento de infraestructura. |
-| **DA06 - Rendimiento** | Redis, optimización de consultas y procesamiento asíncrono. |
-| **DA07 - Disponibilidad común** | Fuente transaccional única para canales web y presencial. |
-| **DA08 - Reserva temporal** | Estados de reserva, expiración y tareas programadas. |
-| **DA09 - Pagos** | Adapter + Culqi + validación de resultado/webhook. |
-| **DA10 - Notificaciones** | RabbitMQ + consumidor de eventos + WhatsApp API. |
-| **DA11 - Consultas frecuentes** | Redis como caché. |
-| **DA12 - Auditoría** | Registro de eventos y operaciones críticas. |
-| **DA13 - Integraciones** | Interfaces y adaptadores externos. |
-| **DA14 - Mantenibilidad** | Monolito modular + Clean Architecture. |
+| Driver | Mecanismo arquitectónico | Decisiones relacionadas |
+|---|---|---|
+| **DA01 - Concurrencia de usuarios** | API REST, control de concurrencia y escalabilidad horizontal. | ADR-01, ADR-07, ADR-14 |
+| **DA02 - Evitar sobreventa** | Transacciones, restricciones de BD y control de concurrencia por asiento. | ADR-07 |
+| **DA03 - Consistencia** | Transacciones, estados controlados y validación de operaciones. | ADR-04, ADR-07, ADR-08 |
+| **DA04 - Aislamiento** | RBAC + ámbito empresa/agencia + autorización en backend. | ADR-05, ADR-06 |
+| **DA05 - Escalabilidad** | Monolito modular, separación de módulos y escalamiento de infraestructura. | ADR-01, ADR-09, ADR-10, ADR-14 |
+| **DA06 - Rendimiento** | Redis para búsquedas y catálogos; optimización y escalamiento. | ADR-09, ADR-14 |
+| **DA07 - Disponibilidad común** | Fuente transaccional única para canales web y presencial. | ADR-04, ADR-07 |
+| **DA08 - Reserva temporal** | Estados de reserva, expiración distribuida y liberación de asientos. | ADR-08 |
+| **DA09 - Pagos** | Culqi Checkout, adaptador, validación de respuesta/webhook e idempotencia. | ADR-11 |
+| **DA10 - Notificaciones** | Transactional Outbox, RabbitMQ y consumidor de WhatsApp. | ADR-10, ADR-12 |
+| **DA11 - Consultas frecuentes** | Redis con TTL de 60 s para búsquedas y catálogos. | ADR-09 |
+| **DA12 - Auditoría** | Registro de eventos y operaciones críticas. | ADR-13, ADR-15 |
+| **DA13 - Integraciones** | Interfaces de aplicación y adaptadores externos. | ADR-03, ADR-11, ADR-12 |
+| **DA14 - Mantenibilidad** | Monolito modular, Clean Architecture e interfaces de módulo. | ADR-01, ADR-02 |
 
 ---
 

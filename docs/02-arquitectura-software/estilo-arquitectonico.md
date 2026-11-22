@@ -34,12 +34,16 @@ Los módulos se comunican mediante contratos internos y casos de uso, evitando e
 1. **Separación de responsabilidades:** cada capa cumple una función específica.
 2. **Dependencias hacia el núcleo:** dominio y casos de uso permanecen independientes de frameworks y proveedores externos.
 3. **Modularidad:** cada módulo conserva sus reglas y contratos; las operaciones entre módulos se coordinan explícitamente.
-4. **Integridad transaccional:** PostgreSQL es la fuente de verdad para reservas, asientos o cupos y confirmaciones de pago; deben evitarse las sobreventas.
+4. **Integridad transaccional:** PostgreSQL es la fuente de verdad para reservas y asientos numerados y confirmaciones de pago; la concurrencia se controla sobre TripSeat.
 5. **Seguridad multiempresa:** las operaciones respetan el alcance de empresa, agencia y rol del usuario.
 6. **Integraciones desacopladas:** pagos, notificaciones y almacenamiento se acceden mediante interfaces y adaptadores.
 7. **Componentes de infraestructura establecidos:** Redis se incorpora como caché para consultas frecuentes (RC12) y RabbitMQ como cola durable para procesamiento asíncrono de notificaciones y eventos secundarios (RC13). Ambos son componentes definidos desde la primera versión de la plataforma.
 
-## 6. Justificación
+## 6. Alcance v1
+
+La v1 utiliza únicamente la aplicación web React responsive. Choferes, réplica de lectura y aplicación móvil nativa quedan como evolución futura. Redis almacena búsquedas de viajes y catálogos con TTL de 60 segundos; nunca cachea el mapa exacto de asientos ni reservas.
+
+## 7. Justificación
 
 La arquitectura en capas favorece la **mantenibilidad (AC07)** y la separación de responsabilidades, respondiendo al driver **DA14**. El monolito modular simplifica el despliegue y permite coordinar operaciones transaccionales críticas (**DA01, DA02, DA03**), mientras que los límites de acceso soportan la seguridad multiempresa (**DA04**). La separación entre lógica de negocio e infraestructura facilita el rendimiento, la disponibilidad y la escalabilidad (**DA05, DA06**). La incorporación de Redis y RabbitMQ desde la primera versión atiende los drivers de rendimiento y procesamiento asíncrono (**DA09, DA10, DA11**).
 

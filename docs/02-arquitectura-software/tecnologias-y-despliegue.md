@@ -12,20 +12,20 @@
 
 | Capa / Función | Tecnología seleccionada | Justificación arquitectónica | Decisión relacionada |
 |---|---|---|:---:|
-| **Frontend Web** | React 18 + TypeScript + Vite | Interfaz SPA reactiva con tipado estricto. Vite provee compilación rápida. TypeScript previene errores en la selección de asientos y operaciones multiagencia. | DA-03 |
-| **Estilos e interfaz** | Tailwind CSS | Diseño adaptable y responsive para pasajeros (web) y agentes (ventanilla). | DA-03 |
-| **Backend API** | ASP.NET Core 8 (C#) | Plataforma de alto rendimiento con soporte nativo de Inyección de Dependencias, concurrencia asíncrona y middlewares seguros. | DA-01, DA-02, DA-14 |
-| **Acceso a datos** | Entity Framework Core 8 + Npgsql | ORM con soporte para Global Query Filters (aislamiento multiempresa), migraciones y consultas SQL nativas con bloqueo pesimista. | DA-04, DA-05 |
-| **Base de datos** | PostgreSQL 16+ | Motor relacional con soporte ACID estricto, índices únicos condicionales para evitar sobreventa (`idx_unique_active_seat`) y transacciones serializables. | DA-04, DA-07 |
-| **Caché** | Redis | Almacén en memoria para consultas frecuentes de rutas, horarios y servicios. Componente obligatorio desde la primera versión (RC12). | DA-09, DA-11 |
-| **Cola de mensajería** | RabbitMQ | Cola durable para procesamiento asíncrono de notificaciones y eventos secundarios. Componente obligatorio desde la primera versión (RC13). | DA-10 |
-| **Proxy y balanceador** | Nginx | Servidor perimetral: terminación TLS 1.3 (HTTPS), compresión Gzip/Brotli, rate limiting y balanceo de carga entre contenedores. | DA-01, DA-05, DA-14 |
-| **Contenedores** | Docker y Docker Compose | Empaquetamiento estándar, reproducible y portable de todos los entornos: desarrollo, pruebas y producción. | DA-14 |
+| **Frontend Web** | React 18 + TypeScript + Vite | Interfaz SPA reactiva con tipado estricto. Vite provee compilación rápida. TypeScript previene errores en la selección de asientos y operaciones multiagencia. | ADR-03 |
+| **Estilos e interfaz** | Tailwind CSS | Diseño adaptable y responsive para pasajeros (web) y agentes (ventanilla). | ADR-03 |
+| **Backend API** | ASP.NET Core 8 (C#) | Plataforma de alto rendimiento con soporte nativo de Inyección de Dependencias, concurrencia asíncrona y middlewares seguros. | ADR-01, ADR-02, ADR-14 |
+| **Acceso a datos** | Entity Framework Core 8 + Npgsql | ORM con soporte para Global Query Filters (aislamiento multiempresa), migraciones y consultas SQL nativas con bloqueo pesimista. | ADR-04, ADR-05 |
+| **Base de datos** | PostgreSQL 16+ | Motor relacional con soporte ACID estricto, índices únicos condicionales para evitar sobreventa (`idx_unique_active_seat`) y transacciones serializables. | ADR-04, ADR-07 |
+| **Caché** | Redis | Almacén en memoria para consultas frecuentes de rutas, horarios y servicios. Componente obligatorio desde la primera versión (RC12). | ADR-09, ADR-11 |
+| **Cola de mensajería** | RabbitMQ | Cola durable para procesamiento asíncrono de notificaciones y eventos secundarios. Componente obligatorio desde la primera versión (RC13). | ADR-10 |
+| **Proxy y balanceador** | Nginx | Servidor perimetral: terminación TLS 1.3 (HTTPS), compresión Gzip/Brotli, rate limiting y balanceo de carga entre contenedores. | ADR-01, ADR-05, ADR-14 |
+| **Contenedores** | Docker y Docker Compose | Empaquetamiento estándar, reproducible y portable de todos los entornos: desarrollo, pruebas y producción. | ADR-14 |
 | **Control de versiones** | Git y GitHub | Repositorio centralizado de código y documentación arquitectónica con control de ramas. | — |
-| **Pipeline CI/CD** | GitHub Actions | Automatización de compilación, pruebas unitarias y construcción de imágenes Docker en cada integración. | DA-15 |
-| **Observabilidad** | Serilog + Health Checks | Logs estructurados en formato JSON para trazabilidad y auditoría. Endpoints de estado (`/health`) para monitoreo. | DA-12, DA-15 |
-| **Pasarela de pagos** | Culqi (mediante Adapter) | Pasarela orientada al contexto peruano, integrada mediante el patrón Adapter (`IPaymentGateway` → `CulqiPaymentAdapter`). Permite cambio futuro sin modificar el dominio. | DA-09, DA-11 |
-| **Notificaciones** | WhatsApp Business Cloud API (mediante Adapter) | Canal de comunicación para confirmaciones, recordatorios, cancelaciones y alertas preventivas. Procesado de forma asíncrona mediante RabbitMQ. | DA-10, DA-12 |
+| **Pipeline CI/CD** | GitHub Actions | Automatización de compilación, pruebas unitarias y construcción de imágenes Docker en cada integración. | ADR-15 |
+| **Observabilidad** | Serilog + Health Checks | Logs estructurados en formato JSON para trazabilidad y auditoría. Endpoints de estado (`/health`) para monitoreo. | ADR-12, ADR-15 |
+| **Pasarela de pagos** | Culqi (mediante Adapter) | Pasarela orientada al contexto peruano, integrada mediante `IPaymentGateway` → `CulqiPaymentAdapter`. | ADR-11 |
+| **Notificaciones** | WhatsApp Business Cloud API (mediante Adapter) | Canal de comunicación para confirmaciones, recordatorios, cancelaciones y alertas preventivas. Procesado de forma asíncrona mediante RabbitMQ. | ADR-10, ADR-12 |
 
 ---
 
@@ -59,7 +59,7 @@ Para la Plataforma Integrada de Transporte Interprovincial se selecciona el **Mo
 
 ```mermaid
 flowchart TB
-    CLIENTE["Navegador Web / Dispositivo Móvil<br/>(Pasajero, Agente, Administrador de Agencia, Superadministrador)"]
+    CLIENTE["Navegador web responsive (escritorio o móvil)<br/>(Pasajero, Agente, Administrador de Agencia, Superadministrador)"]
 
     subgraph SERVIDOR["Servidor de Producción (Linux / Cloud VPS)"]
         NGINX["Proxy Inverso y Balanceador<br/><b>Nginx (Puerto 443 — HTTPS / TLS 1.3)</b>"]
@@ -69,25 +69,22 @@ flowchart TB
 
             subgraph BACKEND_POOL["Pool de Backend (Monolito Modular)"]
                 API1["Contenedor API 1<br/><b>ASP.NET Core 8</b>"]
-                API2["Contenedor API 2 (Réplica)<br/><b>ASP.NET Core 8</b>"]
+                API2["Contenedor API 2<br/><b>ASP.NET Core 8</b>"]
             end
 
             DB["Contenedor Base de Datos<br/><b>PostgreSQL 16 (Puerto 5432)</b><br/>Volumen Persistente"]
-            DB_REPLICA["Contenedor Réplica de Lectura<br/><b>PostgreSQL 16 (Standby)</b><br/>Reportes y Auditoría"]
             REDIS["Contenedor Caché<br/><b>Redis (Puerto 6379)</b><br/>Consultas frecuentes"]
             RABBIT["Contenedor Cola de Mensajería<br/><b>RabbitMQ (Puerto 5672)</b><br/>Eventos asíncronos"]
         end
     end
 
     EXT_PAGOS["Pasarela de Pagos Externa<br/><b>Culqi</b><br/>(mediante CulqiPaymentAdapter)"]
-    EXT_NOTIF["Proveedor de Notificaciones<br/><b>WhatsApp Business Cloud API</b><br/>(mediante WhatsAppAdapter)"]
+    EXT_NOTIF["Proveedor de Notificaciones<br/><b>WhatsApp Business Cloud API</b><br/>(mediante WhatsAppNotificationAdapter)"]
 
     CLIENTE -->|"HTTPS / TLS 1.3"| NGINX
     NGINX -->|"/ (recursos estáticos)"| FRONT
     NGINX -->|"/api/v1 (proxy pass balanceado)"| BACKEND_POOL
     BACKEND_POOL -->|"TCP / Npgsql con Pool"| DB
-    DB -->|"Streaming Replication"| DB_REPLICA
-    BACKEND_POOL -->|"Lectura de reportes"| DB_REPLICA
     BACKEND_POOL -->|"TCP (caché)"| REDIS
     BACKEND_POOL -->|"AMQP (publicar eventos)"| RABBIT
     RABBIT -->|"AMQP (consumir eventos)"| BACKEND_POOL
@@ -97,14 +94,18 @@ flowchart TB
     classDef net fill:#E3F2FD,stroke:#1E88E5,color:#0D47A1
     classDef comp fill:#E8F5E9,stroke:#43A047,color:#1B5E20
     classDef ext fill:#FFF3E0,stroke:#FB8C00,color:#E65100
-    class NGINX,FRONT,API1,API2,DB,DB_REPLICA,REDIS,RABBIT net
+    class NGINX,FRONT,API1,API2,DB,REDIS,RABBIT net
     class CLIENTE comp
     class EXT_PAGOS,EXT_NOTIF ext
 ```
 
 ---
 
-## 4. Pipeline de CI/CD y flujo operativo
+## 4. Alcance de despliegue
+
+La v1 incluye navegador web responsive, API escalable sin estado, PostgreSQL, Redis y RabbitMQ. No incluye réplica de lectura ni aplicación móvil nativa; ambas son evolución futura. Redis se limita a búsquedas de viajes y catálogos con TTL de 60 segundos.
+
+## 5. Pipeline de CI/CD y flujo operativo
 
 ```mermaid
 sequenceDiagram
@@ -138,19 +139,19 @@ sequenceDiagram
 
 ---
 
-## 5. Relación tecnologías — decisiones arquitectónicas
+## 6. Relación tecnologías — decisiones arquitectónicas
 
 | Tecnología | Táctica que implementa | Decisión arquitectónica |
 |---|---|---|
-| PostgreSQL 16 | Bloqueo pesimista, transacciones ACID, replicación | DA-04, DA-07 |
-| Redis | Caché de consultas frecuentes | DA-09 |
-| RabbitMQ | Colas y procesamiento asíncrono | DA-10 |
-| ASP.NET Core 8 + Polly | Circuit Breaker y reintentos | DA-09, DA-10 |
-| ASP.NET Core 8 + JWT | Autenticación y autorización RBAC | DA-06 |
-| ASP.NET Core 8 + Rate Limiting | Rate Limiting | DA-04 |
-| Nginx | Balanceo de carga, terminación TLS | DA-01, DA-05 |
-| Culqi (CulqiPaymentAdapter) | Patrón Adapter para pagos | DA-11 |
-| WhatsApp Business Cloud API (WhatsAppAdapter) | Patrón Adapter para notificaciones | DA-12 |
-| Serilog | Auditoría y logs estructurados | DA-13, DA-15 |
-| Docker + Docker Compose | Despliegue reproducible del monolito | DA-01 |
-| GitHub Actions | Pipeline CI/CD | DA-15 |
+| PostgreSQL 16 | Bloqueo pesimista sobre TripSeat y transacciones ACID | ADR-07, ADR-08 |
+| Redis | Búsquedas de viajes y catálogos (TTL 60 s) | ADR-09 |
+| RabbitMQ | Colas y procesamiento asíncrono | ADR-12 |
+| ASP.NET Core 8 + Polly | Circuit Breaker y reintentos | ADR-11, ADR-12 |
+| ASP.NET Core 8 + JWT | Autenticación y autorización RBAC | ADR-05, ADR-06 |
+| ASP.NET Core 8 + Rate Limiting | Rate Limiting | ADR-06 |
+| Nginx | Balanceo de carga, terminación TLS | ADR-01, ADR-10 |
+| Culqi (CulqiPaymentAdapter) | Patrón Adapter para pagos | ADR-11 |
+| WhatsApp Business Cloud API (WhatsAppNotificationAdapter) | Patrón Adapter para notificaciones | ADR-12 |
+| Serilog | Auditoría y logs estructurados | ADR-13, ADR-15 |
+| Docker + Docker Compose | Despliegue reproducible del monolito | ADR-01 |
+| GitHub Actions | Pipeline CI/CD | ADR-15 |

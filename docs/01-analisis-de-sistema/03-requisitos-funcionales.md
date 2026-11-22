@@ -20,20 +20,20 @@ La plataforma deberá permitir la operación de múltiples empresas y agencias m
 | **RF02** | El sistema debe permitir filtrar los resultados de búsqueda por empresa, agencia, horario y tarifa. |
 | **RF03** | El sistema debe permitir mostrar y comparar los servicios disponibles de diferentes empresas y agencias. |
 | **RF04** | El sistema debe permitir consultar el detalle de un servicio, incluyendo empresa, agencia, origen, destino, horario, tarifa y condiciones del viaje. |
-| **RF05** | El sistema debe permitir consultar la disponibilidad actualizada de asientos o cupos de cada servicio. |
-| **RF06** | El sistema debe permitir seleccionar un asiento o cupo disponible antes de iniciar una reserva. |
+| **RF05** | El sistema debe mostrar el mapa actualizado de asientos numerados de cada viaje con su estado de disponibilidad. |
+| **RF06** | El sistema debe permitir seleccionar uno o varios asientos disponibles y asociar a cada uno los datos del pasajero (DNI y nombre). |
 
 ### 2.2 Reservas y disponibilidad
 
 | ID | Requisito funcional |
 |---|---|
-| **RF07** | El sistema debe permitir registrar una reserva temporal asociada al pasajero, servicio y asiento o cupo seleccionado. |
-| **RF08** | El sistema debe bloquear temporalmente el asiento o cupo reservado para impedir que sea asignado a otra operación mientras la reserva se encuentre vigente. |
-| **RF09** | El sistema debe establecer una vigencia inicial de **10 minutos** para las reservas temporales realizadas por el canal digital. |
-| **RF10** | El sistema debe confirmar una reserva únicamente cuando el resultado del pago haya sido validado correctamente. |
+| **RF07** | El sistema debe permitir registrar una reserva asociada al pasajero, viaje y uno o varios asientos seleccionados, con los datos de cada pasajero. |
+| **RF08** | El sistema debe retener temporalmente los asientos de una reserva digital e impedir que se asignen a otra operación mientras la retención esté vigente. |
+| **RF09** | El sistema debe establecer una vigencia de **10 minutos** para las retenciones `HELD` iniciadas en el canal digital. |
+| **RF10** | El sistema debe confirmar una reserva digital únicamente cuando el pago asociado haya sido aprobado y validado correctamente. |
 | **RF11** | El sistema debe actualizar la disponibilidad del servicio después de una reserva confirmada, cancelada o expirada. |
-| **RF12** | El sistema debe impedir que dos operaciones concurrentes confirmen simultáneamente el mismo asiento o cupo. |
-| **RF13** | El sistema debe registrar el estado de cada reserva, incluyendo como mínimo los estados temporal, confirmada, cancelada y expirada. |
+| **RF12** | El sistema debe impedir que dos operaciones concurrentes confirmen simultáneamente el mismo asiento numerado de un viaje. |
+| **RF13** | El sistema debe registrar el estado de cada reserva: `HELD`, `CONFIRMED`, `CANCELLED`, `EXPIRED` o `RESCHEDULED`. |
 
 ### 2.3 Pasajes y operaciones del pasajero
 
@@ -44,13 +44,15 @@ La plataforma deberá permitir la operación de múltiples empresas y agencias m
 | **RF16** | El sistema debe permitir gestionar la reprogramación de una reserva o pasaje cuando las condiciones del servicio lo permitan. |
 | **RF17** | El sistema debe registrar el historial de cancelaciones y reprogramaciones realizadas sobre una reserva o pasaje. |
 
+Los estados de pago son `PENDING`, `APPROVED`, `REJECTED`, `ERROR` y `REFUNDED`. Los estados de pasaje son `ISSUED`, `USED` y `VOIDED`.
+
 ### 2.4 Pagos
 
 | ID | Requisito funcional |
 |---|---|
-| **RF18** | El sistema debe permitir iniciar el proceso de pago electrónico asociado a una reserva. |
-| **RF19** | El sistema debe validar el resultado del pago antes de confirmar definitivamente la reserva. |
-| **RF20** | El sistema debe registrar el resultado y estado de cada operación de pago asociada a una reserva o venta. |
+| **RF18** | El sistema debe permitir iniciar el pago electrónico mediante un token obtenido con Culqi Checkout y crear el cargo desde el backend. |
+| **RF19** | El sistema debe validar la respuesta del servidor Culqi y reconciliarla con webhooks firmados mediante HMAC antes de confirmar la reserva. |
+| **RF20** | El sistema debe registrar el estado del pago y procesar idempotentemente los eventos por `charge_id` único; si el cargo aprobado llega después de expirar la reserva, debe confirmar solo si los asientos siguen libres y, en caso contrario, registrar el pago como `REFUNDED`. |
 | **RF21** | El sistema debe impedir que una reserva sea confirmada cuando el pago no haya sido validado correctamente. |
 
 ### 2.5 Operación presencial
@@ -59,9 +61,9 @@ La plataforma deberá permitir la operación de múltiples empresas y agencias m
 |---|---|
 | **RF22** | El sistema debe permitir al Agente/Vendedor consultar los servicios, horarios y disponibilidad de su agencia. |
 | **RF23** | El sistema debe permitir al Agente/Vendedor registrar reservas para pasajeros atendidos presencialmente. |
-| **RF24** | El sistema debe permitir al Agente/Vendedor registrar ventas presenciales de pasajes y su forma de pago. |
+| **RF24** | El sistema debe permitir al Agente/Vendedor registrar ventas presenciales de pasajes con pago en efectivo, Yape/Plin o POS y confirmar directamente los asientos. |
 | **RF25** | El sistema debe permitir emitir o registrar el pasaje correspondiente a una venta confirmada. |
-| **RF26** | El sistema debe utilizar la misma disponibilidad de asientos o cupos para las operaciones digitales y presenciales. |
+| **RF26** | El sistema debe utilizar el mismo mapa y disponibilidad transaccional de asientos numerados para las operaciones digitales y presenciales. |
 | **RF27** | El sistema debe permitir al Agente/Vendedor consultar las operaciones realizadas en su agencia. |
 | **RF28** | El sistema debe permitir al Agente/Vendedor cancelar o reprogramar operaciones únicamente cuando cuente con autorización para realizar dichas acciones. |
 
@@ -73,7 +75,7 @@ La plataforma deberá permitir la operación de múltiples empresas y agencias m
 | **RF30** | El sistema debe permitir al Administrador de Agencia gestionar las rutas y destinos correspondientes a sus agencias autorizadas. |
 | **RF31** | El sistema debe permitir al Administrador de Agencia gestionar los horarios y servicios programados. |
 | **RF32** | El sistema debe permitir al Administrador de Agencia gestionar las tarifas de los servicios autorizados. |
-| **RF33** | El sistema debe permitir al Administrador de Agencia registrar y gestionar las unidades de transporte asociadas a sus servicios. |
+| **RF33** | El sistema debe permitir al Administrador de Agencia registrar vehículos por placa y asociarlos a un modelo del catálogo administrado por el Superadministrador. |
 | **RF34** | El sistema debe permitir al Administrador de Agencia gestionar los Agentes/Vendedores asociados a sus agencias autorizadas. |
 | **RF35** | El sistema debe permitir al Administrador de Agencia consultar reservas, ventas, ocupación y operaciones de sus agencias. |
 | **RF36** | El sistema debe generar reportes de ventas, demanda, ocupación y rutas para el Administrador de Agencia. |
@@ -104,6 +106,7 @@ La plataforma deberá permitir la operación de múltiples empresas y agencias m
 |---|---|
 | **RF47** | El sistema debe permitir enviar notificaciones relacionadas con confirmaciones, pagos, recordatorios, cancelaciones, reprogramaciones y modificaciones de servicios. |
 | **RF48** | El sistema debe procesar las notificaciones de forma independiente de las operaciones principales, de manera que una falla en el servicio de notificaciones no impida completar una reserva, venta o pago confirmado. |
+| **RF49** | El sistema debe generar alertas internas para el Administrador de Agencia cuando un servicio de sus agencias alcance el umbral de alta demanda configurado. |
 
 ---
 
@@ -121,13 +124,13 @@ Un usuario no deberá acceder a información de empresas o agencias que no esté
 
 La plataforma deberá permitir almacenar información de múltiples empresas y agencias en una misma solución, manteniendo separación lógica entre sus operaciones.
 
-El Administrador de Agencia solo podrá gestionar las agencias que tenga asignadas.
+El Administrador de Agencia podrá gestionar una o varias agencias autorizadas pertenecientes a una sola empresa. El token contendrá `sub`, `role`, `company_id` y `agency_ids[]`; la agencia activa se enviará en `X-Agency-Id` y el backend la validará en cada caso de uso.
 
 El Agente/Vendedor solo podrá realizar operaciones dentro de la agencia a la que se encuentre asociado.
 
 ### 3.3 Consistencia de disponibilidad
 
-La disponibilidad de asientos o cupos deberá mantenerse consistente entre los diferentes canales de operación.
+La disponibilidad de asientos numerados deberá mantenerse consistente entre los diferentes canales de operación.
 
 El siguiente escenario no deberá ser posible:
 
@@ -136,7 +139,7 @@ Pasajero web ──────┐
                    ├──> mismo servicio
 Agente/Vendedor ───┘
                    ↓
-        mismo asiento/cupo
+        mismo asiento numerado
                    ↓
           SOLO UNA CONFIRMACIÓN
 ```
@@ -146,16 +149,16 @@ Agente/Vendedor ───┘
 Cuando una reserva temporal supere los 10 minutos sin confirmación de pago:
 
 ```text
-HELD
- ↓
-10 minutos
- ↓
+HELD (solo canal digital)
+ ↓ 10 minutos sin pago aprobado
 EXPIRED
  ↓
-Liberar asiento/cupo
+Liberar asientos
  ↓
-Disponible nuevamente
+Disponibles nuevamente
 ```
+
+Para el agente, el pago presencial registrado como efectivo, Yape/Plin o POS confirma directamente la venta y los asientos; no requiere cierre de caja.
 
 ### 3.5 Trazabilidad
 
@@ -204,7 +207,7 @@ Las operaciones críticas deberán conservar información suficiente para identi
 | HU27 | RF34 |
 | HU28 | RF35 |
 | HU29 | RF36 |
-| HU30 | RF47 |
+| HU30 | RF49 |
 | HU31 | RF37 |
 | HU32 | RF38 |
 | HU33 | RF39 |
@@ -220,11 +223,13 @@ Las operaciones críticas deberán conservar información suficiente para identi
 | HU43 | RF48 |
 | HU44 | RF12, RF26 |
 
+HU30 se traza específicamente a **RF49** (alertas internas al Administrador de Agencia); RF47 cubre las notificaciones de cambios y modificaciones de servicio.
+
 ---
 
 ## 5. Resumen
 
-La plataforma contempla **48 requisitos funcionales**, derivados de las historias de usuario de los cuatro actores principales.
+La plataforma contempla **49 requisitos funcionales**, derivados de las historias de usuario de los cuatro actores principales.
 
 Los requisitos cubren:
 
@@ -244,3 +249,9 @@ Los requisitos cubren:
 - aislamiento multiempresa y multiagencia.
 
 Las **encomiendas no forman parte del alcance funcional actual** y, por tanto, no se incluyen requisitos relacionados con dicho módulo.
+
+## 6. Reglas de negocio pendientes de validar
+
+- Las políticas concretas de cancelación y reprogramación, incluida su variación según la anticipación.
+- La facturación/comprobante SUNAT queda fuera del alcance de v1; el pasaje se entrega como PDF con código QR.
+- Las alertas de alta demanda a pasajeros se enviarán únicamente a quienes hayan aceptado recibirlas (opt-in) y cuando la ocupación supere el 70 %.

@@ -27,7 +27,7 @@ La identificación de actores permite establecer las responsabilidades, permisos
 **Responsabilidades:**
 
 - Consultar rutas, horarios, tarifas y servicios disponibles.
-- Consultar la disponibilidad de asientos o cupos.
+- Consultar la disponibilidad de asientos numerados.
 - Realizar reservas de pasajes.
 - Realizar pagos mediante los medios habilitados.
 - Consultar sus reservas y pasajes.
@@ -53,7 +53,7 @@ La identificación de actores permite establecer las responsabilidades, permisos
 - Consultar las operaciones realizadas en su agencia.
 - Atender operaciones concurrentes con otros agentes y pasajeros del canal digital.
 
-**Restricción de acceso:** El agente solo puede realizar operaciones correspondientes a la agencia a la que se encuentra asignado.
+**Restricción de acceso:** El agente solo puede realizar operaciones correspondientes a la agencia activa a la que se encuentra asignado.
 
 No puede consultar ni modificar información de otras agencias o empresas.
 
@@ -77,6 +77,8 @@ No puede consultar ni modificar información de otras agencias o empresas.
 **Restricción de acceso:** El administrador únicamente puede acceder a información de la empresa y de las agencias que tenga expresamente autorizadas.
 
 No puede acceder, consultar ni modificar información perteneciente a otra empresa.
+
+Para cada operación el administrador selecciona una agencia autorizada de su empresa. El cliente envía esa agencia en el encabezado `X-Agency-Id` y el backend valida el ámbito antes de ejecutar el caso de uso. Los claims del token incluyen `sub`, `role`, `company_id` y `agency_ids[]`.
 
 Cuando tenga acceso a varias agencias, el sistema deberá permitir seleccionar la agencia sobre la cual desea trabajar, manteniendo el contexto de agencia durante la operación.
 
@@ -192,9 +194,9 @@ El envío de estas comunicaciones no deberá bloquear las operaciones transaccio
 | Consultar servicios | ✓ | ✓ | ✓ | ✓ |
 | Consultar disponibilidad | ✓ | ✓ | ✓ | ✓ |
 | Registrar reserva | ✓ | ✓ | ✓ | ✓ |
-| Registrar venta presencial | — | ✓ | ✓ | ✓ |
+| Registrar venta presencial | — | ✓ | ✓ | — |
 | Realizar pago electrónico | ✓ | — | — | — |
-| Registrar pago presencial | — | ✓ | ✓ | ✓ |
+| Registrar pago presencial | — | ✓ | ✓ | — |
 | Consultar reservas propias | ✓ | — | — | — |
 | Consultar reservas de la agencia | — | ✓ | ✓ | ✓ |
 | Gestionar horarios | — | — | ✓ | ✓ |
@@ -218,7 +220,7 @@ El envío de estas comunicaciones no deberá bloquear las operaciones transaccio
 - **RG05:** Un administrador podrá administrar una o varias agencias únicamente cuando estas pertenezcan a la empresa autorizada para su cuenta.
 - **RG06:** Un administrador no podrá consultar ni modificar información de empresas ajenas a su ámbito.
 - **RG07:** Un pasajero únicamente podrá consultar y modificar sus propios datos y operaciones.
-- **RG08:** El Superadministrador podrá administrar las empresas, agencias y usuarios de la plataforma.
+- **RG08:** El Superadministrador administra catálogos globales (incluidos modelos de vehículo), pero no registra ventas ni pagos presenciales.
 - **RG09:** Toda operación administrativa o crítica deberá mantener trazabilidad mediante registros de auditoría.
 - **RG10:** Las autorizaciones deberán validarse en el backend y no depender únicamente de controles realizados en la interfaz.
 
@@ -260,7 +262,7 @@ Empresa B
 
 El backend deberá validar que el usuario tenga autorización sobre la empresa y agencia solicitadas antes de devolver o modificar información.
 
-La existencia de una única base de datos no implica que los usuarios puedan acceder libremente a la información almacenada. El aislamiento será aplicado mediante autenticación, autorización, ámbito organizacional y controles de acceso a los datos.
+La existencia de una única base de datos no implica que los usuarios puedan acceder libremente a la información almacenada. El aislamiento será aplicado mediante autenticación, autorización, ámbito organizacional y controles de acceso a los datos. El token contiene `sub`, `role`, `company_id` y `agency_ids[]`; el caso de uso valida la agencia activa indicada por `X-Agency-Id`.
 
 ---
 
@@ -268,7 +270,7 @@ La existencia de una única base de datos no implica que los usuarios puedan acc
 
 La existencia de múltiples empresas y agencias establece como requisito arquitectónico la necesidad de implementar un mecanismo de autorización basado en roles y ámbito organizacional.
 
-Las operaciones de reserva y venta deberán utilizar una fuente de información común sobre la disponibilidad, de manera que una operación realizada por un pasajero desde el canal digital y una operación realizada presencialmente por un agente no puedan confirmar simultáneamente el mismo asiento o cupo.
+Las operaciones de reserva y venta deberán utilizar una fuente de información común sobre la disponibilidad, de manera que una operación realizada por un pasajero desde el canal digital y una operación realizada presencialmente por un agente no puedan confirmar simultáneamente el mismo asiento numerado. El agente registra pagos presenciales en efectivo, Yape/Plin o POS; las ventas del Superadministrador no están permitidas.
 
 Asimismo, las operaciones de pago y notificaciones deberán mantenerse desacopladas de las operaciones transaccionales principales para evitar que una falla en un servicio externo afecte directamente la disponibilidad o consistencia de las reservas.
 

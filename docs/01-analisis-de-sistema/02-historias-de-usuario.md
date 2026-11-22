@@ -19,9 +19,9 @@ Las empresas de transporte y las agencias constituyen entidades organizacionales
 | **HU01** | Como pasajero, quiero buscar viajes indicando origen, destino y fecha, para encontrar alternativas de transporte disponibles. |
 | **HU02** | Como pasajero, quiero consultar y comparar los servicios de diferentes empresas y agencias, para elegir la alternativa que mejor se adapte a mis necesidades. |
 | **HU03** | Como pasajero, quiero consultar el detalle de un viaje, incluyendo horario, tarifa, empresa, agencia y disponibilidad, para decidir si deseo adquirirlo. |
-| **HU04** | Como pasajero, quiero consultar la disponibilidad actualizada de asientos o cupos, para conocer las opciones disponibles antes de realizar una reserva. |
-| **HU05** | Como pasajero, quiero seleccionar un asiento o cupo disponible, para iniciar el proceso de reserva de mi viaje. |
-| **HU06** | Como pasajero, quiero reservar temporalmente un asiento o cupo durante un periodo limitado, para disponer de tiempo suficiente para completar el pago. |
+| **HU04** | Como pasajero, quiero consultar el mapa actualizado de asientos numerados de un viaje, para conocer qué asientos están disponibles, retenidos u ocupados. |
+| **HU05** | Como pasajero, quiero seleccionar uno o varios asientos disponibles y asociar a cada uno los datos del pasajero (DNI y nombre), para reservar los viajes de mi grupo. |
+| **HU06** | Como pasajero, quiero retener temporalmente los asientos seleccionados durante un periodo limitado, para disponer de tiempo suficiente para completar el pago. |
 | **HU07** | Como pasajero, quiero realizar el pago electrónico de mi reserva, para confirmar la adquisición del pasaje. |
 | **HU08** | Como pasajero, quiero recibir la confirmación de mi reserva y pago, para tener constancia de que mi pasaje fue confirmado correctamente. |
 | **HU09** | Como pasajero, quiero consultar mis reservas y pasajes, para conocer el estado de mis operaciones y próximos viajes. |
@@ -43,7 +43,7 @@ Las empresas de transporte y las agencias constituyen entidades organizacionales
 | **HU18** | Como agente/vendedor, quiero emitir el pasaje de una venta confirmada, para entregar al pasajero su comprobante de viaje. |
 | **HU19** | Como agente/vendedor, quiero consultar las operaciones realizadas en mi agencia, para verificar las reservas y ventas efectuadas durante mi atención. |
 | **HU20** | Como agente/vendedor, quiero cancelar o reprogramar una operación cuando tenga autorización para hacerlo, para atender las solicitudes permitidas de los pasajeros. |
-| **HU21** | Como agente/vendedor, quiero que las ventas presenciales y las reservas digitales utilicen la misma disponibilidad, para evitar la asignación duplicada de un asiento o cupo. |
+| **HU21** | Como agente/vendedor, quiero consultar y actualizar el mismo mapa de asientos numerados que utiliza el canal web, para evitar la asignación duplicada de asientos. |
 
 ---
 
@@ -55,7 +55,7 @@ Las empresas de transporte y las agencias constituyen entidades organizacionales
 | **HU23** | Como administrador de agencia, quiero gestionar las rutas y destinos de mis agencias autorizadas, para mantener actualizada la oferta de servicios. |
 | **HU24** | Como administrador de agencia, quiero gestionar los horarios y servicios programados, para mantener actualizada la programación de viajes. |
 | **HU25** | Como administrador de agencia, quiero gestionar las tarifas de los servicios, para mantener actualizados los precios ofrecidos a los pasajeros. |
-| **HU26** | Como administrador de agencia, quiero registrar y gestionar las unidades de transporte cuando corresponda, para asociarlas a los servicios que las requieran. |
+| **HU26** | Como administrador de agencia, quiero registrar un vehículo por su placa y elegir un modelo del catálogo del Superadministrador, para asociarlo a los servicios de mi agencia. |
 | **HU27** | Como administrador de agencia, quiero gestionar los agentes/vendedores de mis agencias autorizadas, para controlar quién puede realizar operaciones presenciales. |
 | **HU28** | Como administrador de agencia, quiero consultar las reservas, ventas, ocupación y operaciones de mis agencias autorizadas, para supervisar su funcionamiento. |
 | **HU29** | Como administrador de agencia, quiero consultar reportes de ventas, demanda, ocupación y rutas utilizadas, para apoyar la toma de decisiones de la agencia. |
@@ -86,7 +86,7 @@ Las siguientes historias representan comportamientos que involucran diferentes a
 |---|---|
 | **HU39** | Como usuario autorizado, quiero que el sistema limite mi acceso según mi rol, empresa y agencia asignada, para impedir el acceso a información que no me corresponde. |
 | **HU40** | Como usuario de la plataforma, quiero que las operaciones críticas queden registradas, para garantizar trazabilidad y auditoría. |
-| **HU41** | Como pasajero, quiero que una reserva temporal expire automáticamente cuando no se confirme dentro del tiempo establecido, para liberar el asiento o cupo para otros pasajeros. |
+| **HU41** | Como pasajero, quiero que una reserva temporal expire automáticamente cuando no se confirme dentro de 10 minutos, para liberar los asientos numerados para otros pasajeros. |
 | **HU42** | Como pasajero, quiero que mi reserva se confirme únicamente cuando el sistema valide correctamente el resultado del pago, para evitar inconsistencias entre reservas y pagos. |
 | **HU43** | Como usuario, quiero recibir las notificaciones de manera independiente de la operación principal, para que una falla en el servicio de mensajería no afecte mi reserva o compra. |
 | **HU44** | Como pasajero o agente, quiero que el sistema mantenga una disponibilidad consistente cuando existan operaciones simultáneas, para evitar la sobreventa o asignación duplicada. |
@@ -97,12 +97,12 @@ Las siguientes historias representan comportamientos que involucran diferentes a
 
 ### Reserva temporal
 
-Las reservas realizadas por el canal digital tendrán una vigencia inicial de **10 minutos** para completar el proceso de pago.
+Las reservas realizadas por el canal digital tendrán una vigencia de **10 minutos** para completar el proceso de pago. Solo este canal utiliza el estado `HELD`; las ventas presenciales se confirman directamente tras registrar el pago del agente.
 
 El flujo será:
 
 ```text
-Seleccionar asiento/cupo
+Seleccionar uno o varios asientos numerados
         ↓
 Reserva temporal
         ↓
@@ -114,7 +114,7 @@ Pago       Sin pago
   ↓             ↓
 CONFIRMED     EXPIRED
                 ↓
-       Liberar asiento/cupo
+       Liberar asientos
 ```
 
 El tiempo de 10 minutos constituye un parámetro inicial de diseño y podrá ser ajustado posteriormente mediante configuración y pruebas de carga.
@@ -126,7 +126,7 @@ Las operaciones realizadas por un agente no utilizarán una disponibilidad indep
 El agente consultará y modificará la **misma disponibilidad transaccional** utilizada por el canal digital.
 
 ```text
-Pasajero Web ──────┐
+Pasajero (web responsive) ──┐
                    ├──> Servicio de disponibilidad
 Agente/Vendedor ───┘
                          ↓
@@ -135,7 +135,7 @@ Agente/Vendedor ───┘
                   Estado consistente
 ```
 
-De esta manera, una venta presencial y una reserva digital no podrán confirmar simultáneamente el mismo asiento o cupo.
+El agente registra el medio de pago presencial (efectivo, Yape/Plin o POS) y confirma directamente. De esta manera, una venta presencial y una reserva digital no podrán confirmar simultáneamente el mismo asiento numerado.
 
 ### Pago electrónico
 

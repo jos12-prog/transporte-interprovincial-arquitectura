@@ -2,231 +2,81 @@
 
 ## 1. Propósito
 
-El Diagrama de Código (Nivel 4 del Modelo C4) ofrece el mayor nivel de detalle técnico, mostrando cómo se implementan los componentes de software en términos de clases, interfaces, métodos y relaciones en código fuente.
+Esta vista describe clases, interfaces y métodos conceptuales de Reservas y Pasajes (MI04) y Ventas y Pagos (MI05). Los ejemplos son documentales; no afirman que el código esté implementado.
 
-En este documento se profundiza en el subsistema transaccional más crítico de la plataforma: la interacción entre el módulo **Reservas y Pasajes (MI04)** y el módulo **Ventas y Pagos (MI05)**. Se detalla la implementación en C# (.NET 8) siguiendo los principios de **Clean Architecture** (organizada en capas de Presentación, Aplicación, Dominio e Infraestructura), el uso de **patrones de diseño** (Repository, Adapter, Factory, Strategy), el **diagrama de secuencia** del flujo de confirmación y cobro, y los mecanismos de **control de concurrencia** requeridos para evitar la sobreventa de asientos (DA01).
+El control de concurrencia se realiza sobre `TripSeat` (DA02); **cero sobreventa** es un objetivo de diseño garantizado por ADR-07 y verificado mediante EQ-02.
 
----
+## 2. Diagramas
 
-## 2. Diagrama de Clases
+![Diagrama de clases; pendiente de regenerar](../../img/diagrama-codigo-c4.svg)
 
-El siguiente diagrama modela la estructura de clases, interfaces y tipos principales organizados por capas de Clean Architecture dentro de cada módulo:
+La imagen referenciada contiene nombres e IDs previos y queda marcada como **pendiente de regenerar**; la lista está en el README.
 
-![Diagrama de Clases (Nivel 4)](../../img/diagrama-codigo-c4.svg)
+![Diagrama de secuencia; pendiente de regenerar](../../img/diagrama-secuencia-c4.svg)
 
-*Figura 1. Diagrama de Clases de los módulos Reservas y Pasajes y Ventas y Pagos según Clean Architecture (C4 — Nivel 4).*
+La imagen referenciada contiene conceptos previos y queda marcada como **pendiente de regenerar**; la lista está en el README.
 
----
+## 3. Contratos y componentes
 
-## 3. Diagrama de Secuencia: Confirmar Reserva con Pago
+### MI04 — Reservas y Pasajes
 
-El siguiente diagrama de secuencia detalla la colaboración cronológica entre controladores, casos de uso, entidades de dominio, repositorios y la pasarela de pagos ante la solicitud `POST /api/v1/reservations/{id}/confirm`, contemplando tanto el flujo principal exitoso como el escenario alternativo de pago rechazado:
+- `ConfirmReservationUseCase` coordina la confirmación; `CreateReservationUseCase`, `CancelReservationUseCase`, `RescheduleReservationUseCase` e `IssueTicketUseCase` cubren sus operaciones respectivas.
+- `IReservationRepository` e `ISeatAvailabilityService` son interfaces de Aplicación. `ReservationRepository` (EF Core) es la implementación de persistencia en Infraestructura.
+- `Reservation` expone `Create`, `Confirm`, `Cancel`, `Expire` y `Reschedule`. Una reserva puede agrupar varios `TripSeat`, cada uno asociado a un pasajero.
+- Estados de reserva: `HELD`, `CONFIRMED`, `CANCELLED`, `EXPIRED`, `RESCHEDULED`.
 
-![Diagrama de Secuencia (Nivel 4)](../../img/diagrama-secuencia-c4.svg)
+### MI05 — Ventas y Pagos
 
-*Figura 2. Diagrama de Secuencia del flujo de confirmación de reserva y procesamiento de pago (C4 — Nivel 4).*
+- `ProcessPaymentUseCase` usa `IPaymentGateway` (interfaz en Aplicación); `CulqiPaymentAdapter` la implementa en Infraestructura.
+- Culqi Checkout entrega el token; el backend crea el cargo y verifica la respuesta. Webhooks HMAC reconcilian idempotentemente por `charge_id`.
+- Estados de pago: `PENDING`, `APPROVED`, `REJECTED`, `ERROR`, `REFUNDED`.
+- `INotificationGateway` es el contrato de Aplicación; `WhatsAppNotificationAdapter` es su implementación en Infraestructura. Outbox y RabbitMQ despachan notificaciones asíncronas.
+- Estados de pasaje: `ISSUED`, `USED`, `VOIDED`.
 
----
+Toda integración externa y persistencia se accede mediante interfaz en Aplicación e implementación en Infraestructura.
 
-## 4. Descripción de Componentes y Clases
+## 4. Patrones de diseño
 
-### 4.1. Módulo Reservas y Pasajes (MI04)
-
-#### `ReservationsController` (Presentación)
-* Recibe solicitudes HTTP REST (`POST /api/v1/reservations/{id}/confirm`), extrae tokens JWT y DTOs de entrada.
-* Invoca a `ConfirmReservationUseCase` y traduce los resultados a códigos de estado HTTP (200 OK, 400 Bad Request, 402 Payment Required, 404 Not Found).
-
-#### `ConfirmReservationUseCase` (Aplicación)
-* Orquesta la confirmación de la reserva:
-  1. Recupera la reserva desde `IReservationRepository`.
-  2. Verifica que la reserva se encuentre en estado `Held` y dentro del tiempo de vigencia.
-  3. Solicita el cobro invocando a la API pública del módulo de pagos (`ProcessPaymentUseCase`).
-  4. Si el pago es aprobado, ejecuta `reserva.marcarConfirmada(autorizacion)`.
-  5. Persiste el estado actualizado en PostgreSQL mediante el repositorio.
-  6. Despacha la notificación del boleto mediante `INotificationPort`.
-
-#### `Reservation` (Dominio — Entidad Raíz de Agregado)
-* Encapsula el ciclo de vida y las reglas invariantes de negocio:
-  * No permite confirmar reservas que ya hayan vencido o hayan sido canceladas.
-  * Protege sus atributos permitiendo mutaciones de estado solo a través de métodos de negocio (`marcarConfirmada`, `cancelar`).
-
-#### `SeatAllocation` (Dominio — Objeto de Valor)
-* Representa la asignación de un asiento (`seatNumber`, `floor`, `isWindow`), siendo inmutable por diseño.
-
-#### `ReservationStatus` (Dominio — Enumeración)
-* Define los cuatro estados válidos: `HELD` (retención temporal), `CONFIRMED` (pagada y emitida), `CANCELLED` (cancelada) y `EXPIRED` (retención vencida sin pago).
-
-#### `IReservationRepository` (Dominio / Aplicación — Puerto)
-* Define los métodos de persistencia desacoplados de la tecnología de base de datos (`guardar`, `buscarPorId`).
-
-#### `PostgresReservationRepository` (Infraestructura — Adaptador)
-* Implementa `IReservationRepository` utilizando Entity Framework Core 8 y Npgsql. Aplica bloqueos pesimistas (`SELECT ... FOR UPDATE`) para evitar carreras críticas (race conditions).
-
----
-
-### 4.2. Módulo Ventas y Pagos (MI05)
-
-#### `ProcessPaymentUseCase` (Aplicación — API Pública del Módulo)
-* Expone la funcionalidad de cobro como API pública del módulo hacia otros módulos del backend.
-* Invoca `IPaymentPort.cobrar(monto, token)` y retorna un DTO desacoplado `PaymentResult`.
-
-#### `IPaymentPort` (Dominio / Aplicación — Puerto)
-* Define el contrato para procesar cobros electrónicos, aislando la lógica de negocio de los detalles de proveedores específicos.
-
-#### `CulqiPaymentAdapter` (Infraestructura — Adaptador)
-* Implementa `IPaymentGateway` / `IPaymentPort` adaptando las llamadas hacia la API REST del proveedor de pagos Culqi (EXT01).
-
----
-
-## 5. Patrones de Diseño Implementados
-
-| Código | Patrón | Clase / Interfaz Implicada | Justificación y Aplicación |
+| Código | Patrón | Clase / interfaz | Aplicación |
 |---|---|---|---|
-| **PD01** | **Repository** | `IReservationRepository` y `PostgresReservationRepository` | Desacopla la lógica de negocio de las consultas de Entity Framework Core y PostgreSQL. Permite crear pruebas unitarias mediante mocks. |
-| **PD02** | **Dependency Injection** | ASP.NET Core IoC Container (`IServiceCollection`) | Conecta controladores, casos de uso, puertos y adaptadores sin dependencias rígidas ni acoplamiento directo. |
-| **PD03** | **Strategy** | `IAvailabilityStrategy`, `NumberedSeatStrategy`, `QuotaSeatStrategy` | Permite alternar la regla de validación de disponibilidad dinámicamente según la modalidad del transporte (asientos fijos o cupo abierto). |
-| **PD04** | **Adapter** | `CulqiPaymentAdapter` : `IPaymentPort` | Adapta la API externa de Culqi a un contrato interno de la aplicación, aislando el dominio de cambios del proveedor. |
-| **PD05** | **Factory Method** | `Reservation.Crear(...)` | Garantiza que ninguna entidad `Reservation` sea instanciada en un estado inválido o incompleto. |
+| PD01 | Repository | `IReservationRepository` / `ReservationRepository` | Persistencia EF Core desacoplada. |
+| PD02 | Dependency Injection | Contenedor IoC | Conecta contratos y adaptadores. |
+| PD03 | Strategy | `ICancellationPolicy` | Políticas por anticipación, pendientes de validación comercial. |
+| PD04 | Adapter | `IPaymentGateway` / `CulqiPaymentAdapter`; `INotificationGateway` / `WhatsAppNotificationAdapter` | Aísla proveedores externos. |
+| PD05 | Factory Method | `Reservation.Create(...)` | Crea reservas válidas. |
 
----
-
-## 6. Fragmentos de Código de Referencia (.NET 8 / C#)
-
-### 6.1. Entidad de Dominio: `Reservation.cs`
+## 5. Ejemplo de dominio
 
 ```csharp
-namespace TransportPlatform.Modules.Reservations.Domain;
+public enum ReservationStatus
+{
+    HELD, CONFIRMED, CANCELLED, EXPIRED, RESCHEDULED
+}
 
 public sealed class Reservation
 {
-    public Guid Id { get; private set; }
-    public Guid TripId { get; private set; }
-    public Guid PassengerId { get; private set; }
-    public int? SeatNumber { get; private set; }
     public ReservationStatus Status { get; private set; }
-    public DateTime HeldUntil { get; private set; }
-    public DateTime CreatedAt { get; private set; }
+    public IReadOnlyCollection<TripSeat> Seats => _seats;
 
-    private Reservation() { }
-
-    public static Reservation Crear(
-        Guid tripId,
-        Guid passengerId,
-        int? seatNumber,
-        int holdDurationMinutes = 10)
+    public static Reservation Create(IEnumerable<TripSeat> seats)
     {
-        if (tripId == Guid.Empty)
-            throw new ArgumentException("El viaje es obligatorio.", nameof(tripId));
-
-        if (passengerId == Guid.Empty)
-            throw new ArgumentException("El pasajero es obligatorio.", nameof(passengerId));
-
-        return new Reservation
-        {
-            Id = Guid.NewGuid(),
-            TripId = tripId,
-            PassengerId = passengerId,
-            SeatNumber = seatNumber,
-            Status = ReservationStatus.Held,
-            HeldUntil = DateTime.UtcNow.AddMinutes(holdDurationMinutes),
-            CreatedAt = DateTime.UtcNow
-        };
+        // Valida que haya asientos numerados y crea la retención digital.
+        throw new NotImplementedException();
     }
 
-    public void MarcarConfirmada(string codigoAutorizacion)
-    {
-        if (Status != ReservationStatus.Held)
-            throw new InvalidOperationException("Solo se pueden confirmar reservas retenidas.");
-
-        if (EstaVencida())
-            throw new InvalidOperationException("La retención temporal ha vencido.");
-
-        Status = ReservationStatus.Confirmed;
-    }
-
-    public void Cancelar()
-    {
-        if (Status == ReservationStatus.Cancelled || Status == ReservationStatus.Expired)
-            throw new InvalidOperationException("La reserva ya se encuentra cancelada o vencida.");
-
-        Status = ReservationStatus.Cancelled;
-    }
-
-    public bool EstaVencida() =>
-        Status == ReservationStatus.Held && DateTime.UtcNow > HeldUntil;
+    public void Confirm() { /* transición de dominio */ }
+    public void Cancel() { /* transición de dominio */ }
+    public void Expire() { /* libera los TripSeat retenidos */ }
+    public void Reschedule() { /* política comercial por validar */ }
 }
 ```
 
----
+El fragmento ilustra el vocabulario canónico, no es código ejecutable.
 
-### 6.2. Caso de Uso: `ConfirmReservationUseCase.cs`
+## 6. Concurrencia e idempotencia
 
-```csharp
-namespace TransportPlatform.Modules.Reservations.Application.UseCases;
+La asignación bloquea las filas de `TripSeat` con `SELECT ... FOR UPDATE`; un índice único parcial sobre `trip_seat_id` impide reservas activas duplicadas para estados `HELD` y `CONFIRMED`. Un `BackgroundService` expira retenciones cada 10 segundos usando `FOR UPDATE SKIP LOCKED`.
 
-using TransportPlatform.Modules.Reservations.Application.Contracts;
-using TransportPlatform.Modules.Reservations.Domain;
-using TransportPlatform.Modules.SalesPayments.Application.UseCases;
+Las ventas digitales retienen asientos por 10 minutos. El agente registra pago presencial (efectivo, Yape/Plin o POS) y confirma directamente. Si una aprobación Culqi llega tras expirar la retención, solo se confirma si todos los asientos siguen libres; de lo contrario el pago queda `REFUNDED`.
 
-public sealed class ConfirmReservationUseCase
-{
-    private readonly IReservationRepository _repository;
-    private readonly ProcessPaymentUseCase _paymentService;
-    private readonly INotificationPort _notificationService;
-
-    public ConfirmReservationUseCase(
-        IReservationRepository repository,
-        ProcessPaymentUseCase paymentService,
-        INotificationPort notificationService)
-    {
-        _repository = repository;
-        _paymentService = paymentService;
-        _notificationService = notificationService;
-    }
-
-    public async Task<string> EjecutarAsync(
-        Guid reservationId,
-        decimal monto,
-        string tokenPago,
-        CancellationToken ct = default)
-    {
-        // 1. Obtener la reserva
-        var reservation = await _repository.BuscarPorIdAsync(reservationId, ct)
-            ?? throw new KeyNotFoundException("Reserva no encontrada.");
-
-        // 2. Verificar que no haya expirado
-        if (reservation.EstaVencida())
-            throw new InvalidOperationException("La retención de la reserva ha expirado.");
-
-        // 3. Procesar cobro mediante API pública del módulo de pagos
-        var resultadoCobro = await _paymentService.EjecutarAsync(monto, tokenPago, ct);
-        if (!resultadoCobro.Aprobado)
-            throw new InvalidOperationException($"Pago rechazado: {resultadoCobro.MotivoRechazo}");
-
-        // 4. Confirmar reserva en dominio
-        reservation.MarcarConfirmada(resultadoCobro.Autorizacion);
-
-        // 5. Persistir estado confirmado
-        await _repository.GuardarAsync(reservation, ct);
-
-        // 6. Notificar emisión de boleto (desacoplado)
-        await _notificationService.NotificarReservaConfirmadaAsync(reservation, ct);
-
-        return reservation.Id.ToString();
-    }
-}
-```
-
----
-
-## 7. Control de Concurrencia y Transacciones en PostgreSQL
-
-Para satisfacer el requerimiento arquitectónico crítico **DA01 (Consistencia de Reservas sin sobreventa)**, el repositorio implementa dos mecanismos complementarios:
-
-1. **Bloqueo Pesimista a Nivel de Fila:** Se bloquea el registro del viaje o asiento durante la transacción con `FOR UPDATE`, asegurando que solicitudes simultáneas provenientes de dos pasajeros distintos para el mismo asiento sean serializadas por el motor de base de datos.
-2. **Restricción de Exclusión / Índice Único Parcial:** En PostgreSQL se define un índice único condicional:
-   ```sql
-   CREATE UNIQUE INDEX idx_unique_active_seat ON reservations (trip_id, seat_number)
-   WHERE status IN ('Held', 'Confirmed');
-   ```
-   Esta restricción a nivel de base de datos actúa como salvaguarda definitiva en caso de cualquier concurrencia imprevista en la aplicación, garantizando que el motor físico rechace cualquier intento duplicado mediante un error de violación de restricción única (`unique_violation`).
+La notificación se escribe mediante Outbox en la transacción y se publica asíncronamente; no se realiza una llamada síncrona al proveedor dentro del caso de uso transaccional.

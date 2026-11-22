@@ -15,7 +15,7 @@ Los patrones se aplicarán según las necesidades de cada módulo, evitando inco
 |---|---|---|
 | PD01 | Repository | Abstraer las operaciones de persistencia de las entidades de negocio. |
 | PD02 | Dependency Injection | Conectar casos de uso, contratos y adaptadores sin acoplamiento directo. |
-| PD03 | Strategy | Seleccionar reglas de disponibilidad según la modalidad de asientos o cupos. |
+| PD03 | Strategy | Aplicar políticas de cancelación/reprogramación según anticipación; reglas pendientes de validar. |
 | PD04 | Adapter | Integrar pasarelas de pago y proveedores de notificaciones. |
 | PD05 | Factory Method | Centralizar la creación válida de entidades de dominio cuando sea necesario. |
 
@@ -43,18 +43,11 @@ Los controladores reciben casos de uso y estos reciben interfaces de repositorio
 
 ### 3.3. PD03 — Strategy
 
-**Objetivo:** encapsular reglas alternativas de una misma operación.
+**Objetivo:** encapsular políticas de cancelación y reprogramación según la anticipación.
 
-**Aplicación:** módulo Transporte y Programación, en coordinación con Reservas y Pasajes.
+**Aplicación:** módulo Reservas y Pasajes mediante `ICancellationPolicy`. Las reglas comerciales, plazos y penalidades siguen pendientes de validación.
 
-Se contemplan dos modalidades de disponibilidad:
-
-- **Asientos numerados:** se verifica que el asiento seleccionado no esté asignado a otra reserva vigente.
-- **Cupos:** se verifica que las reservas vigentes no superen la capacidad del servicio.
-
-Cada modalidad puede implementar un contrato común de validación de disponibilidad.
-
-**Beneficio:** permite incorporar reglas específicas sin concentrarlas en múltiples condiciones dentro de un único componente.
+**Beneficio:** permite añadir políticas validadas sin concentrar condiciones en los casos de uso.
 
 ### 3.4. PD04 — Adapter
 
@@ -62,7 +55,7 @@ Cada modalidad puede implementar un contrato común de validación de disponibil
 
 **Aplicación:** módulos Ventas y Pagos, Auditoría y Notificaciones.
 
-Los casos de uso se comunican mediante contratos como `IPaymentGateway` e `INotificationService`. Los adaptadores concretos traducen las solicitudes a los formatos requeridos por cada proveedor.
+Los casos de uso se comunican mediante contratos como `IPaymentGateway` e `INotificationGateway`. Los adaptadores concretos traducen las solicitudes a los formatos requeridos por cada proveedor.
 
 **Beneficio:** facilita cambiar proveedores sin modificar la lógica principal del negocio.
 
@@ -78,40 +71,30 @@ La entidad `Reservation` puede exponer un método de creación que valide los id
 
 En C#, este comportamiento puede implementarse mediante un método de fábrica estático, sin requerir una jerarquía adicional de clases.
 
-## 4. Ejemplo de aplicación: disponibilidad de reservas
+## 4. Ejemplo de aplicación: políticas de cancelación
 
-![Patrón Strategy aplicado a la disponibilidad](../../../img/patron-strategy-disponibilidad.png)
+![Patrón Strategy aplicado a políticas de cancelación](../../../img/patron-strategy-disponibilidad.png)
 
-*Figura 1. Aplicación del patrón Strategy para validar disponibilidad por asientos numerados o cupos.*
-El patrón Strategy permite diferenciar las reglas de disponibilidad según la modalidad configurada para un servicio.
+*Figura 1. Aplicación conceptual de Strategy a políticas de cancelación/reprogramación; reglas pendientes de validar.*
+El patrón Strategy representa políticas de cancelación/reprogramación; las reglas comerciales están pendientes de validación.
 
 ```csharp
-public interface IAvailabilityStrategy
+public interface ICancellationPolicy
 {
-    Task<bool> IsAvailableAsync(
-        Guid tripId,
-        Guid? seatId,
-        CancellationToken cancellationToken);
+    bool CanCancel(Reservation reservation, DateTimeOffset requestedAt);
 }
 ```
 
-Implementaciones propuestas:
+Implementación conceptual propuesta (sin reglas comerciales fijadas):
 
 ```csharp
-public sealed class NumberedSeatStrategy
-    : IAvailabilityStrategy
+public sealed class CancellationPolicyByNotice : ICancellationPolicy
 {
-    // Verifica la disponibilidad del asiento seleccionado.
-}
-
-public sealed class CapacityQuotaStrategy
-    : IAvailabilityStrategy
-{
-    // Verifica la capacidad restante del servicio.
+    // Política pendiente de definir y validar con el negocio.
 }
 ```
 
-Estas clases representan una estructura conceptual. La implementación definitiva deberá consultar la persistencia y garantizar que la asignación se confirme mediante una operación transaccional segura frente a solicitudes concurrentes.
+El contrato es conceptual: los plazos, penalidades y condiciones requieren validación del negocio antes de definir sus implementaciones.
 
 ## 5. Reglas de aplicación
 
@@ -119,14 +102,14 @@ Estas clases representan una estructura conceptual. La implementación definitiv
 - **RP02:** mantener las interfaces de persistencia y servicios externos independientes de implementaciones concretas.
 - **RP03:** no incorporar reglas de negocio en controladores ni adaptadores.
 - **RP04:** aplicar inyección de dependencias para conectar las implementaciones.
-- **RP05:** proteger la asignación de asientos y cupos mediante mecanismos transaccionales; Strategy por sí solo no garantiza la concurrencia.
+- **RP05:** proteger la asignación de asientos numerados mediante mecanismos transaccionales; el patrón Strategy no sustituye el bloqueo sobre TripSeat ni las restricciones de integridad.
 - **RP06:** evitar patrones que generen clases o abstracciones innecesarias.
 
 ## 6. Relación con los drivers arquitectónicos
 
 | Driver | Contribución |
 |---|---|
-| DA02 / DA03 — Concurrencia y Consistencia | Encapsulación de reglas de reserva, estrategia de disponibilidad y creación válida de entidades. |
+| DA02 / DA03 — Concurrencia y Consistencia | Encapsulación de reglas de reserva por TripSeat y creación válida de entidades. |
 | DA04 — Seguridad y Aislamiento multiempresa | Contratos que permiten aplicar el contexto de autorización en los casos de uso. |
 | DA06 / DA11 — Rendimiento y Caché | Posibilidad de optimizar implementaciones de acceso a datos y repositorios sin alterar los casos de uso. |
 | DA05 — Escalabilidad | Separación de responsabilidades y adaptadores sustituibles. |

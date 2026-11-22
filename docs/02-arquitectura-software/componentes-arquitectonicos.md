@@ -12,20 +12,20 @@ Cada componente tiene responsabilidades definidas y se comunica con los demás a
 
 | ID | Componente | Responsabilidad |
 |---|---|---|
-| CA01 | Aplicación Web | Interfaces para pasajero, agente/vendedor, administrador de agencia y superadministrador. React + TypeScript. |
-| CA02 | API REST | Recibir solicitudes HTTPS, validar entradas, aplicar autenticación y autorización, y delegar en los casos de uso correspondientes. |
-| CA03 | Identidad y Acceso | Autenticación mediante JWT, gestión de roles y validación del contexto organizacional (empresa y agencia). |
+| CA01 | Aplicación Web Responsive | Interfaces React + TypeScript para pasajero, agente/vendedor, administrador de agencia y superadministrador, en navegador de escritorio o móvil. |
+| CA02 | API REST | Recibir solicitudes HTTPS, validar entradas, autorizar la agencia activa y delegar en casos de uso. |
+| CA03 | Identidad y Acceso | Autenticación JWT con claims `sub`, `role`, `company_id`, `agency_ids[]`; valida empresa y agencia activa (`X-Agency-Id`). |
 | CA04 | Empresas y Agencias | Gestión de empresas, agencias y asignaciones de administradores y agentes. Superadministrador como actor principal. |
-| CA05 | Transporte y Programación | Rutas, destinos, tipos de transporte, unidades, horarios, tarifas y servicios programados. |
-| CA06 | Reservas y Pasajes | Disponibilidad, reservas temporales (estado `HELD`), control de concurrencia, confirmación, cancelación, expiración automática y emisión de pasajes. |
-| CA07 | Ventas y Pagos | Ventas presenciales, integración con la pasarela de pagos Culqi, confirmación de operaciones y registro de estados. |
+| CA05 | Transporte y Programación | Rutas, destinos, `VehicleModel` (capacidad y `SeatLayout`), vehículos por placa, horarios, tarifas y viajes programados con `TripSeat`. |
+| CA06 | Reservas y Pasajes | Mapa de asientos numerados, reservas de varios asientos/pasajeros, `HELD` digital, concurrencia, estados y emisión de pasajes. |
+| CA07 | Ventas y Pagos | Venta presencial con pago en efectivo, Yape/Plin o POS y confirmación directa; pagos electrónicos Culqi y reconciliación idempotente. |
 | CA08 | Consultas y Reportes | Búsqueda pública de viajes, consulta de disponibilidad, reportes de ventas, ocupación y demanda para administradores y superadministrador. |
-| CA09 | Auditoría y Notificaciones | Registro de operaciones críticas, alertas preventivas de alta demanda y envío de notificaciones mediante WhatsApp Business Cloud API. |
-| CA10 | Persistencia | Acceso transaccional a PostgreSQL mediante Entity Framework Core 8 y Npgsql. |
-| CA11 | Caché | Redis para lecturas frecuentes y de baja volatilidad (rutas, horarios, servicios). No aplica a operaciones críticas de reserva. |
-| CA12 | Cola de Eventos | RabbitMQ para procesamiento asíncrono de notificaciones, alertas y eventos secundarios. |
-| CA13 | Adaptador de Pagos | Contrato `IPaymentGateway` implementado por `CulqiPaymentAdapter`. Permite cambio de pasarela sin modificar el dominio. |
-| CA14 | Adaptador de Notificaciones | Contrato `INotificationGateway` implementado por el adaptador de WhatsApp Business Cloud API. |
+| CA09 | Auditoría y Notificaciones | Registro de operaciones críticas, Outbox transaccional y alertas; despacho asíncrono por WhatsApp. |
+| CA10 | Persistencia | Una base PostgreSQL con esquema y `DbContext` por módulo, EF Core 8 y Npgsql; `company_id`/`agency_id`, Global Query Filters y validación en casos de uso. |
+| CA11 | Caché | Redis solo para búsquedas de viajes y catálogos con TTL de 60 s; nunca para mapa exacto de asientos o reservas. |
+| CA12 | Cola de Eventos | RabbitMQ consume eventos persistidos en Outbox y procesa notificaciones de forma asíncrona. |
+| CA13 | Adaptador de Pagos | Interfaz `IPaymentGateway` en Aplicación implementada por `CulqiPaymentAdapter` en Infraestructura. |
+| CA14 | Adaptador de Notificaciones | Interfaz `INotificationGateway` en Aplicación implementada por `WhatsAppNotificationAdapter` en Infraestructura. |
 
 ---
 
@@ -44,40 +44,36 @@ Cada componente tiene responsabilidades definidas y se comunica con los demás a
 | Aplicación Web (CA01) | API REST (CA02) | Solicitudes HTTPS. |
 | API REST (CA02) | Identidad y Acceso (CA03) | Autenticación y verificación del contexto de empresa y agencia. |
 | API REST (CA02) | Módulos de aplicación (CA04–CA09) | Delegación de casos de uso. |
-| Reservas y Pasajes (CA06) | Transporte y Programación (CA05) | Consulta de servicio, horario y capacidad disponible. |
-| Ventas y Pagos (CA07) | Reservas y Pasajes (CA06) | Confirmación de ventas y actualización del estado de la reserva. |
-| Ventas y Pagos (CA07) | Adaptador de Pagos (CA13) | Solicitud y verificación del resultado de pago ante Culqi. |
-| Consultas y Reportes (CA08) | Caché (CA11) | Lecturas cacheables de rutas, horarios y servicios. |
-| Consultas y Reportes (CA08) | Persistencia (CA10) | Consultas de reportes hacia la réplica de lectura PostgreSQL. |
-| Auditoría y Notificaciones (CA09) | Cola de Eventos (CA12) | Publicación de eventos de notificación y alertas. |
-| Cola de Eventos (CA12) | Adaptador de Notificaciones (CA14) | Consumo de eventos y envío mediante WhatsApp Business Cloud API. |
+| Reservas y Pasajes (CA06) | Transporte y Programación (CA05) | Consulta de viaje, modelo de asientos y `TripSeat` disponibles mediante contrato público. |
+| Ventas y Pagos (CA07) | Reservas y Pasajes (CA06) | La venta presencial solicita confirmación de asientos mediante contrato público. |
+| Ventas y Pagos (CA07) | Adaptador de Pagos (CA13) | El caso de uso usa `IPaymentGateway`; el adaptador crea cargos y reconcilia respuestas/webhooks. |
+| Consultas y Reportes (CA08) | Caché (CA11) | Búsquedas y catálogos cacheables por 60 s; no se cachean asientos. |
+| Consultas y Reportes (CA08) | Persistencia (CA10) | Consultas autorizadas a PostgreSQL (sin réplica de lectura en v1). |
+| Auditoría y Notificaciones (CA09) | Cola de Eventos (CA12) | Transactional Outbox persiste eventos con la transacción para despacho. |
+| Cola de Eventos (CA12) | Adaptador de Notificaciones (CA14) | Consumidor usa `INotificationGateway` y envía mediante WhatsApp Business Cloud API. |
 | Módulos de aplicación (CA04–CA09) | Persistencia (CA10) | Operaciones transaccionales mediante contratos de repositorio. |
-| Reservas y Pasajes (CA06) | Mecanismo de expiración | Proceso en segundo plano que detecta reservas en estado `HELD` que superaron los 10 minutos, las marca como `EXPIRED` y libera el asiento o cupo. |
+| Reservas y Pasajes (CA06) | Mecanismo de expiración | `BackgroundService` cada 10 s usa `FOR UPDATE SKIP LOCKED` para expirar retenciones digitales y liberar `TripSeat`. |
 
 ---
 
 ## 5. Flujo de reserva digital
 
 ```text
-Pasajero (CA01)
+Pasajero (web responsive, CA01)
        ↓
 API REST (CA02) → validar autenticación (CA03)
        ↓
-Consultas y Reportes (CA08) → Redis (CA11)
+Buscar viajes y catálogos → Redis (CA11, TTL 60 s)
        ↓
-Reservas y Pasajes (CA06) → Persistencia (CA10) → PostgreSQL
-       ├── SELECT FOR UPDATE (bloqueo pesimista)
-       └── Estado: HELD (10 minutos)
-              ↓
-Ventas y Pagos (CA07) → Adaptador de Pagos (CA13) → Culqi
+Seleccionar varios TripSeat + datos de pasajeros
        ↓
-Resultado del pago validado
+Reserva digital HELD 10 min; bloqueo transaccional en PostgreSQL (CA10)
        ↓
-Reservas y Pasajes (CA06) → Estado: CONFIRMED → Pasaje emitido
+Culqi Checkout token → IPaymentGateway (CA13) → cargo / webhook HMAC
+       ├── Primer resultado válido por charge_id: APPROVED → CONFIRMED → ISSUED
+       └── EXPPIRED tardío: confirmar si todos los asientos siguen libres; si no, REFUNDED
        ↓
-Auditoría y Notificaciones (CA09) → Cola de Eventos (CA12)
-       ↓
-Adaptador de Notificaciones (CA14) → WhatsApp Business Cloud API
+Outbox (CA09) → RabbitMQ (CA12) → WhatsAppNotificationAdapter (CA14)
 ```
 
 ---
@@ -87,15 +83,15 @@ Adaptador de Notificaciones (CA14) → WhatsApp Business Cloud API
 ```text
 Agente / Vendedor (CA01)
        ↓
-API REST (CA02) → validar agencia asignada (CA03)
+API REST (CA02) → validar `X-Agency-Id` y claims (CA03)
        ↓
-Ventas y Pagos (CA07) → Reservas y Pasajes (CA06) → Persistencia (CA10)
-       ├── Misma disponibilidad transaccional que el canal digital
-       └── Estado: CONFIRMED → Pasaje emitido
-              ↓
-Auditoría y Notificaciones (CA09) → Cola de Eventos (CA12)
+Ventas y Pagos registra efectivo / Yape/Plin / POS
        ↓
-Adaptador de Notificaciones (CA14) → WhatsApp Business Cloud API
+Reservas y Pasajes bloquea TripSeat y confirma directamente en PostgreSQL
+       ↓
+Reserva CONFIRMED → pasajes ISSUED
+       ↓
+Outbox (CA09) → RabbitMQ (CA12) → WhatsAppNotificationAdapter (CA14)
 ```
 
 ---
@@ -103,9 +99,9 @@ Adaptador de Notificaciones (CA14) → WhatsApp Business Cloud API
 ## 7. Reglas arquitectónicas
 
 - Los componentes funcionales (CA04–CA09) pertenecen al mismo backend y se despliegan en el mismo proceso.
-- PostgreSQL (CA10) es la fuente de verdad para reservas, disponibilidad, ventas y pagos.
+- PostgreSQL (CA10) es la fuente de verdad para reservas, disponibilidad, ventas y pagos; cada módulo es propietario de un esquema y `DbContext`.
 - Redis (CA11) no reemplaza las transacciones ni controla la disponibilidad crítica.
-- RabbitMQ (CA12) no confirma ni libera asientos o cupos; su función es publicar y consumir eventos secundarios.
+- RabbitMQ (CA12) no confirma ni libera asientos; su función es despachar eventos persistidos en Outbox.
 - Culqi y WhatsApp se consumen únicamente mediante sus adaptadores reemplazables (CA13 y CA14).
 - Todas las operaciones privadas validan empresa, agencia y rol antes de ejecutarse.
 - El mecanismo de expiración de reservas opera de forma independiente como proceso en segundo plano, sin bloquear operaciones concurrentes.

@@ -12,11 +12,11 @@ Estas restricciones deben ser consideradas en las decisiones arquitectónicas, d
 | **RC02** | Modelo multiempresa y multiagencia | Una misma plataforma debe soportar múltiples empresas de transporte y sus respectivas agencias. Cada empresa y agencia debe mantener su información y operación independiente. |
 | **RC03** | Aislamiento de información | La información debe estar aislada por empresa y agencia. Un Administrador de Agencia o Agente/Vendedor no podrá consultar ni modificar información perteneciente a otra agencia. |
 | **RC04** | Base de datos compartida | La solución utilizará una única base de datos PostgreSQL para todas las empresas y agencias. El aislamiento será lógico mediante identificación de empresa y agencia, roles y autorización. |
-| **RC05** | Administración jerárquica | El **Superadmin** administra la plataforma y asigna Administradores de Agencia. Cada Administrador de Agencia gestiona únicamente la información de la agencia que tiene asignada. |
-| **RC06** | Transporte multimodal | La solución no estará limitada a buses. Cada empresa podrá configurar el tipo de unidad utilizado, incluyendo buses, combis, taxis u otros vehículos, según su operación. |
+| **RC05** | Administración jerárquica | El **Superadmin** administra la plataforma y asigna Administradores de Agencia. Cada Administrador de Agencia gestiona una o varias agencias autorizadas de una sola empresa. |
+| **RC06** | Modelos de vehículos y asientos numerados | El Superadministrador administra modelos con capacidad y plano de asientos numerados; el Administrador de Agencia registra vehículos por placa y selecciona un modelo. La v1 asigna únicamente asientos numerados. |
 | **RC07** | Disponibilidad compartida | Las reservas realizadas por pasajeros mediante la plataforma y las ventas realizadas presencialmente por un Agente/Vendedor deben utilizar la misma fuente transaccional de disponibilidad. |
-| **RC08** | Reserva temporal | Una reserva permanecerá temporalmente en estado **HELD durante 10 minutos** mientras el pasajero completa el pago. Si el pago no se confirma dentro de ese periodo, la reserva expirará y el asiento o cupo será liberado. |
-| **RC09** | Prevención de sobreventa | El sistema debe impedir que dos operaciones confirmen simultáneamente el mismo asiento o cupo disponible. La base de datos será la fuente de verdad para la disponibilidad. |
+| **RC08** | Reserva temporal | Solo una reserva del canal digital permanecerá en estado **HELD durante 10 minutos** mientras el pasajero completa el pago. Si no se confirma, expirará y los asientos se liberarán. Las ventas de agente se confirman directamente tras registrar el pago presencial. |
+| **RC09** | Prevención de sobreventa | El sistema debe impedir que dos operaciones confirmen simultáneamente el mismo asiento numerado de un viaje. La base de datos será la fuente de verdad para la disponibilidad. |
 | **RC10** | Pasarela de pago externa | Los pagos electrónicos se realizarán mediante **Culqi**, utilizando el patrón **Adapter** para mantener desacoplada la lógica de negocio respecto del proveedor externo. |
 | **RC11** | Notificaciones externas | Las notificaciones al pasajero se realizarán mediante **WhatsApp Business Cloud API**. El fallo temporal del servicio de notificaciones no deberá comprometer una reserva o pago ya confirmado. |
 | **RC12** | Caché | La solución deberá incorporar **Redis** para almacenar información de consulta frecuente y reducir la carga sobre la base de datos. La información transaccional crítica no dependerá exclusivamente de la caché. |
@@ -38,7 +38,7 @@ Superadmin
     ▼
 Administrador de Agencia
     │
-    └── gestiona únicamente su agencia
+    └── gestiona una o varias agencias autorizadas de la misma empresa
               │
               ▼
        Agente / Vendedor
@@ -72,6 +72,8 @@ Empresa B
 
 Un usuario perteneciente a **Empresa A / Agencia A1** no podrá consultar ni modificar información de **Empresa B / Agencia B1**.
 
+El token incluye `sub`, `role`, `company_id` y `agency_ids[]`. Para seleccionar una agencia autorizada, el cliente envía su identificador en `X-Agency-Id`; el backend valida el rol, la empresa y la pertenencia de la agencia en cada caso de uso.
+
 ## 3. Restricciones sobre reservas
 
 La reserva deberá mantener estados controlados para evitar inconsistencias:
@@ -90,6 +92,8 @@ CONFIRMADA
 PASaje EMITIDO
 ```
 
+La retención `HELD` se aplica solo a reservas digitales. Las ventas presenciales se confirman directamente al registrar el pago. Las máquinas de estado son: reserva (`HELD`, `CONFIRMED`, `CANCELLED`, `EXPIRED`, `RESCHEDULED`), pago (`PENDING`, `APPROVED`, `REJECTED`, `ERROR`, `REFUNDED`) y pasaje (`ISSUED`, `USED`, `VOIDED`).
+
 Si transcurren los 10 minutos sin confirmación del pago:
 
 ```text
@@ -99,10 +103,10 @@ HELD
   ↓
 EXPIRED
   ↓
-Asiento / cupo liberado
+Asientos liberados
 ```
 
-La misma regla deberá aplicarse independientemente de que la operación se origine desde el canal web, móvil o desde un Agente/Vendedor.
+La retención de 10 minutos se aplica únicamente a operaciones digitales. La venta presencial registra pago en efectivo, Yape/Plin o POS y confirma directamente los asientos. La aplicación v1 es web responsive para navegador de escritorio o móvil; no incluye app móvil nativa.
 
 ## 4. Restricciones de integración
 
@@ -122,10 +126,10 @@ Se utilizarán adaptadores:
              ┌───────────┴───────────┐
              ▼                       ▼
            Culqi             WhatsApp Business
-        Pagos externos          Notificaciones
+        Pago + webhook       Notificaciones asíncronas
 ```
 
-Esto permitirá mantener la lógica de negocio independiente de los proveedores externos.
+El backend crea el cargo de Culqi a partir del token generado por Culqi Checkout. La respuesta del servidor y los webhooks firmados HMAC se reconcilian idempotentemente por `charge_id`; el primer resultado válido es autoritativo. Los eventos de notificación se guardan con Transactional Outbox y se despachan mediante RabbitMQ. Esto permitirá mantener la lógica de negocio independiente de los proveedores externos.
 
 ## 5. Restricciones de alcance
 
@@ -137,8 +141,11 @@ La primera versión contempla principalmente:
 - Gestión de horarios.
 - Configuración de servicios.
 - Gestión de unidades y tipos de transporte.
+- Catálogo `VehicleModel` del Superadministrador con nombre, categoría, capacidad y `SeatLayout` (conductor y asientos por número, fila, columna y piso); modelos iniciales Toyota Yaris (4), Toyota Avanza (6), Minivan (7), Van (15), Bus 1 piso y Bus 2 pisos.
+- Registro de `Vehicle` por placa y modelo; al crear un viaje, generación de `TripSeat` desde el plano del modelo.
 - Consulta de viajes.
-- Consulta de disponibilidad.
+- Consulta compartida del mapa de asientos numerados con estados disponible, retenido/ocupado y seleccionado.
+- Reservas de uno o varios asientos, asociando DNI y nombre de pasajero a cada asiento.
 - Reserva temporal.
 - Confirmación de compra.
 - Pagos mediante Culqi.
@@ -154,6 +161,8 @@ No se contempla en esta versión:
 - Servicio de delivery.
 - Integración con múltiples pasarelas simultáneamente.
 - Operación mediante microservicios independientes.
+- App móvil nativa, réplica de lectura y gestión de choferes (evolución futura).
+- Emisión de comprobantes SUNAT en v1; el pasaje se entrega como PDF con QR.
 
 ## 6. Restricciones con mayor impacto arquitectónico
 
@@ -165,7 +174,7 @@ Las restricciones que tendrán mayor influencia sobre las decisiones arquitectó
 | **RC03 - Aislamiento de información** | Determina la estrategia de autenticación y autorización. |
 | **RC04 - Base compartida** | Requiere un modelo de datos preparado para múltiples empresas y agencias. |
 | **RC07 - Disponibilidad compartida** | Obliga a utilizar una única fuente transaccional para reservas presenciales y digitales. |
-| **RC08 - Reserva temporal** | Requiere control de estados, expiración y liberación automática. |
+| **RC08 - Reserva temporal digital** | Requiere control de estados, expiración y liberación automática; la venta presencial se confirma al registrar el pago. |
 | **RC09 - Prevención de sobreventa** | Requiere control de concurrencia y transacciones. |
 | **RC10 - Culqi mediante Adapter** | Determina el desacoplamiento de la integración de pagos. |
 | **RC11 - WhatsApp** | Requiere integración externa y procesamiento tolerante a fallos. |

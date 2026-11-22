@@ -10,25 +10,25 @@ Cada decisión se establece considerando el contexto académico del proyecto, la
 
 | ID | Decisión arquitectónica | Driver principal | Decisión adoptada |
 |---|---|---|---|
-| **DA-01** | Estilo de arquitectura | DA01, DA05, DA14 | Monolito modular |
-| **DA-02** | Enfoque arquitectónico | DA14, AC07 | Clean Architecture |
-| **DA-03** | Comunicación entre cliente y backend | DA13, RC15 | API REST |
-| **DA-04** | Persistencia | DA03, DA04, DA07 | PostgreSQL |
-| **DA-05** | Modelo multiempresa/multiagencia | DA04 | Base de datos compartida con aislamiento lógico |
-| **DA-06** | Control de acceso | DA04, AC04 | RBAC + ámbito organizacional |
-| **DA-07** | Control de concurrencia | DA02, DA03 | Transacciones y control de concurrencia en PostgreSQL |
-| **DA-08** | Reserva temporal | DA08 | Estado HELD durante 10 minutos |
-| **DA-09** | Caché | DA06, DA11 | Redis |
-| **DA-10** | Procesamiento asíncrono | DA10 | RabbitMQ |
-| **DA-11** | Pasarela de pagos | DA09 | Culqi mediante patrón Adapter |
-| **DA-12** | Notificaciones | DA10, DA13 | WhatsApp Business Cloud API mediante procesamiento asíncrono |
-| **DA-13** | Auditoría | DA12 | Registro de operaciones críticas |
-| **DA-14** | Escalabilidad | DA01, DA05, DA06 | Escalamiento horizontal de la aplicación |
-| **DA-15** | Observabilidad | DA12, AC03 | Logs estructurados, métricas y monitoreo |
+| **ADR-01** | Estilo de arquitectura | DA01, DA05, DA14 | Monolito modular |
+| **ADR-02** | Enfoque arquitectónico | DA14, AC07 | Clean Architecture |
+| **ADR-03** | Comunicación entre cliente y backend | DA13, RC15 | API REST |
+| **ADR-04** | Persistencia | DA02, DA03, DA07 | PostgreSQL |
+| **ADR-05** | Modelo multiempresa/multiagencia | DA04 | Base de datos compartida, esquemas por módulo y aislamiento por tenant |
+| **ADR-06** | Control de acceso | DA04, AC04 | RBAC + ámbito organizacional y agencia activa |
+| **ADR-07** | Control de concurrencia | DA02, DA03, DA07 | Bloqueo por asiento de viaje y restricción única en PostgreSQL |
+| **ADR-08** | Reserva temporal | DA08, DA03 | Estado HELD digital durante 10 minutos y expiración distribuida |
+| **ADR-09** | Caché | DA06, DA11 | Redis para búsquedas y catálogos, TTL de 60 segundos |
+| **ADR-10** | Procesamiento asíncrono | DA10 | RabbitMQ |
+| **ADR-11** | Pasarela de pagos | DA09 | Culqi mediante patrón Adapter |
+| **ADR-12** | Notificaciones | DA10, DA13 | WhatsApp Business Cloud API mediante procesamiento asíncrono |
+| **ADR-13** | Auditoría | DA12 | Registro de operaciones críticas |
+| **ADR-14** | Escalabilidad | DA01, DA05, DA06 | Escalamiento horizontal de la aplicación |
+| **ADR-15** | Observabilidad | DA12, AC03 | Logs estructurados, métricas y monitoreo |
 
 ---
 
-# 2. DA-01 — Monolito modular
+# 2. ADR-01 — Monolito modular
 
 ## Contexto
 
@@ -68,7 +68,7 @@ La solución tendrá menor complejidad operacional inicialmente, pero deberá ma
 
 ---
 
-# 3. DA-02 — Clean Architecture
+# 3. ADR-02 — Clean Architecture
 
 ## Contexto
 
@@ -106,7 +106,7 @@ Se incrementa ligeramente la cantidad de estructuras y clases, pero se obtiene m
 
 ---
 
-# 4. DA-03 — API REST
+# 4. ADR-03 — API REST
 
 ## Contexto
 
@@ -117,7 +117,7 @@ La plataforma tendrá diferentes canales de acceso y deberá comunicarse con ser
 La comunicación entre las aplicaciones cliente y el backend se realizará mediante una **API REST**.
 
 ```text
-Web / Móvil / Agente
+Web responsive / Agente
         │
         ▼
      API REST
@@ -136,7 +136,7 @@ Las interfaces deberán utilizar contratos claramente definidos, validación de 
 
 ---
 
-# 5. DA-04 — PostgreSQL como base de datos
+# 5. ADR-04 — PostgreSQL como base de datos
 
 ## Contexto
 
@@ -171,7 +171,7 @@ Las operaciones críticas de reserva y disponibilidad deberán diseñarse consid
 
 ---
 
-# 6. DA-05 — Base de datos compartida con aislamiento lógico
+# 6. ADR-05 — Base de datos compartida con aislamiento lógico
 
 ## Contexto
 
@@ -179,7 +179,7 @@ La plataforma será utilizada por múltiples empresas y agencias, pero se manten
 
 ## Decisión
 
-Se utilizará una **base de datos compartida con aislamiento lógico**.
+Se utilizará una **base PostgreSQL compartida**, con un esquema y un `DbContext` por módulo. La separación de tenants se aplicará mediante `company_id`, `agency_id`, Global Query Filters y validación de autorización en cada caso de uso; los módulos accederán a datos ajenos solo mediante contratos públicos.
 
 Las entidades operativas tendrán referencia a su ámbito organizacional.
 
@@ -208,7 +208,7 @@ La seguridad no dependerá únicamente de ocultar información en la interfaz.
 
 ---
 
-# 7. DA-06 — RBAC + ámbito organizacional
+# 7. ADR-06 — RBAC + ámbito organizacional
 
 ## Contexto
 
@@ -244,7 +244,7 @@ Puede administrar la plataforma y gestionar empresas, agencias y administradores
 
 ### Administrador de Agencia
 
-Puede gestionar únicamente la agencia que tiene asignada.
+Puede gestionar una o varias agencias autorizadas pertenecientes a una sola empresa. El token contiene `sub`, `role`, `company_id` y `agency_ids[]`; la agencia activa se envía en `X-Agency-Id` y el backend la valida en cada caso de uso.
 
 ### Agente/Vendedor
 
@@ -260,11 +260,11 @@ El rol por sí solo no es suficiente. Un Administrador de Agencia podría tener 
 
 ---
 
-# 8. DA-07 — Control de concurrencia
+# 8. ADR-07 — Control de concurrencia
 
 ## Contexto
 
-Dos o más pasajeros o agentes pueden intentar reservar simultáneamente el mismo asiento o cupo.
+Dos o más pasajeros o agentes pueden intentar reservar simultáneamente el mismo asiento numerado de un viaje.
 
 ## Decisión
 
@@ -287,11 +287,11 @@ La base de datos será la fuente de verdad de las operaciones críticas.
 
 ## Consecuencia
 
-Las operaciones de reserva deberán ser cortas, transaccionales e idempotentes cuando corresponda.
+Las operaciones de reserva deberán ser cortas, transaccionales e idempotentes cuando corresponda. La asignación bloquea `TripSeat` con `SELECT FOR UPDATE`; un índice único parcial sobre `trip_seat_id` con estados `HELD` y `CONFIRMED` actúa como salvaguarda contra carreras.
 
 ---
 
-# 9. DA-08 — Reserva temporal de 10 minutos
+# 9. ADR-08 — Reserva temporal de 10 minutos
 
 ## Contexto
 
@@ -301,7 +301,7 @@ Mantener el asiento bloqueado indefinidamente perjudicaría la disponibilidad.
 
 ## Decisión
 
-Una reserva temporal tendrá una duración máxima de **10 minutos**.
+Solo las reservas iniciadas en el canal digital tendrán una retención `HELD` de **10 minutos**. La venta presencial registra pago en efectivo, Yape/Plin o POS y confirma directamente sin cierre de caja.
 
 ```text
 DISPONIBLE
@@ -318,8 +318,10 @@ PAGO CONFIRMADO   SIN PAGO
  CONFIRMADA       EXPIRED
                      │
                      ▼
-              LIBERAR ASIENTO
+              LIBERAR ASIENTOS
 ```
+
+Las máquinas de estados se mantienen separadas: reserva `HELD`, `CONFIRMED`, `CANCELLED`, `EXPIRED`, `RESCHEDULED`; pago `PENDING`, `APPROVED`, `REJECTED`, `ERROR`, `REFUNDED`; pasaje `ISSUED`, `USED`, `VOIDED`.
 
 ## Justificación
 
@@ -327,11 +329,11 @@ El periodo permite completar razonablemente el proceso de pago y, al mismo tiemp
 
 ## Consecuencia
 
-Debe existir un mecanismo que detecte y expire automáticamente las reservas vencidas.
+Debe existir un mecanismo que detecte y expire automáticamente las reservas vencidas. Un `BackgroundService` revisa las reservas cada 10 segundos y usa `FOR UPDATE SKIP LOCKED`, lo que permite ejecutar varias instancias sin procesar una retención más de una vez.
 
 ---
 
-# 10. DA-09 — Redis como caché
+# 10. ADR-09 — Redis como caché
 
 ## Contexto
 
@@ -339,7 +341,7 @@ Las consultas de rutas, horarios y servicios pueden repetirse constantemente, es
 
 ## Decisión
 
-Se utilizará **Redis como capa de caché** para información de consulta frecuente y no crítica.
+Se utilizará **Redis como capa de caché** exclusivamente para búsquedas de viajes y catálogos con TTL de 60 segundos.
 
 ```text
 Cliente
@@ -362,7 +364,7 @@ Respuesta       PostgreSQL
 
 Redis **no será la fuente principal de verdad para una reserva**.
 
-La disponibilidad definitiva deberá validarse contra PostgreSQL.
+El mapa de asientos, su disponibilidad exacta y las operaciones de reserva se consultan siempre contra PostgreSQL; no se almacenan en caché.
 
 ## Consecuencia
 
@@ -370,7 +372,7 @@ Será necesario definir políticas de expiración e invalidación de caché.
 
 ---
 
-# 11. DA-10 — RabbitMQ para procesamiento asíncrono
+# 11. ADR-10 — RabbitMQ para procesamiento asíncrono
 
 ## Contexto
 
@@ -385,13 +387,13 @@ Por ejemplo:
 
 ## Decisión
 
-Se utilizará **RabbitMQ** como mecanismo de mensajería y procesamiento asíncrono.
+Se utilizará **Transactional Outbox + RabbitMQ** como mecanismo de mensajería y procesamiento asíncrono. El evento se persiste junto a la transacción principal y un consumidor despacha la notificación.
 
 ```text
 Reserva confirmada
        │
        ▼
-Publicar evento
+Persistir evento en Outbox
        │
        ▼
     RabbitMQ
@@ -413,7 +415,7 @@ Se deberán implementar reintentos, manejo de errores y control de mensajes dupl
 
 ---
 
-# 12. DA-11 — Culqi mediante Adapter
+# 12. ADR-11 — Culqi mediante Adapter
 
 ## Contexto
 
@@ -427,7 +429,7 @@ Las alternativas consideradas son:
 
 ## Decisión
 
-Se seleccionará **Culqi** para la primera versión y se integrará mediante el patrón **Adapter**.
+Se seleccionará **Culqi** para la primera versión y se integrará mediante `IPaymentGateway` en Aplicación, implementada por `CulqiPaymentAdapter` en Infraestructura. El frontend obtiene un token mediante Culqi Checkout; el backend crea el cargo y valida la respuesta del servidor. Los webhooks firmados HMAC reconcilian el resultado; el primer evento válido es autoritativo y el procesamiento es idempotente por `charge_id` único.
 
 ```text
 Servicio de Pagos
@@ -459,9 +461,11 @@ El sistema deberá manejar:
 - validación de notificaciones/webhooks;
 - idempotencia.
 
+Si la aprobación llega después de expirar la reserva, el backend confirma únicamente si todos los asientos siguen libres; en caso contrario, registra `REFUNDED`.
+
 ---
 
-# 13. DA-12 — WhatsApp para notificaciones
+# 13. ADR-12 — WhatsApp para notificaciones
 
 ## Contexto
 
@@ -469,7 +473,7 @@ Las notificaciones son un complemento importante de la plataforma y representan 
 
 ## Decisión
 
-Se utilizará **WhatsApp Business Cloud API** para enviar notificaciones mediante un componente desacoplado.
+Se utilizará **WhatsApp Business Cloud API** a través de `INotificationGateway` en Aplicación, implementada por `WhatsAppNotificationAdapter` en Infraestructura. Las notificaciones se procesan de forma asíncrona con Transactional Outbox y RabbitMQ.
 
 Las notificaciones podrán incluir:
 
@@ -500,9 +504,11 @@ La notificación se considera una funcionalidad complementaria y no debe bloquea
 
 Por ello, será procesada mediante RabbitMQ.
 
+Las alertas internas de alta demanda se envían al Administrador de Agencia. Las alertas a pasajeros requieren opt-in y ocupación superior al 70 %.
+
 ---
 
-# 14. DA-13 — Auditoría
+# 14. ADR-13 — Auditoría
 
 ## Contexto
 
@@ -538,7 +544,7 @@ Permite investigar errores, operaciones no autorizadas y problemas de negocio.
 
 ---
 
-# 15. DA-14 — Escalabilidad horizontal
+# 15. ADR-14 — Escalabilidad horizontal
 
 ## Contexto
 
@@ -568,7 +574,7 @@ Permite aumentar capacidad sin modificar las reglas principales del sistema.
 
 ---
 
-# 16. DA-15 — Observabilidad
+# 16. ADR-15 — Observabilidad
 
 ## Contexto
 
@@ -611,20 +617,20 @@ Permite detectar problemas relacionados con reservas, pagos, colas, caché y ser
 
 | Driver | Decisiones relacionadas |
 |---|---|
-| DA01 - Concurrencia de usuarios | DA-01, DA-07, DA-14 |
-| DA02 - Evitar sobreventa | DA-07, DA-08 |
-| DA03 - Consistencia | DA-04, DA-07, DA-08 |
-| DA04 - Seguridad multiempresa | DA-05, DA-06 |
-| DA05 - Escalabilidad | DA-01, DA-09, DA-10, DA-14 |
-| DA06 - Rendimiento | DA-09, DA-14 |
-| DA07 - Disponibilidad común | DA-04, DA-07 |
-| DA08 - Reserva temporal | DA-08, DA-10 |
-| DA09 - Pagos | DA-11 |
-| DA10 - Notificaciones | DA-10, DA-12 |
-| DA11 - Caché | DA-09 |
-| DA12 - Auditoría | DA-13, DA-15 |
-| DA13 - Interoperabilidad | DA-03, DA-11, DA-12 |
-| DA14 - Mantenibilidad | DA-01, DA-02, DA-11 |
+| DA01 - Concurrencia de usuarios | ADR-01, ADR-07, ADR-14 |
+| DA02 - Evitar sobreventa | ADR-07 |
+| DA03 - Consistencia | ADR-04, ADR-07, ADR-08 |
+| DA04 - Seguridad multiempresa | ADR-05, ADR-06 |
+| DA05 - Escalabilidad | ADR-01, ADR-09, ADR-10, ADR-14 |
+| DA06 - Rendimiento | ADR-09, ADR-14 |
+| DA07 - Disponibilidad común | ADR-04, ADR-07 |
+| DA08 - Reserva temporal | ADR-08 |
+| DA09 - Pagos | ADR-11 |
+| DA10 - Notificaciones | ADR-10, ADR-12 |
+| DA11 - Caché | ADR-09 |
+| DA12 - Auditoría | ADR-13, ADR-15 |
+| DA13 - Interoperabilidad | ADR-03, ADR-11, ADR-12 |
+| DA14 - Mantenibilidad | ADR-01, ADR-02 |
 
 ---
 
@@ -636,7 +642,7 @@ Las decisiones adoptadas permiten establecer una arquitectura inicial coherente 
                     USUARIOS
                         │
                         ▼
-              Aplicación Web / Móvil
+              Aplicación Web Responsive
                         │
                         ▼
                  API REST

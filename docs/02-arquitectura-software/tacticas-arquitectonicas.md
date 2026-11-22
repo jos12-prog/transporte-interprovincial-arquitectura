@@ -88,7 +88,7 @@ Redis (consulta frecuente)
      Redis (almacenar)
 ```
 
-**Driver relacionado:** DA-06, DA-11
+**Driver relacionado:** DA06, DA11
 
 ---
 
@@ -112,7 +112,7 @@ WhatsApp Business Cloud API
 
 Si WhatsApp presenta una falla temporal, la operación principal queda correctamente persistida. Los eventos pendientes en la cola se reintentan según la política configurada.
 
-**Driver relacionado:** DA-10, DA-13
+**Driver relacionado:** DA10, DA13
 
 ---
 
@@ -134,20 +134,17 @@ Si WhatsApp presenta una falla temporal, la operación principal queda correctam
                     PostgreSQL
 ```
 
-**Driver relacionado:** DA-01, DA-05, DA-14
+**Driver relacionado:** DA01, DA05, DA14
 
 ---
 
-### Táctica 4: Replicación de datos — Para Disponibilidad y Rendimiento de lectura (AC03, AC01)
+### Táctica 4: Réplica de lectura — Evolución futura, fuera de v1
 
 **Objetivo:** Proteger la base de datos ante fallos y descargar el tráfico de reportes y analítica del nodo principal.
 
-**Aplicación:** Replicación física en streaming de PostgreSQL:
+**Aplicación:** la v1 usa un único PostgreSQL como fuente de verdad. Una réplica de lectura podrá evaluarse como evolución futura y no forma parte del despliegue inicial.
 
-- **Nodo Primario:** exclusivo para operaciones de escritura transaccional (reservas, pagos, ventas).
-- **Réplica de Lectura:** atiende consultas del módulo de Reportes y Auditoría, evitando que la generación de reportes bloquee las operaciones críticas de reserva.
-
-**Driver relacionado:** DA-05, DA-06
+**Driver relacionado:** DA05, DA06
 
 ---
 
@@ -160,7 +157,7 @@ Si WhatsApp presenta una falla temporal, la operación principal queda correctam
 - **Retry con Backoff Exponencial:** ante error 503 o timeout de la pasarela de pagos Culqi, se reintenta 3 veces con espera incremental (2 s, 4 s, 8 s) más jitter.
 - **Circuit Breaker:** si el servicio externo falla 5 veces consecutivas, el circuito se abre durante 30 segundos, rechazando nuevas solicitudes de inmediato y retornando un mensaje controlado al usuario.
 
-**Driver relacionado:** DA-09, DA-10
+**Driver relacionado:** DA09, DA10
 
 ---
 
@@ -179,7 +176,7 @@ Si WhatsApp presenta una falla temporal, la operación principal queda correctam
 
 Los middlewares de autorización en ASP.NET Core rechazan cualquier solicitud fuera del ámbito organizacional antes de que llegue a la lógica de negocio.
 
-**Driver relacionado:** DA-04, DA-06
+**Driver relacionado:** DA04, DA06
 
 ---
 
@@ -192,23 +189,23 @@ Los middlewares de autorización en ASP.NET Core rechazan cualquier solicitud fu
 - Endpoints de búsqueda (`/api/v1/trips/search`): máximo 60 peticiones por minuto por IP.
 - Endpoints de autenticación (`/api/v1/auth/login`): máximo 5 intentos fallidos cada 5 minutos por usuario antes del bloqueo temporal.
 
-**Driver relacionado:** DA-04
+**Driver relacionado:** DA04
 
 ---
 
 ### Táctica 8: Bloqueo pesimista e índice único parcial — Para Concurrencia e Integridad (AC05, AC06)
 
-**Objetivo:** Garantizar cero sobreventa de asientos o cupos en escenarios de alta concurrencia, donde pasajeros y agentes intentan reservar simultáneamente el mismo recurso.
+**Objetivo:** Garantizar cero sobreventa de asientos numerados en escenarios de alta concurrencia, donde pasajeros y agentes intentan reservar simultáneamente el mismo recurso.
 
 **Aplicación:**
 
-- **En la capa de infraestructura:** consulta con bloqueo pesimista `SELECT ... FOR UPDATE` sobre la fila del servicio o del asiento durante la transacción de creación de reserva. Solo una transacción puede avanzar; las demás esperan o son rechazadas.
+- **En la capa de infraestructura:** consulta con bloqueo pesimista `SELECT ... FOR UPDATE` sobre la fila de `TripSeat` durante la transacción de creación de reserva. Solo una transacción puede avanzar; las demás esperan o son rechazadas.
 - **En la base de datos física:** índice único condicional como segunda línea de defensa:
 
 ```sql
 CREATE UNIQUE INDEX idx_unique_active_seat
-  ON reservations (trip_id, seat_number)
-  WHERE status IN ('Held', 'Confirmed');
+  ON reservation_seats (trip_seat_id)
+  WHERE status IN ('HELD', 'CONFIRMED');
 ```
 
 Si dos transacciones concurrentes intentan confirmar el mismo asiento, la primera consolida y la segunda es abortada por el motor relacional con error de clave duplicada.
@@ -224,7 +221,7 @@ Agente ───────────────┘
       Una sola confirmación válida
 ```
 
-**Driver relacionado:** DA-02, DA-03, DA-07
+**Driver relacionado:** DA02, DA03, DA07
 
 ---
 
@@ -234,7 +231,7 @@ Agente ───────────────┘
 
 **Aplicación:** Cada módulo expone únicamente sus casos de uso e interfaces públicas. Los demás módulos interactúan a través de estos contratos, sin acceder directamente a las entidades o repositorios internos de otro módulo.
 
-**Driver relacionado:** DA-05, DA-14
+**Driver relacionado:** DA05, DA14
 
 ---
 
@@ -249,12 +246,12 @@ Dominio / Aplicación
         │
         ▼
   IPaymentGateway ──────► CulqiPaymentAdapter ──► Culqi
-  INotificationGateway ─► WhatsAppAdapter ────────► WhatsApp Business Cloud API
+  INotificationGateway ─► WhatsAppNotificationAdapter ────────► WhatsApp Business Cloud API
 ```
 
 Un cambio de pasarela de pagos o de canal de notificaciones afecta únicamente al adaptador correspondiente, sin modificar las reglas de reservas ni los casos de uso.
 
-**Driver relacionado:** DA-09, DA-10, DA-13
+**Driver relacionado:** DA09, DA10, DA13
 
 ---
 
@@ -275,31 +272,40 @@ Un cambio de pasarela de pagos o de canal de notificaciones afecta únicamente a
 | `recurso_afectado` | Entidad modificada (reserva, servicio, pago, etc.) |
 | `resultado` | Resultado de la operación |
 
-**Driver relacionado:** DA-04, DA-12, DA-15
+**Driver relacionado:** DA04, DA12; decisión ADR-15
 
 ---
+
+### Táctica 12: Interfaz por rol y sistema de diseño consistente — Para Usabilidad (AC10)
+
+**Objetivo:** facilitar que cada rol complete sus flujos y que pasajeros y agentes comprendan visualmente la disponibilidad de asientos.
+
+**Aplicación:** navegación según rol, mapa visual compartido de asientos y componentes consistentes según `design/stitch/DESIGN.md`.
+
+**Driver relacionado:** DA03, DA04, DA07
 
 ## 4. Matriz de trazabilidad: Atributos de Calidad vs. Tácticas
 
 | Atributo de Calidad | Driver Vinculado | Táctica Arquitectónica Aplicada | Mecanismo Técnico |
 |---|---|---|---|
-| **AC01 — Rendimiento** | DA-06, DA-11 | Caché de lectura | Redis para rutas, horarios y servicios |
-| **AC01 — Rendimiento** | DA-10 | Procesamiento asíncrono | RabbitMQ para notificaciones y eventos secundarios |
-| **AC02 — Escalabilidad** | DA-01, DA-05 | Balanceo de carga | Nginx + múltiples instancias stateless de la API |
-| **AC03 — Disponibilidad** | DA-05, DA-06 | Replicación de datos | Streaming replication Primario-Standby PostgreSQL |
-| **AC03 — Disponibilidad** | DA-09, DA-10 | Circuit Breaker y reintentos | Polly con backoff exponencial ante Culqi y WhatsApp |
-| **AC04 — Seguridad** | DA-04, DA-06 | Autenticación y autorización RBAC | Tokens JWT con Claims de Rol, Empresa y Agencia |
-| **AC04 — Seguridad** | DA-04 | Rate Limiting | RateLimiter Middleware contra fuerza bruta y scraping |
-| **AC05 — Concurrencia** | DA-02, DA-03 | Bloqueo pesimista e índice único parcial | `SELECT FOR UPDATE` + índice único condicional en PostgreSQL |
-| **AC06 — Integridad y consistencia** | DA-03, DA-07, DA-08 | Bloqueo pesimista + transacciones ACID | Transacciones PostgreSQL sobre reservas y disponibilidad |
-| **AC07 — Mantenibilidad** | DA-05, DA-14 | Aislamiento modular por contratos | Interfaces públicas de aplicación entre módulos del monolito |
-| **AC08 — Interoperabilidad** | DA-09, DA-10, DA-13 | Patrón Adapter | Adaptadores de Culqi y WhatsApp Business Cloud API |
-| **AC09 — Trazabilidad** | DA-04, DA-12, DA-15 | Auditoría y logs estructurados | Serilog con campos de auditoría en todas las operaciones críticas |
+| **AC01 — Rendimiento** | DA06, DA11 | Caché de lectura | Redis para búsquedas de viajes y catálogos (TTL 60 s) |
+| **AC01 — Rendimiento** | DA10 | Procesamiento asíncrono | RabbitMQ para notificaciones y eventos secundarios |
+| **AC02 — Escalabilidad** | DA01, DA05 | Balanceo de carga | Nginx + múltiples instancias stateless de la API |
+| **AC03 — Disponibilidad** | DA05, DA06 | Instancias stateless y recuperación | Réplica de lectura fuera de v1; evolución futura |
+| **AC03 — Disponibilidad** | DA09, DA10 | Circuit Breaker y reintentos | Polly con backoff exponencial ante Culqi y WhatsApp |
+| **AC04 — Seguridad** | DA04, DA06 | Autenticación y autorización RBAC | Tokens JWT con Claims de Rol, Empresa y Agencia |
+| **AC04 — Seguridad** | DA04 | Rate Limiting | RateLimiter Middleware contra fuerza bruta y scraping |
+| **AC05 — Concurrencia** | DA02, DA03 | Bloqueo pesimista e índice único parcial | `SELECT FOR UPDATE` + índice único condicional en PostgreSQL |
+| **AC06 — Integridad y consistencia** | DA03, DA07, DA08 | Bloqueo pesimista + transacciones ACID | Transacciones PostgreSQL sobre reservas y disponibilidad |
+| **AC07 — Mantenibilidad** | DA05, DA14 | Aislamiento modular por contratos | Interfaces públicas de aplicación entre módulos del monolito |
+| **AC08 — Interoperabilidad** | DA09, DA10, DA13 | Patrón Adapter | Adaptadores de Culqi y WhatsApp Business Cloud API |
+| **AC09 — Trazabilidad** | DA04, DA12; decisión ADR-15 | Auditoría y logs estructurados | Serilog con campos de auditoría en todas las operaciones críticas |
+| **AC10 — Usabilidad** | DA03, DA04, DA07 | Interfaz por rol y sistema de diseño consistente | Navegación por rol y mapa visual de asientos (DESIGN.md) |
 
 ---
 
 ## 5. Conclusión
 
-Las 11 tácticas arquitectónicas seleccionadas responden directamente a los atributos de calidad prioritarios identificados en el análisis del sistema.
+Las 12 tácticas arquitectónicas seleccionadas responden directamente a los atributos de calidad prioritarios identificados en el análisis del sistema.
 
 La distinción entre **enfoque arquitectónico** (Clean Architecture como organización del código), **tácticas de calidad** (Caché, Rate Limiting, Circuit Breaker, Bloqueo pesimista) y **patrones de diseño** (Adapter, Strategy) garantiza la coherencia conceptual del diseño y la alineación con los drivers arquitectónicos del proyecto.

@@ -31,7 +31,7 @@ Cada clase o componente debe tener una responsabilidad claramente definida.
 **Aplicación: módulo Reservas y Pasajes**
 
 - `ReservationsController`: recibe solicitudes HTTP y devuelve respuestas.
-- `CreateReservation`: coordina el caso de uso de creación de reservas.
+- `CreateReservationUseCase`: coordina el caso de uso de creación de reservas.
 - `Reservation`: representa la reserva y sus reglas de estado.
 - `ReservationRepository`: implementa las operaciones de persistencia.
 
@@ -41,16 +41,11 @@ Cada clase o componente debe tener una responsabilidad claramente definida.
 
 Los componentes deben permitir extender comportamientos sin modificar innecesariamente el código existente.
 
-**Aplicación: disponibilidad de servicios**
+**Aplicación: políticas de cancelación y reprogramación**
 
-La plataforma contempla dos modalidades:
+`ICancellationPolicy` permite encapsular variantes basadas en anticipación. Los plazos y condiciones concretos están pendientes de validación comercial.
 
-- Asientos numerados.
-- Cupos según capacidad.
-
-Ambas pueden implementar el contrato `IAvailabilityStrategy`, permitiendo incorporar nuevas modalidades cuando exista una necesidad real.
-
-**Criterio:** agregar una estrategia de disponibilidad no debe obligar a modificar las reglas de las demás estrategias.
+**Criterio:** añadir una política validada no debe obligar a modificar las reglas de otras políticas.
 
 ### 3.3. PR03 — Sustitución de Liskov (LSP)
 
@@ -70,10 +65,10 @@ Los componentes deben depender únicamente de las operaciones que necesitan.
 
 Se utilizarán contratos específicos, como:
 
-- `IReservationRepository`: persistencia de reservas.
-- `IAvailabilityService`: disponibilidad de servicios.
+- `IReservationRepository`: persistencia de reservas; `ReservationRepository` (Infraestructura/EF Core) lo implementa.
+- `ISeatAvailabilityService`: disponibilidad de asientos numerados.
 - `IPaymentGateway`: integración con pagos.
-- `INotificationService`: envío de notificaciones.
+- `INotificationGateway`: envío de notificaciones.
 
 **Criterio:** un módulo no debe implementar métodos ajenos a su responsabilidad.
 
@@ -83,7 +78,7 @@ Los casos de uso deben depender de abstracciones y no de implementaciones tecnol
 
 **Aplicación: módulo Reservas y Pasajes**
 
-`CreateReservation` utiliza `IReservationRepository`, mientras que `ReservationRepository` implementa ese contrato mediante Entity Framework Core y PostgreSQL.
+`CreateReservationUseCase` utiliza `IReservationRepository`, mientras que `ReservationRepository` implementa ese contrato mediante Entity Framework Core y PostgreSQL.
 
 La configuración de ASP.NET Core conecta ambas implementaciones mediante inyección de dependencias.
 
@@ -132,9 +127,9 @@ Estas decisiones podrán revisarse cuando las mediciones de rendimiento o las ne
 | RG03 | Los módulos deben comunicarse mediante contratos internos definidos. |
 | RG04 | La infraestructura debe implementar las interfaces requeridas por la aplicación. |
 | RG05 | La autorización debe considerar el rol y el contexto de empresa y agencia. |
-| RG06 | La asignación de asientos y cupos debe protegerse mediante transacciones y control de concurrencia. |
+| RG06 | La asignación de asientos numerados debe protegerse mediante transacciones y control de concurrencia. |
 | RG07 | Las confirmaciones de pago deben verificarse y procesarse de manera idempotente. |
-| RG08 | Las confirmaciones de pago deben verificarse y procesarse de manera idempotente para evitar confirmaciones duplicadas ante notificaciones repetidas del proveedor. |
+| RG08 | Las confirmaciones de pago se reconcilian de forma idempotente por `charge_id`. |
 
 ## 6. Verificación de los principios
 
@@ -155,11 +150,11 @@ Durante el desarrollo y la revisión del código se comprobará lo siguiente:
 
 | Driver | Contribución de los principios |
 |---|---|
-| DA02 / DA03 — Concurrencia y Consistencia | Centralización de reglas invariantes y separación de operaciones transaccionales seguras. |
-| DA04 — Seguridad y Aislamiento multiempresa | Responsabilidades claras y controles de autorización contextual por empresa y agencia. |
-| DA06 / DA11 — Rendimiento y Caché | Implementaciones optimizables con Redis sin alterar las entidades del dominio. |
-| DA10 — Procesamiento asíncrono | Desacoplamiento mediante interfaces para publicar eventos en RabbitMQ y notificar por WhatsApp. |
-| DA05 / DA14 — Escalabilidad y Mantenibilidad | Aplicación de SOLID, DRY, KISS y YAGNI para reducir acoplamiento y permitir réplicas stateless. |
+| DA02 — Prevención de sobreventa / DA03 — Consistencia de reservas, pagos, disponibilidad y pasajes | Centralización de reglas invariantes y separación de operaciones transaccionales seguras. |
+| DA04 — Aislamiento multiempresa/agencia | Responsabilidades claras y controles de autorización contextual por empresa y agencia. |
+| DA06 / DA11 — Rendimiento bajo demanda y consultas frecuentes | Implementaciones optimizables con Redis sin alterar las entidades del dominio. |
+| DA10 — Notificaciones asíncronas | Desacoplamiento mediante interfaces para publicar eventos en RabbitMQ y notificar por WhatsApp. |
+| DA05 / DA14 — Escalabilidad y mantenibilidad | Aplicación de SOLID, DRY, KISS y YAGNI para reducir acoplamiento y permitir réplicas stateless. |
 
 ## 8. Conclusión
 

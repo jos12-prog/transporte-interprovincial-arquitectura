@@ -47,13 +47,13 @@ src/
     │   │   │       └── ReservationPolicy.cs
     │   │   ├── Application/
     │   │   │   ├── UseCases/
-    │   │   │   │   ├── CreateReservation.cs
-    │   │   │   │   └── ConfirmReservation.cs
+    │   │   │   │   ├── CreateReservationUseCase.cs
+    │   │   │   │   └── ConfirmReservationUseCase.cs
     │   │   │   ├── Contracts/
     │   │   │   │   ├── IReservationRepository.cs
-    │   │   │   │   └── IAvailabilityService.cs
+    │   │   │   │   └── ISeatAvailabilityService.cs
     │   │   │   └── DTOs/
-    │   │   │       └── CreateReservationRequest.cs
+    │   │   │       └── CreateReservationUseCaseRequest.cs
     │   │   ├── Infrastructure/
     │   │   │   └── Persistence/
     │   │   │       └── ReservationRepository.cs
@@ -76,10 +76,10 @@ La estructura representa una propuesta de organización del código; no implica 
 | Reservation.cs | Dominio | Representar la reserva y controlar sus transiciones de estado. |
 | ReservationStatus.cs | Dominio | Definir los estados válidos de una reserva. |
 | ReservationPolicy.cs | Dominio | Aplicar políticas de cancelación, confirmación y reprogramación. |
-| CreateReservation.cs | Aplicación | Coordinar la creación de una reserva. |
-| ConfirmReservation.cs | Aplicación | Coordinar su confirmación según disponibilidad y pago verificado, cuando corresponda. |
+| CreateReservationUseCase.cs | Aplicación | Coordinar la creación de una reserva. |
+| ConfirmReservationUseCase.cs | Aplicación | Coordinar su confirmación según disponibilidad y pago verificado, cuando corresponda. |
 | IReservationRepository.cs | Aplicación | Definir las operaciones de persistencia requeridas. |
-| IAvailabilityService.cs | Aplicación | Definir el contrato para consultar y asegurar disponibilidad. |
+| ISeatAvailabilityService.cs | Aplicación | Definir el contrato para consultar y asegurar disponibilidad. |
 | ReservationRepository.cs | Infraestructura | Implementar la persistencia mediante Entity Framework Core. |
 | ReservationsController.cs | Presentación | Recibir solicitudes HTTP e invocar casos de uso. |
 | ReservationsModule.cs | Composición | Registrar las dependencias del módulo. |
@@ -108,9 +108,9 @@ La infraestructura implementa los contratos definidos hacia el núcleo. Las depe
 
 | Entidad | Información y reglas principales |
 |---|---|
-| Reserva | Identificador, pasajero, servicio, estado y vigencia de retención. |
-| Pasaje | Reserva confirmada, información del viaje y asiento o cupo asignado. |
-| Asiento o cupo | Capacidad disponible según la modalidad del servicio. |
+| Reserva | Identificador, viaje, estado y vigencia de retención; agrupa uno o varios TripSeat con datos de pasajero (DNI y nombre). |
+| Pasaje | Reserva confirmada, información del viaje y asientos numerados asignados. |
+| TripSeat | Asiento numerado del viaje, con estado y datos de pasajero/reserva. |
 
 El módulo utiliza información de Transporte y Programación para identificar el servicio y validar su capacidad, sin administrar directamente las rutas o vehículos.
 
@@ -118,18 +118,18 @@ El módulo utiliza información de Transporte y Programación para identificar e
 
 | Caso de uso | Función |
 |---|---|
-| ConsultarDisponibilidad | Obtener la disponibilidad vigente del servicio. |
-| CrearReserva | Registrar una reserva o retención temporal válida. |
-| ConfirmarReserva | Confirmar una reserva cuando se cumplen las condiciones aplicables. |
-| CancelarReserva | Aplicar las políticas de cancelación. |
-| ReprogramarReserva | Modificar el servicio reservado según disponibilidad y políticas. |
-| EmitirPasaje | Generar el pasaje asociado a una reserva confirmada. |
+| GetSeatAvailabilityUseCase | Obtener la disponibilidad vigente de TripSeat. |
+| CreateReservationUseCase | Registrar una reserva o retención temporal válida. |
+| ConfirmReservationUseCase | Confirmar una reserva cuando se cumplen las condiciones aplicables. |
+| CancelReservationUseCase | Aplicar las políticas de cancelación. |
+| RescheduleReservationUseCase | Modificar el servicio reservado según disponibilidad y políticas. |
+| IssueTicketUseCase | Generar el pasaje asociado a una reserva confirmada. |
 
 ### 5.3. Reglas de negocio
 
 - **RIM01:** una reserva debe pertenecer a un servicio programado válido.
 - **RIM02:** no se puede asignar un asiento ocupado por otra reserva vigente.
-- **RIM03:** en servicios por cupos, las reservas vigentes no pueden superar la capacidad.
+- **RIM03:** cada asiento del viaje se asocia como máximo a una reserva activa `HELD` o `CONFIRMED`.
 - **RIM04:** las retenciones temporales deben respetar su vencimiento.
 - **RIM05:** la confirmación de pago debe estar verificada antes de registrar una reserva como pagada.
 - **RIM06:** las cancelaciones y reprogramaciones deben respetar las políticas aplicables.
@@ -142,11 +142,11 @@ El flujo de referencia es el siguiente:
 | Paso | Origen → Destino | Operación |
 |---|---|---|
 | 1 | Aplicación Web → API REST | Solicitar reserva de un servicio. |
-| 2 | Controller → CreateReservation | Validar entrada y ejecutar el caso de uso. |
-| 3 | Caso de uso → Transporte y Programación | Verificar servicio, modalidad y capacidad. |
+| 2 | Controller → CreateReservationUseCase | Validar entrada y ejecutar el caso de uso. |
+| 3 | Caso de uso → Transporte y Programación | Verificar viaje y asientos TripSeat. |
 | 4 | Caso de uso → Dominio | Evaluar reglas de reserva y retención. |
 | 5 | Caso de uso → Persistencia | Ejecutar una operación transaccional con control de concurrencia. |
-| 6 | Persistencia → PostgreSQL | Registrar reserva y asignación de asiento o cupo. |
+| 6 | Persistencia → PostgreSQL | Registrar reserva y asignación de asientos numerados. |
 | 7 | Caso de uso → Controller | Devolver el identificador y estado de la reserva. |
 | 8 | Controller → Aplicación Web | Responder con el resultado de la operación. |
 
@@ -230,13 +230,13 @@ El contrato no depende de Entity Framework Core ni de PostgreSQL.
 ### 7.3. Aplicación: caso de uso
 
 ```csharp
-public sealed class CreateReservation
+public sealed class CreateReservationUseCase
 {
-    private readonly IAvailabilityService _availability;
+    private readonly ISeatAvailabilityService _availability;
     private readonly IReservationRepository _repository;
 
-    public CreateReservation(
-        IAvailabilityService availability,
+    public CreateReservationUseCase(
+        ISeatAvailabilityService availability,
         IReservationRepository repository)
     {
         _availability = availability;
@@ -311,17 +311,17 @@ La confirmación de la transacción corresponde a la coordinación transaccional
 public sealed class ReservationsController
     : ControllerBase
 {
-    private readonly CreateReservation _createReservation;
+    private readonly CreateReservationUseCase _createReservation;
 
     public ReservationsController(
-        CreateReservation createReservation)
+        CreateReservationUseCase createReservation)
     {
         _createReservation = createReservation;
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(
-        CreateReservationRequest request,
+        CreateReservationUseCaseRequest request,
         CancellationToken cancellationToken)
     {
         // La identidad del pasajero y el contexto
@@ -373,12 +373,12 @@ El diseño interno se considera consistente cuando:
 
 | Driver | Aplicación en el diseño |
 |---|---|
-| DA01 — Consistencia | Transacciones y control de concurrencia en reservas y pagos. |
-| DA02 — Seguridad multiempresa | Autorización y aislamiento por empresa y agencia. |
-| DA03 — Rendimiento | Consultas especializadas y separación de responsabilidades. |
-| DA04 — Disponibilidad y recuperación | Persistencia confiable y recuperación de operaciones. |
+| DA01 — Concurrencia de usuarios | Soporte de operaciones simultáneas con aislamiento transaccional. |
+| DA02 — Prevención de sobreventa | Control de asignación exclusiva de cada TripSeat. |
+| DA03 — Consistencia de reservas, pagos, disponibilidad y pasajes | Transacciones e invariantes de dominio. |
+| DA04 — Aislamiento multiempresa/agencia | Validación de tenant y alcance autorizado. |
 | DA05 — Escalabilidad | Módulos internos compatibles con réplicas del backend sin estado. |
-| DA06 — Mantenibilidad | Contratos internos, separación de capas y bajo acoplamiento. |
+| DA06 — Rendimiento bajo demanda | Consultas e índices adecuados bajo picos de demanda. |
 
 ## 11. Conclusión
 

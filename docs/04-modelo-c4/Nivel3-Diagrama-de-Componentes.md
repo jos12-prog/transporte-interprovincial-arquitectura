@@ -23,7 +23,7 @@ El objetivo es evidenciar el principio de **alta cohesión y bajo acoplamiento**
 | — | **API REST** | Controlador / Entrada | Expone endpoints HTTPS (`/api/v1`), aplica middlewares de autenticación (JWT/Identity), valida formatos de entrada y despacha a los casos de uso. |
 | **MI01** | **Identidad y Acceso** | Módulo de Negocio | Autenticación, gestión de usuarios, roles, permisos y emisión de tokens con claims de empresa y agencia. |
 | **MI02** | **Empresas y Agencias** | Módulo de Negocio | Registro y administración de empresas de transporte, agencias, sucursales y asignaciones. |
-| **MI03** | **Transporte y Programación** | Módulo de Negocio | Gestión de rutas, destinos, unidades vehiculares, choferes, horarios, tarifas y servicios programados. |
+| **MI03** | **Transporte y Programación** | Módulo de Negocio | Gestión de rutas, destinos, unidades vehiculares, vehículos y planos de asientos numerados, horarios, tarifas y servicios programados. |
 | **MI04** | **Reservas y Pasajes** | Módulo de Negocio | Gestión de disponibilidad en tiempo real, retenciones temporales (HELD por 10 min), control de concurrencia y emisión de pasajes. |
 | **MI05** | **Ventas y Pagos** | Módulo de Negocio | Registro transaccional de ventas presenciales, integración con Culqi mediante adaptador y confirmación de cobros verificados. |
 | **MI06** | **Consultas y Reportes** | Módulo de Negocio | Búsqueda pública de itinerarios con soporte de caché en Redis y reportes consolidados para administradores. |
@@ -37,7 +37,7 @@ Los módulos conviven en el mismo proceso de backend, pero respetan fronteras es
 
 1. **API REST → Módulos de Negocio:** La capa de presentación recibe las peticiones HTTP e invoca los casos de uso correspondientes mediante inyección de dependencias de ASP.NET Core.
 2. **Identidad y Acceso → Empresas y Agencias:** Valida la pertenencia de usuarios y permisos específicos por empresa y agencia (`Valida ámbito organizacional`).
-3. **Reservas y Pasajes → Transporte y Programación:** Consulta la existencia de viajes programados, distribución de asientos y capacidad máxima (`Consulta viajes y cupos`).
+3. **Reservas y Pasajes → Transporte y Programación:** Consulta los viajes programados, su plano y los `TripSeat` disponibles.
 4. **Ventas y Pagos → Reservas y Pasajes:** Tras confirmar la recepción y verificación de fondos ante Culqi, solicita cambiar el estado de la reserva a confirmada (`Confirma reserva`).
 5. **Módulos Transaccionales → Auditoría y Notificaciones:** Ante eventos críticos (creación de reserva, pago liquidado), se publican eventos internos para auditoría y despacho asíncrono de notificaciones.
 6. **Consultas y Reportes → Transporte / Reservas:** Consulta itinerarios y disponibilidad para la visualización pública y reportes de ocupación.
@@ -47,10 +47,10 @@ Los módulos conviven en el mismo proceso de backend, pero respetan fronteras es
 ## 5. Integración con Contenedores y Sistemas Externos
 
 * **Aplicación Web (SPA):** Cliente React que envía solicitudes REST autenticadas al componente API REST mediante HTTPS.
-* **Base de Datos (PostgreSQL 16):** Cada módulo gestiona sus propias tablas relacionales mediante Entity Framework Core con aislamiento lógico por empresa y agencia.
+* **Base de Datos (PostgreSQL 16):** Cada módulo posee esquema y DbContext propios en PostgreSQL compartido; filtros globales y validación del caso de uso aíslan `company_id` y `agency_id`.
 * **Caché (Redis):** El módulo de Consultas y Reportes consume y actualiza la caché de catálogos y rutas frecuentes para reducir latencia.
 * **Cola de Mensajería (RabbitMQ):** El módulo de Auditoría y Notificaciones publica eventos para que los consumidores envíen mensajes de WhatsApp sin bloquear la transacción principal.
-* **Pasarela de Pago (Culqi - EXT01):** El módulo de Ventas y Pagos solicita el cobro electrónico y procesa confirmaciones mediante `IPaymentGateway` / `CulqiPaymentAdapter`.
+* **Pasarela de Pago (Culqi - EXT01):** El módulo de Ventas y Pagos solicita el cobro electrónico y procesa confirmaciones mediante `IPaymentGateway` (Aplicación) / `CulqiPaymentAdapter` (Infraestructura).
 * **Proveedor de Notificaciones (WhatsApp Business Cloud API - EXT02):** Procesa el envío directo de boletos digitales, recordatorios y alertas preventivas.
 
 ---
@@ -60,3 +60,6 @@ Los módulos conviven en el mismo proceso de backend, pero respetan fronteras es
 1. **Despliegue Unificado:** Todos los componentes se compilan y despliegan juntos dentro del contenedor Backend API (Monolito Modular).
 2. **Aislamiento de Persistencia:** Un módulo accede a los datos de otro únicamente a través de su interfaz o servicio de aplicación público, nunca mediante consultas SQL cruzadas entre esquemas privados.
 3. **Organización Interna:** Cada módulo implementa internamente el patrón Clean Architecture organizado en 4 capas (Presentación, Aplicación, Dominio e Infraestructura), tal como se detalla en el Nivel 4 (Diagrama de Código).
+
+
+Los contratos públicos de integración y persistencia pertenecen a Aplicación: `IPaymentGateway`, `INotificationGateway`, `IReservationRepository` e `ISeatAvailabilityService`; `CulqiPaymentAdapter`, `WhatsAppNotificationAdapter` y `ReservationRepository` (EF Core) se ubican en Infraestructura.

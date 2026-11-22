@@ -15,7 +15,7 @@ En este nivel se hace explícito el enfoque de **Monolito Modular** para el back
 | **Aplicación Web (SPA)** | Frontend / Cliente Web | React 18+, TypeScript, Vite, Tailwind CSS | Proporciona la interfaz gráfica responsive y dinámica para pasajeros, agentes de ventanilla, administradores de agencia y superadministradores. |
 | **Backend API (Monolito Modular)** | Servidor de Aplicaciones / API | ASP.NET Core 8+ (C#), REST API | Ejecuta la lógica del negocio, coordina casos de uso, aplica políticas de seguridad multiempresa y gestiona las transacciones de reservas y ventas. |
 | **Base de Datos Principal** | Base de Datos Relacional | PostgreSQL 16+ | Fuente única de verdad. Garantiza consistencia transaccional (ACID), aislamiento multiempresa, control de concurrencia y persistencia de auditoría. |
-| **Caché Distribuida** | Almacén en Memoria | Redis | Almacena temporalmente resultados de consultas frecuentes (rutas, horarios, tarifas) aliviando la carga sobre PostgreSQL (RC12). |
+| **Caché Distribuida** | Almacén en Memoria | Redis | Almacena búsquedas de viajes y catálogos con TTL de 60 segundos (RC12); no almacena mapas de asientos ni reservas. |
 | **Cola de Mensajería** | Broker de Mensajes | RabbitMQ | Cola durable para el procesamiento asíncrono y desacoplado de notificaciones (WhatsApp) y eventos secundarios (RC13). |
 
 ---
@@ -35,7 +35,7 @@ En este nivel se hace explícito el enfoque de **Monolito Modular** para el back
 * **Ejecución:** Se descarga como recursos estáticos (HTML/JS/CSS) y se ejecuta en el navegador web del cliente (desktop, tablet o móvil).
 * **Responsabilidades:**
   * Renderizado del catálogo de rutas, horarios, precios y estado de buses en tiempo real.
-  * Selector interactivo de asientos (distribución gráfica de 1 o 2 pisos según bus) y selector numérico de cupos.
+  * Selector interactivo de asientos (distribución gráfica de 1 o 2 pisos según bus) y selección de asientos numerados.
   * Pasarela visual para ingreso de datos de pasajeros y selección de método de pago.
   * Módulo de ventanilla optimizado con atajos de teclado para agentes de ventas.
   * Paneles administrativos para configuración de frecuencias, unidades y visualización de reportes.
@@ -57,14 +57,14 @@ En este nivel se hace explícito el enfoque de **Monolito Modular** para el back
 * **Responsabilidades:**
   * Almacenamiento persistente estructurado con integridad referencial estricta.
   * Soporte de transacciones serializables o con bloqueo pesimista (`SELECT ... FOR UPDATE`) durante la reserva simultánea de asientos.
-  * Esquema particionado lógicamente por empresa y agencia para garantizar el aislamiento multiempresa.
-  * Índices optimizados (B-Tree, índice único parcial `idx_unique_active_seat`) para búsquedas rápidas y prevención de sobreventa.
+  * Base compartida con esquemas y DbContext por módulo; `company_id`/`agency_id`, Global Query Filters y validación del caso de uso aseguran aislamiento por tenant.
+  * Índices optimizados (B-Tree, índice único parcial sobre `trip_seat_id` para estados `HELD` y `CONFIRMED`) para búsquedas rápidas y prevención de sobreventa.
   * Tablas inmutables para el registro cronológico de auditoría (logs de seguridad y transacciones).
 
 ### 4.4. Caché Distribuida (Redis)
 * **Tecnología:** Redis.
 * **Responsabilidades:**
-  * Almacenamiento en memoria de rutas, horarios, frecuencias y catálogos de consulta recurrente.
+  * Almacenamiento en memoria únicamente de búsquedas de viajes y catálogos, con TTL de 60 segundos.
   * Alivio sustancial del tráfico de lectura a la base de datos durante campañas de alta demanda (Semana Santa, Fiestas Patrias).
 
 ### 4.5. Cola de Mensajería (RabbitMQ)
@@ -78,14 +78,14 @@ En este nivel se hace explícito el enfoque de **Monolito Modular** para el back
 
 ## 5. Decisiones Arquitectónicas Relacionadas
 
-* **DA-01 — Monolito Modular:** Consolida los módulos en un único backend desplegable, reduciendo drásticamente la sobrecarga de red y complejidad operativa en la fase inicial, manteniendo límites estrictos de código.
-* **DA-02 — Clean Architecture:** Separa el dominio y la aplicación de los detalles técnicos de frameworks e infraestructura.
-* **DA-03 — API REST:** Canal desacoplado y estándar sobre HTTPS para clientes web.
-* **DA-04 / DA-07 — PostgreSQL:** Provee soporte ACID maduro, indispensable para el requerimiento DA02/DA03 (evitar sobreventa y garantizar consistencia de reservas).
-* **DA-09 — Redis:** Caché de lectura obligatoria (RC12) para soportar alta demanda sin degradar la base de datos.
-* **DA-10 — RabbitMQ:** Cola durable de eventos para procesar notificaciones asíncronas tolerantes a fallos (RC13).
-* **DA-11 — Culqi mediante Adapter:** Integración de pagos desacoplada mediante `IPaymentGateway`.
-* **DA-12 — WhatsApp Business Cloud API:** Canal oficial de mensajería para confirmaciones y alertas preventivas.
+* **ADR-01 — Monolito Modular:** Consolida los módulos en un único backend desplegable, reduciendo drásticamente la sobrecarga de red y complejidad operativa en la fase inicial, manteniendo límites estrictos de código.
+* **ADR-02 — Clean Architecture:** Separa el dominio y la aplicación de los detalles técnicos de frameworks e infraestructura.
+* **ADR-03 — API REST:** Canal desacoplado y estándar sobre HTTPS para clientes web.
+* **ADR-07 — PostgreSQL:** Provee soporte ACID y bloqueos necesarios para la integridad de asientos y reservas.
+* **ADR-09 — Redis:** Caché de lectura obligatoria (RC12) para soportar alta demanda sin degradar la base de datos.
+* **ADR-12 — RabbitMQ:** Cola durable de eventos para procesar notificaciones asíncronas tolerantes a fallos (RC13).
+* **ADR-11 — Culqi mediante Adapter:** Integración de pagos desacoplada mediante `IPaymentGateway`.
+* **ADR-12 — WhatsApp Business Cloud API:** Canal oficial de mensajería para confirmaciones y alertas preventivas.
 
 ---
 
@@ -104,3 +104,10 @@ En este nivel se hace explícito el enfoque de **Monolito Modular** para el back
 3. **Backend API → Pasarela de Pagos:**
    * Comunicación saliente HTTPS con autenticación por API Keys / Secret Token.
    * Comunicación entrante (Webhooks) validada con firmas HMAC SHA-256 en las cabeceras HTTP y verificación de idempotencia contra la base de datos.
+
+
+## 7. Alcance y aislamiento v1
+
+La v1 solo ofrece aplicación web responsive. Choferes, réplica de lectura y app móvil nativa quedan como evolución futura. La aplicación usa estados canónicos de reserva `HELD`, `CONFIRMED`, `CANCELLED`, `EXPIRED`, `RESCHEDULED`, pago `PENDING`, `APPROVED`, `REJECTED`, `ERROR`, `REFUNDED` y pasaje `ISSUED`, `USED`, `VOIDED`.
+
+El JWT incluye `company_id` y `agency_ids[]`; la agencia activa se envía en `X-Agency-Id` y se valida en cada caso de uso. La persistencia usa PostgreSQL compartido, esquemas y DbContext por módulo, filtros globales y validación del tenant. No hay réplica de lectura ni app nativa en v1.

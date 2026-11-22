@@ -14,7 +14,7 @@ Los valores cuantitativos establecidos en este documento representan objetivos i
 | **AC02** | Escalabilidad | Alta | El sistema debe soportar el crecimiento de empresas, agencias, servicios, pasajeros y operaciones concurrentes sin rediseñar completamente la solución. |
 | **AC03** | Disponibilidad | Alta | La consulta y operación de reservas debe mantenerse disponible durante los periodos normales y de alta demanda. |
 | **AC04** | Seguridad | Crítica | La información de empresas, agencias, usuarios, reservas y pagos debe estar protegida frente a accesos no autorizados. |
-| **AC05** | Concurrencia | Crítica | El sistema debe impedir que dos operaciones confirmen simultáneamente el mismo asiento o cupo. |
+| **AC05** | Concurrencia | Crítica | El sistema debe impedir que dos operaciones confirmen simultáneamente el mismo asiento numerado de un viaje. |
 | **AC06** | Integridad y consistencia | Crítica | Las reservas, pagos, disponibilidad y pasajes deben mantener estados coherentes aun cuando ocurran fallos o solicitudes simultáneas. |
 | **AC07** | Mantenibilidad | Alta | La solución debe permitir modificar reglas o integrar nuevos servicios sin afectar innecesariamente otros módulos. |
 | **AC08** | Interoperabilidad | Alta | La plataforma debe integrarse con la pasarela de pagos y el servicio de notificaciones mediante interfaces desacopladas. |
@@ -29,7 +29,7 @@ El sistema debe responder de manera adecuada ante consultas frecuentes de viajes
 
 **Criterio inicial:**
 
-- Con **100 usuarios concurrentes**, al menos el **95 % de las consultas de disponibilidad y búsqueda** deberá responder en un tiempo menor o igual a **2 segundos**, bajo un escenario de carga representativo.
+- Con **200 usuarios concurrentes**, al menos el **95 % de las consultas de disponibilidad y búsqueda** deberá responder en un tiempo menor o igual a **2 segundos**, bajo un escenario de carga representativo.
 - Las operaciones críticas de reserva deberán mantener tiempos de respuesta controlados aun cuando exista concurrencia.
 
 **Verificación:**
@@ -87,7 +87,7 @@ Se ejecutarán pruebas de autenticación, autorización basada en roles, aislami
 
 ### AC05 - Concurrencia
 
-La plataforma debe controlar operaciones simultáneas sobre un mismo asiento o cupo.
+La plataforma debe controlar operaciones simultáneas sobre un mismo asiento numerado de un viaje.
 
 **Escenario principal:**
 
@@ -103,7 +103,7 @@ Pasajero B ─────┘
 
 **Criterio inicial:**
 
-- En el **100 % de las pruebas concurrentes definidas**, no deberá existir más de una confirmación válida para el mismo asiento o cupo.
+- En el **100 % de las pruebas concurrentes definidas**, no deberá existir más de una confirmación válida para el mismo asiento numerado.
 - Una operación presencial y una operación digital deberán utilizar la misma fuente transaccional de disponibilidad.
 - Las reservas temporales deberán bloquear el recurso durante su vigencia.
 
@@ -119,7 +119,7 @@ La información de reserva, pago, disponibilidad y pasaje deberá mantenerse coh
 
 **Criterio inicial:**
 
-Una reserva deberá seguir un flujo controlado:
+Las máquinas de estados se mantienen separadas: reserva (`HELD`, `CONFIRMED`, `CANCELLED`, `EXPIRED`, `RESCHEDULED`), pago (`PENDING`, `APPROVED`, `REJECTED`, `ERROR`, `REFUNDED`) y pasaje (`ISSUED`, `USED`, `VOIDED`). Una reserva digital sigue este flujo:
 
 ```text
 Disponible
@@ -228,6 +228,7 @@ La plataforma deberá permitir que los diferentes actores completen sus operacio
 - El pasajero deberá poder completar el proceso de búsqueda, selección, reserva y pago sin pasos innecesarios.
 - El Agente/Vendedor deberá poder registrar una operación presencial utilizando la misma disponibilidad del sistema.
 - El Administrador deberá poder seleccionar únicamente las agencias que tiene autorizadas.
+- El mapa de asientos mostrará visualmente los estados disponible, retenido/ocupado y seleccionado para pasajeros y agentes.
 
 **Verificación:**
 
@@ -277,6 +278,7 @@ Los atributos de calidad identificados serán utilizados posteriormente para jus
 | Procesamiento de notificaciones | Cola de eventos |
 | Integración de pagos | Patrón Adapter |
 | Integración con WhatsApp | Adaptador y procesamiento asíncrono |
+| Usabilidad por rol | Navegación diferenciada, mapa visual de asientos y sistema de diseño consistente |
 | Aislamiento entre empresas/agencias | Autenticación, autorización y ámbito organizacional |
 | Crecimiento de usuarios | Escalamiento de la aplicación y servicios de soporte |
 | Consistencia de reservas | Transacciones y control de concurrencia |
@@ -289,8 +291,8 @@ Estos mecanismos no constituyen todavía decisiones definitivas de implementaci�
 
 ## Resumen
 
-La plataforma prioriza principalmente **seguridad, concurrencia e integridad**, debido a que una inconsistencia en la disponibilidad de un asiento o cupo puede producir una sobreventa y afectar directamente la operación de las agencias.
+La plataforma prioriza principalmente **seguridad, concurrencia e integridad**, debido a que una inconsistencia en la disponibilidad de un asiento numerado puede producir una sobreventa y afectar directamente la operación de las agencias.
 
 Asimismo, el sistema debe considerar **rendimiento, escalabilidad y disponibilidad** debido a la posibilidad de recibir un incremento significativo de usuarios y operaciones durante festividades, feriados y temporadas de alta demanda.
 
-Finalmente, la **mantenibilidad, interoperabilidad y trazabilidad** permitirán integrar servicios externos como la pasarela de pagos y WhatsApp, mantener la evolución de la plataforma y conservar evidencia de las operaciones críticas.
+Finalmente, la **mantenibilidad, interoperabilidad, trazabilidad y usabilidad** permitirán integrar servicios externos como la pasarela de pagos y WhatsApp, mantener la evolución de la plataforma, conservar evidencia de las operaciones críticas y facilitar los flujos por rol.

@@ -31,12 +31,12 @@ Los valores cuantitativos establecidos son objetivos iniciales y podrán ser aju
 |---|---|
 | **Atributo de calidad** | Concurrencia y consistencia |
 | **Fuente del estímulo** | Pasajeros y agentes que intentan reservar simultáneamente. |
-| **Estímulo** | Dos o más usuarios intentan reservar el mismo asiento o cupo del mismo servicio al mismo tiempo. |
-| **Artefacto** | Módulo de Reservas, módulo de Disponibilidad y PostgreSQL. |
+| **Estímulo** | Dos o más usuarios intentan reservar el mismo asiento numerado (`TripSeat`) del mismo viaje al mismo tiempo. |
+| **Artefacto** | Módulo de Reservas, registros `TripSeat` y PostgreSQL. |
 | **Entorno** | Servicio con disponibilidad limitada y múltiples solicitudes concurrentes. |
 | **Respuesta esperada** | El sistema permite confirmar el recurso únicamente a una operación válida y rechaza las demás sin generar sobreventa. |
-| **Medida de la respuesta** | En el 100 % de las pruebas, un mismo asiento o cupo deberá tener como máximo **una reserva confirmada**. No deberán existir registros de sobreventa. |
-| **Verificación** | Ejecutar pruebas concurrentes sobre el mismo recurso y comprobar el estado final de reservas y disponibilidad en PostgreSQL. |
+| **Medida de la respuesta** | En el 100 % de las pruebas, un mismo `TripSeat` deberá tener como máximo **una reserva activa `HELD` o `CONFIRMED`**. No deberán existir registros de sobreventa. |
+| **Verificación** | Ejecutar solicitudes concurrentes sobre el mismo `TripSeat` y comprobar el estado final de reservas y disponibilidad en PostgreSQL. |
 | **Drivers relacionados** | DA01, DA02, DA03, DA07 |
 | **Estado** | Pendiente de validación. |
 
@@ -71,7 +71,7 @@ Los valores cuantitativos establecidos son objetivos iniciales y podrán ser aju
 | **Respuesta esperada** | El sistema mantiene disponibles las operaciones críticas que no dependen del componente afectado y comunica de forma controlada las operaciones temporalmente no disponibles. |
 | **Medida de la respuesta** | Alcanzar una disponibilidad mensual objetivo de **99,5 %** para las operaciones críticas. |
 | **Verificación** | Revisar registros de monitoreo, errores, interrupciones y tiempo total de disponibilidad. |
-| **Drivers relacionados** | DA05, DA06, DA10, DA15 |
+| **Drivers relacionados** | DA05, DA06, DA10; decisión ADR-15 |
 | **Estado** | Pendiente de validación en producción o entorno de simulación. |
 
 ---

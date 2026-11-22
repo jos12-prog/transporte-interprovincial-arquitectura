@@ -14,7 +14,7 @@ La ausencia de una plataforma integrada para la gestión y consulta de los servi
 
 Para los pasajeros, la información se encuentra dispersa entre diferentes empresas y agencias, por lo que deben realizar consultas individuales para conocer horarios, rutas, tarifas y disponibilidad. Asimismo, las reservas realizadas por canales presenciales o telefónicos no necesariamente se encuentran integradas con otros canales de atención.
 
-Para las agencias, la administración independiente de sus operaciones dificulta mantener una visión consolidada de sus horarios, disponibilidad, reservas y ventas. Cuando una misma agencia atiende simultáneamente operaciones presenciales y digitales, existe el riesgo de que dos usuarios intenten adquirir el mismo asiento o cupo, generando inconsistencias y posibles casos de sobreventa si no existe un mecanismo adecuado de control de concurrencia.
+Para las agencias, la administración independiente de sus operaciones dificulta mantener una visión consolidada de sus horarios, disponibilidad, reservas y ventas. Cuando una misma agencia atiende simultáneamente operaciones presenciales y digitales, existe el riesgo de que dos usuarios intenten adquirir el mismo asiento, generando inconsistencias y posibles casos de sobreventa si no existe un mecanismo adecuado de control de concurrencia.
 
 Esta problemática se vuelve más relevante cuando existen múltiples agencias pertenecientes a una misma empresa, debido a que se requiere administrar la información de cada sucursal de manera independiente, evitando que usuarios autorizados de una agencia puedan acceder o modificar información correspondiente a otra empresa o agencia.
 
@@ -24,7 +24,7 @@ Asimismo, la falta de información preventiva sobre periodos de alta demanda pue
 
 Se requiere una plataforma integrada que permita centralizar la consulta y gestión de los servicios de transporte, manteniendo la separación de información entre empresas y agencias y permitiendo atender tanto las operaciones realizadas por pasajeros mediante canales digitales como las operaciones registradas presencialmente por los agentes o vendedores.
 
-La solución deberá permitir gestionar rutas, horarios, servicios, unidades de transporte, disponibilidad, reservas, ventas y pagos, manteniendo un control consistente de las operaciones concurrentes.
+La solución deberá permitir gestionar rutas, horarios, servicios, unidades de transporte y sus planos de asientos numerados, disponibilidad, reservas, ventas y pagos, manteniendo un control consistente de las operaciones concurrentes. Pasajeros y agentes deberán operar sobre el mismo mapa de asientos por viaje.
 
 También deberá proporcionar mecanismos de comunicación con los pasajeros para confirmar operaciones, informar modificaciones y emitir recordatorios o alertas preventivas ante situaciones de alta demanda relacionadas con fechas, festividades o eventos que puedan afectar la disponibilidad de los servicios.
 

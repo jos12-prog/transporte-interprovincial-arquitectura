@@ -31,7 +31,7 @@ Su objetivo principal es definir de forma explícita el **límite del sistema de
 
 * **Límite del Sistema:** Frontera lógica y de despliegue que delimita la responsabilidad directa del software desarrollado.
 * **Sistema Central:** **Plataforma Integrada de Reservas y Gestión de Transporte Interprovincial**
-  * **Consulta de servicios · Reservas y pasajes:** Búsqueda en tiempo real de itinerarios, retención temporal de asientos (estado HELD por 10 minutos) y emisión de pasajes garantizando cero sobreventa.
+  * **Consulta de servicios · Reservas y pasajes:** Búsqueda en tiempo real de itinerarios, retención digital de asientos (estado `HELD` por 10 minutos) y emisión de pasajes. Cero sobreventa es un objetivo de diseño garantizado por los mecanismos de ADR-07 y verificado mediante EQ-02.
   * **Ventas y pagos:** Registro de ventas presenciales y cobros electrónicos verificados mediante pasarela de pagos.
   * **Administración multiempresa y multiagencia:** Aislamiento y control de datos operativos para múltiples empresas y sus respectivas agencias en una misma base de datos compartida.
 
@@ -48,9 +48,9 @@ Su objetivo principal es definir de forma explícita el **límite del sistema de
 
 ## 6. Descripción de las Interacciones
 
-1. **Pasajero → Plataforma (Utiliza):** El usuario final accede mediante navegador web o móvil para buscar rutas, seleccionar asientos o cupos, realizar reservas temporales y pagar en línea.
+1. **Pasajero → Plataforma (Utiliza):** El usuario final accede mediante la aplicación web responsive en navegador de escritorio o móvil para buscar rutas, seleccionar asientos numerados, realizar retenciones digitales de 10 minutos y pagar en línea.
 2. **Agente / Vendedor → Plataforma (Opera):** El personal de agencia interactúa con la interfaz web de ventanilla para consultar disponibilidad compartida, registrar reservas presenciales, procesar cobros y emitir pasajes.
 3. **Administrador de Agencia → Plataforma (Administra):** Configura frecuencias de viajes, unidades de transporte (buses, combis, minivanes), tarifas, horarios y supervisa las ventas y ocupación de sus agencias asignadas.
 4. **Superadministrador → Plataforma (Supervisa y configura):** Registra empresas de transporte, activa o desactiva agencias, asigna administradores, audita eventos y mantiene parámetros globales del sistema.
-5. **Plataforma → Culqi (Solicita y verifica pagos):** Solicita el cobro electrónico y valida el resultado de la transacción antes de confirmar definitivamente la reserva.
+5. **Plataforma → Culqi (Solicita y verifica pagos):** Culqi Checkout entrega un token; el backend crea el cargo, valida la respuesta y reconcilia webhooks firmados HMAC de forma idempotente por `charge_id`. Si una aprobación llega después de expirar la retención, confirma solo si todos los asientos siguen libres; en caso contrario registra el reembolso.
 6. **Plataforma → WhatsApp Business Cloud API (Solicita notificaciones):** Despacha confirmaciones de reserva, pasajes digitales emitidos, recordatorios y alertas preventivas de forma desacoplada y asíncrona.
