@@ -21,6 +21,7 @@
     <ProjectReference Include="../../src/backend/Modules/CompaniesAgencies/Application/TransportPlatform.Modules.CompaniesAgencies.Application.csproj" />
     <ProjectReference Include="../../src/backend/Modules/TransportScheduling/Application/TransportPlatform.Modules.TransportScheduling.Application.csproj" />
     <ProjectReference Include="../../src/backend/Modules/Reservations/Application/TransportPlatform.Modules.Reservations.Application.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/Reservations/Presentation/TransportPlatform.Modules.Reservations.Presentation.csproj" />
     <ProjectReference Include="../../src/backend/Modules/QueriesReports/Application/TransportPlatform.Modules.QueriesReports.Application.csproj" />
     <ProjectReference Include="../../src/backend/Modules/QueriesReports/Infrastructure/TransportPlatform.Modules.QueriesReports.Infrastructure.csproj" />
     <ProjectReference Include="../../src/backend/Shared/TransportPlatform.Shared.Contracts/TransportPlatform.Shared.Contracts.csproj" />

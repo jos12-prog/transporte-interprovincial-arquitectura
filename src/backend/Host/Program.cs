@@ -42,7 +42,8 @@ builder.Services.AddSwaggerGen(options =>
     var documentedAssemblies = new[]
     {
         Assembly.GetExecutingAssembly(),
-        typeof(TransportPlatform.Modules.QueriesReports.Presentation.PresentationAssemblyMarker).Assembly
+        typeof(TransportPlatform.Modules.QueriesReports.Presentation.PresentationAssemblyMarker).Assembly,
+        typeof(TransportPlatform.Modules.Reservations.Presentation.PresentationAssemblyMarker).Assembly
     };
     foreach (var assembly in documentedAssemblies)
     {
@@ -67,6 +68,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.MapControllers();
+app.MapReservationsEndpoints();
 app.MapGet("/health", GetHealth)
     .WithName("GetHealth")
     .WithSummary("Comprueba la disponibilidad de PostgreSQL, Redis y RabbitMQ.")

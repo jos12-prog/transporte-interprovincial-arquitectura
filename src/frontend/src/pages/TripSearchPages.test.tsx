@@ -67,6 +67,10 @@ describe('passenger trip search screens', () => {
     expect(within(tripCard).getByText('Agencia Ayacucho')).toBeInTheDocument();
     expect(within(tripCard).getByText('Bus 1 piso')).toBeInTheDocument();
     expect(within(tripCard).getByText('21 asientos libres')).toBeInTheDocument();
+    expect(within(tripCard).getByRole('link', { name: 'Elegir asientos' })).toHaveAttribute(
+      'href',
+      '/pasajero/viajes/trip-1/asientos',
+    );
     expect(screen.getAllByText('Ayacucho').length).toBeGreaterThan(0);
     expect(screen.getByText('Lima')).toBeInTheDocument();
   });

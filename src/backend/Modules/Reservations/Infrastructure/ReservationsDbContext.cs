@@ -7,6 +7,8 @@ namespace TransportPlatform.Modules.Reservations.Infrastructure.Persistence;
 public sealed class ReservationsDbContext : DbContext
 {
     public DbSet<TripSeat> TripSeats => Set<TripSeat>();
+    public DbSet<Reservation> Reservations => Set<Reservation>();
+    public DbSet<ReservationSeat> ReservationSeats => Set<ReservationSeat>();
 
     public ReservationsDbContext(DbContextOptions<ReservationsDbContext> options) : base(options)
     {

@@ -28,4 +28,7 @@ public sealed class TransportSchedulingApi(
             AvailableSeats = counts.GetValueOrDefault(trip.TripId)
         }).ToArray();
     }
+
+    public Task<SeatLayoutDto?> GetSeatLayoutAsync(Guid tripId, CancellationToken cancellationToken = default) =>
+        tripSearchRepository.GetSeatLayoutAsync(tripId, cancellationToken);
 }

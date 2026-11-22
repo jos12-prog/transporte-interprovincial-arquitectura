@@ -79,6 +79,9 @@ public sealed class TripSearchRedisCacheTests
             CallCount++;
             return Task.FromResult(trips);
         }
+
+        public Task<SeatLayoutDto?> GetSeatLayoutAsync(Guid tripId, CancellationToken cancellationToken = default) =>
+            Task.FromResult<SeatLayoutDto?>(null);
     }
 
     private sealed class FakeCompaniesAgenciesApi(IReadOnlyList<PublicAgencySummary> agencies) : ICompaniesAgenciesApi
