@@ -1,0 +1,162 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  MSBUILDDISABLENODEREUSE: '1'
+  DOTNET_CLI_USE_MSBUILD_SERVER: '0'
+
+jobs:
+  backend:
+    name: Backend build and tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore src/backend/TransportPlatform.sln -m:1 -nodeReuse:false
+
+      - name: Build
+        run: dotnet build src/backend/TransportPlatform.sln --no-restore -m:1 -nodeReuse:false
+
+      - name: Test with Cobertura collection
+        run: dotnet test src/backend/TransportPlatform.sln --no-build --collect:"XPlat Code Coverage" -m:1 -nodeReuse:false
+
+      - name: Restore ReportGenerator
+        if: always()
+        run: dotnet tool restore
+
+      - name: Generate backend HTML coverage
+        if: always()
+        shell: bash
+        run: |
+          if find tests -type f -path '*/TestResults/*/coverage.cobertura.xml' -print -quit | grep -q .; then
+            dotnet tool run reportgenerator "-reports:tests/**/TestResults/**/coverage.cobertura.xml" "-targetdir:artifacts/coverage/backend" "-reporttypes:Html"
+          else
+            echo "No Cobertura files were produced."
+          fi
+
+      - name: Upload backend coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: |
+            tests/**/TestResults/**/coverage.cobertura.xml
+            artifacts/coverage/backend/**
+          if-no-files-found: warn
+
+  frontend:
+    name: Frontend build and tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.20.0
+          cache: npm
+          cache-dependency-path: src/frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: src/frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: src/frontend
+        run: npm run build
+
+      - name: Test frontend with coverage
+        working-directory: src/frontend
+        run: npm run test -- --coverage
+
+      - name: Upload frontend coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: src/frontend/coverage/**
+          if-no-files-found: warn
+
+  api:
+    name: Compose and API tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.20.0
+          cache: npm
+          cache-dependency-path: tests/api/package-lock.json
+
+      - name: Install API test dependencies
+        working-directory: tests/api
+        run: npm ci
+
+      - name: Start Compose stack
+        run: docker compose up --build -d
+
+      - name: Wait for API health
+        shell: bash
+        run: |
+          for attempt in {1..60}; do
+            if curl --fail --silent http://localhost:8080/health; then
+              echo "API is healthy."
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose ps
+          exit 1
+
+      - name: Test API over HTTP with coverage
+        working-directory: tests/api
+        env:
+          API_BASE_URL: http://localhost:8080
+        run: npm run test -- --coverage
+
+      - name: Upload API coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-coverage
+          path: tests/api/coverage/**
+          if-no-files-found: warn
+
+      - name: Stop Compose stack
+        if: always()
+        run: docker compose down --volumes --remove-orphans
+
+  openspec:
+    name: OpenSpec validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.20.0
+
+      - name: Install OpenSpec CLI
+        run: npm install --global @fission-ai/openspec@2.1.1
+
+      - name: Validate all OpenSpec artifacts
+        run: openspec validate --all --strict

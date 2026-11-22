@@ -14,4 +14,4 @@ $env:API_BASE_URL = 'http://localhost:8080'
 npm --prefix tests/api run test -- --coverage
 ```
 
-Jest escribe los reportes Cobertura, LCOV y HTML en `tests/api/coverage/`.
+Jest escribe los reportes Cobertura, LCOV y HTML en `tests/api/coverage/`. La cobertura de este paquete mide el código TypeScript de las pruebas; al llamar al Host por HTTP como caja negra, no instrumenta el código C# y por eso puede mostrar 0%. La cobertura del backend se mide por separado con xUnit, Coverlet y ReportGenerator.

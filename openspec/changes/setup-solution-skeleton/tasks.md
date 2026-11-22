@@ -27,15 +27,15 @@
 
 ## 6. Tests y entorno local
 
-- [ ] 6.1 Crear `docker-compose.yml` con `postgres:16`, `redis:7`, `rabbitmq:3-management`, `api` y `frontend`, healthchecks, puertos y configuración desde `.env`; verificar `docker compose config` y que el stack alcance saludable en `/health`.
-- [ ] 6.2 Crear `tests/Unit` con xUnit y coverlet para helpers de infraestructura/configuración sin reglas de negocio; configurar ReportGenerator y verificar con `dotnet test` salidas Cobertura y HTML.
+- [x] 6.1 Crear `docker-compose.yml` con `postgres:16`, `redis:7`, `rabbitmq:3-management`, `api` y `frontend`, healthchecks, puertos y configuración desde `.env`; verificar `docker compose config` y que el stack alcance saludable en `/health`.
+- [x] 6.2 Crear `tests/Unit` con xUnit y coverlet para helpers de infraestructura/configuración sin reglas de negocio; configurar ReportGenerator y verificar con `dotnet test` salidas Cobertura y HTML.
 - [x] 6.3 Crear `tests/Architecture` con xUnit y NetArchTest para asegurar Domain sin dependencias de infraestructura, Application sin Infrastructure/Presentation y ausencia de referencias directas entre módulos; verificar que las reglas pasan sobre los ensamblados construidos.
-- [ ] 6.4 Crear `tests/Integration` con xUnit, `Microsoft.AspNetCore.Mvc.Testing` y Testcontainers para PostgreSQL, Redis y RabbitMQ; probar `/health` saludable y degradado y verificar códigos 200/503 sin filtrar secretos.
-- [ ] 6.5 Crear `tests/api` como paquete Jest + TypeScript que use `API_BASE_URL` para llamar por HTTP al Host real en `/health`; verificar los checks de componentes y reportes Cobertura/HTML con los servicios levantados.
-- [ ] 6.6 Crear `tests/Concurrency/README.md` que registre EQ-02 y EQ-03 como obligatorios pero diferidos hasta que existan reglas de reserva y autorización; verificar que no se afirme que esos escenarios están probados.
-- [ ] 6.7 Crear `tests/performance/smoke-health.js` para k6 y un README con instrucciones para levantar Compose, configurar `BASE_URL` y ejecutar el smoke test; verificar que una API saludable pase y una respuesta no exitosa falle.
+- [x] 6.4 Crear `tests/Integration` con xUnit, `Microsoft.AspNetCore.Mvc.Testing` y Testcontainers para PostgreSQL, Redis y RabbitMQ; probar `/health` saludable y degradado y verificar códigos 200/503 sin filtrar secretos.
+- [x] 6.5 Crear `tests/api` como paquete Jest + TypeScript que use `API_BASE_URL` para llamar por HTTP al Host real en `/health`; verificar los checks de componentes y reportes Cobertura/HTML con los servicios levantados.
+- [x] 6.6 Crear `tests/Concurrency/README.md` que registre EQ-02 y EQ-03 como obligatorios pero diferidos hasta que existan reglas de reserva y autorización; verificar que no se afirme que esos escenarios están probados.
+- [x] 6.7 Crear `tests/performance/smoke-health.js` para k6 y un README con instrucciones para levantar Compose, configurar `BASE_URL` y ejecutar el smoke test; verificar que una API saludable pase y una respuesta no exitosa falle.
 
 ## 7. CI e integración final
 
-- [ ] 7.1 Crear `.github/workflows/ci.yml` para push y pull request: restaurar, compilar y probar .NET; ejecutar Jest de frontend; levantar Compose y ejecutar Jest de API contra HTTP real; subir Cobertura/HTML de backend, frontend y API incluso ante fallos; ejecutar `openspec validate --all --strict`; verificar que el workflow analice y use esos eventos y jobs.
-- [ ] 7.2 Verificar el conjunto integrado con `dotnet build`, `dotnet test`, `npm run build`, pruebas Jest de frontend y API, `docker compose up`/`down` y `openspec validate --all --strict`; confirmar que el change no introduce login/JWT, reglas de negocio, Culqi ni WhatsApp.
+- [x] 7.1 Crear `.github/workflows/ci.yml` para push y pull request: restaurar, compilar y probar .NET; ejecutar Jest de frontend; levantar Compose y ejecutar Jest de API contra HTTP real; subir Cobertura/HTML de backend, frontend y API incluso ante fallos; ejecutar `openspec validate --all --strict`; verificar que el workflow analice y use esos eventos y jobs.
+- [x] 7.2 Verificar el conjunto integrado con `dotnet build`, `dotnet test`, `npm run build`, pruebas Jest de frontend y API, `docker compose up`/`down` y `openspec validate --all --strict`; confirmar que el change no introduce login/JWT, reglas de negocio, Culqi ni WhatsApp.
