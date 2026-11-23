@@ -1,0 +1,104 @@
+{
+  "info": {
+    "_postman_id": "69ea3146-8a19-4f97-a40f-8a59f8b8d3e2",
+    "name": "RutaAndina — Sprint 2",
+    "description": "Smoke y contrato HTTP del Sprint 2: salud, búsqueda, mapa de asientos y holds. Ejecutar la colección completa en orden contra una API con semilla Development.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "tripId", "value": "", "type": "string" },
+    { "key": "tripSeatId", "value": "", "type": "string" },
+    { "key": "elevenSeatIds", "value": "[]", "type": "string" },
+    { "key": "holdId", "value": "", "type": "string" },
+    { "key": "holdToken", "value": "", "type": "string" }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Convert UTC to the Lima service date (UTC-5), then keep yyyy-MM-dd.",
+          "const limaNow = new Date(Date.now() - 5 * 60 * 60 * 1000);",
+          "pm.collectionVariables.set('serviceDate', limaNow.toISOString().slice(0, 10));"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "01 — Health (200)",
+      "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/health" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('health responde 200', () => pm.response.to.have.status(200));",
+        "pm.test('health reporta todos los componentes', () => { const body = pm.response.json(); pm.expect(body.status).to.eql('healthy'); pm.expect(body.components).to.have.property('postgresql', 'healthy'); pm.expect(body.components).to.have.property('redis', 'healthy'); pm.expect(body.components).to.have.property('rabbitmq', 'healthy'); });"
+      ] } }]
+    },
+    {
+      "name": "02 — Búsqueda de viajes (200 + X-Cache)",
+      "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": { "raw": "{{baseUrl}}/api/v1/trips/search?origin=Ayacucho&destination=Lima&date={{serviceDate}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "trips", "search"], "query": [{ "key": "origin", "value": "Ayacucho" }, { "key": "destination", "value": "Lima" }, { "key": "date", "value": "{{serviceDate}}" }] } },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('búsqueda responde 200', () => pm.response.to.have.status(200));",
+        "pm.test('X-Cache indica HIT o MISS', () => pm.expect(['HIT', 'MISS']).to.include(pm.response.headers.get('X-Cache')));",
+        "pm.test('hay viajes de semilla', () => { const trips = pm.response.json(); pm.expect(trips).to.be.an('array').that.is.not.empty; pm.expect(trips[0]).to.have.property('tripId'); pm.collectionVariables.set('tripId', trips[0].tripId); });"
+      ] } }]
+    },
+    {
+      "name": "03 — Búsqueda con fecha inválida (400 ProblemDetails)",
+      "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/problem+json" }], "url": "{{baseUrl}}/api/v1/trips/search?origin=Ayacucho&destination=Lima&date=no-es-fecha" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('fecha inválida responde 400', () => pm.response.to.have.status(400));",
+        "pm.test('400 usa ValidationProblemDetails', () => { const body = pm.response.json(); pm.expect(body.status).to.eql(400); pm.expect(body).to.have.property('title'); pm.expect(body).to.have.property('errors'); });"
+      ] } }]
+    },
+    {
+      "name": "04 — Mapa de asientos (200)",
+      "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/v1/trips/{{tripId}}/seats" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('mapa responde 200', () => pm.response.to.have.status(200));",
+        "pm.test('mapa contiene estados y al menos once asientos libres', () => { const body = pm.response.json(); pm.expect(body.seats).to.be.an('array'); const free = body.seats.filter(seat => seat.status === 'Available'); pm.expect(free.length).to.be.at.least(11); pm.expect(free[0]).to.have.property('tripSeatId'); pm.collectionVariables.set('tripSeatId', free[0].tripSeatId); pm.collectionVariables.set('elevenSeatIds', JSON.stringify(free.slice(0, 11).map(seat => seat.tripSeatId))); });"
+      ] } }]
+    },
+    {
+      "name": "05 — Crear hold (200)",
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"tripId\": \"{{tripId}}\",\n  \"tripSeatIds\": [\"{{tripSeatId}}\"]\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/v1/reservations/holds" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('hold responde 200', () => pm.response.to.have.status(200));",
+        "pm.test('hold retorna identificador, token opaco y vencimiento', () => { const body = pm.response.json(); pm.expect(body.reservationId).to.be.a('string').and.not.empty; pm.expect(body.holdToken).to.be.a('string').and.not.empty; pm.expect(body.expiresAtUtc).to.be.a('string').and.not.empty; pm.collectionVariables.set('holdId', body.reservationId); pm.collectionVariables.set('holdToken', body.holdToken); });"
+      ] } }]
+    },
+    {
+      "name": "06 — Más de 10 asientos (400 ProblemDetails)",
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/problem+json" }], "body": { "mode": "raw", "raw": "{\n  \"tripId\": \"{{tripId}}\",\n  \"tripSeatIds\": {{elevenSeatIds}}\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/v1/reservations/holds" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('más de diez asientos responde 400', () => pm.response.to.have.status(400));",
+        "pm.test('respuesta 400 es ProblemDetails', () => { const body = pm.response.json(); pm.expect(body.status).to.eql(400); pm.expect(body).to.have.property('title'); pm.expect(body).to.have.property('detail'); });"
+      ] } }]
+    },
+    {
+      "name": "07 — Asiento retenido (409 ProblemDetails)",
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/problem+json" }], "body": { "mode": "raw", "raw": "{\n  \"tripId\": \"{{tripId}}\",\n  \"tripSeatIds\": [\"{{tripSeatId}}\"]\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/v1/reservations/holds" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('asiento ya retenido responde 409', () => pm.response.to.have.status(409));",
+        "pm.test('conflicto contiene ProblemDetails', () => { const body = pm.response.json(); pm.expect(body.status).to.eql(409); pm.expect(body).to.have.property('title'); pm.expect(body).to.have.property('detail'); });"
+      ] } }]
+    },
+    {
+      "name": "08 — Liberar hold (204)",
+      "request": { "method": "DELETE", "header": [{ "key": "X-Hold-Token", "value": "{{holdToken}}" }, { "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/v1/reservations/holds/{{holdId}}" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('liberar responde 204 No Content', () => pm.response.to.have.status(204));",
+        "pm.test('204 no contiene cuerpo', () => pm.expect(pm.response.text()).to.eql(''));"
+      ] } }]
+    },
+    {
+      "name": "09 — Liberar hold inexistente (404 ProblemDetails)",
+      "request": { "method": "DELETE", "header": [{ "key": "X-Hold-Token", "value": "token-invalido-de-prueba" }, { "key": "Accept", "value": "application/problem+json" }], "url": "{{baseUrl}}/api/v1/reservations/holds/00000000-0000-0000-0000-000000000001" },
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('hold inexistente responde 404', () => pm.response.to.have.status(404));",
+        "pm.test('404 usa ProblemDetails', () => { const body = pm.response.json(); pm.expect(body.status).to.eql(404); pm.expect(body).to.have.property('title'); pm.expect(body).to.have.property('detail'); });"
+      ] } }]
+    }
+  ]
+}
