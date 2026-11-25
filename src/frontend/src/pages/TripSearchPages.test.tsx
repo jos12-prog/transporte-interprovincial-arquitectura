@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { AppRoutes } from '@/App';
+import { AuthProvider } from '@/auth/AuthContext';
 import type { TripSearchResult } from '@/api/trips';
 
 const sampleTrip: TripSearchResult = {
@@ -23,7 +24,7 @@ const sampleTrip: TripSearchResult = {
 function renderRoutes(path: string) {
   return render(
     <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={[path]}>
-      <AppRoutes />
+      <AuthProvider><AppRoutes /></AuthProvider>
     </MemoryRouter>,
   );
 }

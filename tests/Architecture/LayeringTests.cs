@@ -8,7 +8,7 @@ public sealed class LayeringTests
 {
     private static readonly (string Name, Assembly Domain, Assembly Application)[] Modules =
     [
-        ("IdentityAccess", typeof(TransportPlatform.Modules.IdentityAccess.Domain.Class1).Assembly, typeof(TransportPlatform.Modules.IdentityAccess.Application.Class1).Assembly),
+        ("IdentityAccess", typeof(TransportPlatform.Modules.IdentityAccess.Domain.Entities.User).Assembly, typeof(TransportPlatform.Modules.IdentityAccess.Application.UseCases.RegisterPassengerUseCase).Assembly),
         ("CompaniesAgencies", typeof(TransportPlatform.Modules.CompaniesAgencies.Domain.Entities.Company).Assembly, typeof(TransportPlatform.Modules.CompaniesAgencies.Application.Services.CompaniesAgenciesApi).Assembly),
         ("TransportScheduling", typeof(TransportPlatform.Modules.TransportScheduling.Domain.Entities.Route).Assembly, typeof(TransportPlatform.Modules.TransportScheduling.Application.Services.TransportSchedulingApi).Assembly),
         ("Reservations", typeof(TransportPlatform.Modules.Reservations.Domain.Entities.TripSeat).Assembly, typeof(TransportPlatform.Modules.Reservations.Application.Services.ReservationsApi).Assembly),

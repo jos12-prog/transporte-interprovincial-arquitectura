@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
 using Testcontainers.Redis;
@@ -35,7 +32,6 @@ public sealed class HealthEndpointTests : IAsyncLifetime
     public async Task HealthIsHealthyWhenAllContainersAreReachable()
     {
         var redisPort = _redis.GetMappedPublicPort(6379);
-        using var environment = OverrideContainerEnvironment(redisPort);
         using var factory = CreateFactory(redisPort);
         using var client = factory.CreateClient();
 
@@ -55,7 +51,6 @@ public sealed class HealthEndpointTests : IAsyncLifetime
     [Fact]
     public async Task HealthIsUnavailableWhenOneContainerEndpointCannotBeReached()
     {
-        using var environment = OverrideContainerEnvironment(redisPort: 1);
         using var factory = CreateFactory(redisPort: 1);
         using var client = factory.CreateClient();
 
@@ -68,14 +63,11 @@ public sealed class HealthEndpointTests : IAsyncLifetime
         Assert.DoesNotContain("Host=", body);
     }
 
-    private WebApplicationFactory<Program> CreateFactory(int redisPort)
+    private IntegrationWebApplicationFactory CreateFactory(int redisPort)
     {
         var values = GetContainerEnvironment(redisPort);
-        return new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
-            builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(values)));
+        return new IntegrationWebApplicationFactory(values);
     }
-
-    private IDisposable OverrideContainerEnvironment(int redisPort) => new EnvironmentScope(GetContainerEnvironment(redisPort));
 
     private Dictionary<string, string?> GetContainerEnvironment(int redisPort) => new()
     {
@@ -87,29 +79,4 @@ public sealed class HealthEndpointTests : IAsyncLifetime
         ["RABBITMQ_HOST"] = _rabbitMq.Hostname,
         ["RABBITMQ_PORT"] = _rabbitMq.GetMappedPublicPort(5672).ToString(),
     };
-
-    private sealed class EnvironmentScope : IDisposable
-    {
-        private readonly Dictionary<string, string?> _previousValues;
-
-        public EnvironmentScope(IReadOnlyDictionary<string, string?> values)
-        {
-            _previousValues = values.Keys.ToDictionary(
-                key => key,
-                key => Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.Process));
-
-            foreach (var (key, value) in values)
-            {
-                Environment.SetEnvironmentVariable(key, value, EnvironmentVariableTarget.Process);
-            }
-        }
-
-        public void Dispose()
-        {
-            foreach (var (key, value) in _previousValues)
-            {
-                Environment.SetEnvironmentVariable(key, value, EnvironmentVariableTarget.Process);
-            }
-        }
-    }
 }

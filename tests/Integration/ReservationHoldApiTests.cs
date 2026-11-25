@@ -3,10 +3,8 @@ using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 using Testcontainers.Redis;
@@ -151,16 +149,14 @@ public sealed class ReservationHoldApiTests
     {
         private readonly PostgreSqlContainer _postgres;
         private readonly RedisContainer _redis;
-        private readonly Dictionary<string, string?> _previousEnvironment;
-        public WebApplicationFactory<Program> Factory { get; }
+        public IntegrationWebApplicationFactory Factory { get; }
         public HttpClient Client { get; }
 
         private ReservationTestEnvironment(PostgreSqlContainer postgres, RedisContainer redis,
-            Dictionary<string, string?> previousEnvironment, WebApplicationFactory<Program> factory)
+            IntegrationWebApplicationFactory factory)
         {
             _postgres = postgres;
             _redis = redis;
-            _previousEnvironment = previousEnvironment;
             Factory = factory;
             Client = factory.CreateClient();
         }
@@ -181,19 +177,9 @@ public sealed class ReservationHoldApiTests
                 ["RABBITMQ_HOST"] = "127.0.0.1",
                 ["RABBITMQ_PORT"] = "1"
             };
-            var previous = settings.Keys.ToDictionary(key => key,
-                key => Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.Process));
-            foreach (var (key, value) in settings)
-            {
-                Environment.SetEnvironmentVariable(key, value, EnvironmentVariableTarget.Process);
-            }
-            var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(webHost =>
-            {
-                webHost.UseEnvironment("Development");
-                webHost.ConfigureAppConfiguration((_, builder) => builder.AddInMemoryCollection(settings));
-            });
+            var factory = new IntegrationWebApplicationFactory(settings);
             _ = factory.Server;
-            return new ReservationTestEnvironment(postgres, redis, previous, factory);
+            return new ReservationTestEnvironment(postgres, redis, factory);
         }
 
         public async Task<SeedTrip> FindSeedTripAsync()
@@ -261,10 +247,6 @@ public sealed class ReservationHoldApiTests
         {
             Client.Dispose();
             await Factory.DisposeAsync();
-            foreach (var (key, value) in _previousEnvironment)
-            {
-                Environment.SetEnvironmentVariable(key, value, EnvironmentVariableTarget.Process);
-            }
             await Task.WhenAll(_postgres.DisposeAsync().AsTask(), _redis.DisposeAsync().AsTask());
         }
     }

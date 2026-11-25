@@ -6,12 +6,86 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
-    { "key": "tripId", "value": "", "type": "string" },
-    { "key": "tripSeatId", "value": "", "type": "string" },
-    { "key": "elevenSeatIds", "value": "[]", "type": "string" },
-    { "key": "holdId", "value": "", "type": "string" },
-    { "key": "holdToken", "value": "", "type": "string" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "tripId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tripSeatId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "elevenSeatIds",
+      "value": "[]",
+      "type": "string"
+    },
+    {
+      "key": "holdId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "holdToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "passengerEmail",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "key": "passengerDni",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "key": "passengerPassword",
+      "type": "string",
+      "value": "RutaAndina-test-2026"
+    },
+    {
+      "key": "accessToken",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "key": "agentToken",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "key": "agentPassword",
+      "type": "string",
+      "value": "replace-with-IDENTITY_SEED_AGENT_PASSWORD"
+    },
+    {
+      "key": "agencyId",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "key": "otherAgencyId",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "key": "lockedIdentifier",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "key": "ipAttemptIdentifier",
+      "type": "string",
+      "value": ""
+    }
   ],
   "event": [
     {
@@ -29,76 +103,1480 @@
   "item": [
     {
       "name": "01 — Health (200)",
-      "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/health" },
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-        "pm.test('health responde 200', () => pm.response.to.have.status(200));",
-        "pm.test('health reporta todos los componentes', () => { const body = pm.response.json(); pm.expect(body.status).to.eql('healthy'); pm.expect(body.components).to.have.property('postgresql', 'healthy'); pm.expect(body.components).to.have.property('redis', 'healthy'); pm.expect(body.components).to.have.property('rabbitmq', 'healthy'); });"
-      ] } }]
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('health responde 200', () => pm.response.to.have.status(200));",
+              "pm.test('health reporta todos los componentes', () => { const body = pm.response.json(); pm.expect(body.status).to.eql('healthy'); pm.expect(body.components).to.have.property('postgresql', 'healthy'); pm.expect(body.components).to.have.property('redis', 'healthy'); pm.expect(body.components).to.have.property('rabbitmq', 'healthy'); });"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "02 — Búsqueda de viajes (200 + X-Cache)",
-      "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": { "raw": "{{baseUrl}}/api/v1/trips/search?origin=Ayacucho&destination=Lima&date={{serviceDate}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "trips", "search"], "query": [{ "key": "origin", "value": "Ayacucho" }, { "key": "destination", "value": "Lima" }, { "key": "date", "value": "{{serviceDate}}" }] } },
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-        "pm.test('búsqueda responde 200', () => pm.response.to.have.status(200));",
-        "pm.test('X-Cache indica HIT o MISS', () => pm.expect(['HIT', 'MISS']).to.include(pm.response.headers.get('X-Cache')));",
-        "pm.test('hay viajes de semilla', () => { const trips = pm.response.json(); pm.expect(trips).to.be.an('array').that.is.not.empty; pm.expect(trips[0]).to.have.property('tripId'); pm.collectionVariables.set('tripId', trips[0].tripId); });"
-      ] } }]
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/trips/search?origin=Ayacucho&destination=Lima&date={{serviceDate}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "trips",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "origin",
+              "value": "Ayacucho"
+            },
+            {
+              "key": "destination",
+              "value": "Lima"
+            },
+            {
+              "key": "date",
+              "value": "{{serviceDate}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('búsqueda responde 200', () => pm.response.to.have.status(200));",
+              "pm.test('X-Cache indica HIT o MISS', () => pm.expect(['HIT', 'MISS']).to.include(pm.response.headers.get('X-Cache')));",
+              "pm.test('hay viajes de semilla', () => { const trips = pm.response.json(); pm.expect(trips).to.be.an('array').that.is.not.empty; pm.expect(trips[0]).to.have.property('tripId'); pm.collectionVariables.set('tripId', trips[0].tripId); });"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "03 — Búsqueda con fecha inválida (400 ProblemDetails)",
-      "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/problem+json" }], "url": "{{baseUrl}}/api/v1/trips/search?origin=Ayacucho&destination=Lima&date=no-es-fecha" },
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-        "pm.test('fecha inválida responde 400', () => pm.response.to.have.status(400));",
-        "pm.test('400 usa ValidationProblemDetails', () => { const body = pm.response.json(); pm.expect(body.status).to.eql(400); pm.expect(body).to.have.property('title'); pm.expect(body).to.have.property('errors'); });"
-      ] } }]
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/problem+json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/trips/search?origin=Ayacucho&destination=Lima&date=no-es-fecha"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('fecha inválida responde 400', () => pm.response.to.have.status(400));",
+              "pm.test('400 usa ValidationProblemDetails', () => { const body = pm.response.json(); pm.expect(body.status).to.eql(400); pm.expect(body).to.have.property('title'); pm.expect(body).to.have.property('errors'); });"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "04 — Mapa de asientos (200)",
-      "request": { "method": "GET", "header": [{ "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/v1/trips/{{tripId}}/seats" },
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-        "pm.test('mapa responde 200', () => pm.response.to.have.status(200));",
-        "pm.test('mapa contiene estados y al menos once asientos libres', () => { const body = pm.response.json(); pm.expect(body.seats).to.be.an('array'); const free = body.seats.filter(seat => seat.status === 'Available'); pm.expect(free.length).to.be.at.least(11); pm.expect(free[0]).to.have.property('tripSeatId'); pm.collectionVariables.set('tripSeatId', free[0].tripSeatId); pm.collectionVariables.set('elevenSeatIds', JSON.stringify(free.slice(0, 11).map(seat => seat.tripSeatId))); });"
-      ] } }]
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/trips/{{tripId}}/seats"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('mapa responde 200', () => pm.response.to.have.status(200));",
+              "pm.test('mapa contiene estados y al menos once asientos libres', () => { const body = pm.response.json(); pm.expect(body.seats).to.be.an('array'); const free = body.seats.filter(seat => seat.status === 'Available'); pm.expect(free.length).to.be.at.least(11); pm.expect(free[0]).to.have.property('tripSeatId'); pm.collectionVariables.set('tripSeatId', free[0].tripSeatId); pm.collectionVariables.set('elevenSeatIds', JSON.stringify(free.slice(0, 11).map(seat => seat.tripSeatId))); });"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "05 — Crear hold (200)",
-      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"tripId\": \"{{tripId}}\",\n  \"tripSeatIds\": [\"{{tripSeatId}}\"]\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/v1/reservations/holds" },
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-        "pm.test('hold responde 200', () => pm.response.to.have.status(200));",
-        "pm.test('hold retorna identificador, token opaco y vencimiento', () => { const body = pm.response.json(); pm.expect(body.reservationId).to.be.a('string').and.not.empty; pm.expect(body.holdToken).to.be.a('string').and.not.empty; pm.expect(body.expiresAtUtc).to.be.a('string').and.not.empty; pm.collectionVariables.set('holdId', body.reservationId); pm.collectionVariables.set('holdToken', body.holdToken); });"
-      ] } }]
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tripId\": \"{{tripId}}\",\n  \"tripSeatIds\": [\"{{tripSeatId}}\"]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/v1/reservations/holds"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('hold responde 200', () => pm.response.to.have.status(200));",
+              "pm.test('hold retorna identificador, token opaco y vencimiento', () => { const body = pm.response.json(); pm.expect(body.reservationId).to.be.a('string').and.not.empty; pm.expect(body.holdToken).to.be.a('string').and.not.empty; pm.expect(body.expiresAtUtc).to.be.a('string').and.not.empty; pm.collectionVariables.set('holdId', body.reservationId); pm.collectionVariables.set('holdToken', body.holdToken); });"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "06 — Más de 10 asientos (400 ProblemDetails)",
-      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/problem+json" }], "body": { "mode": "raw", "raw": "{\n  \"tripId\": \"{{tripId}}\",\n  \"tripSeatIds\": {{elevenSeatIds}}\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/v1/reservations/holds" },
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-        "pm.test('más de diez asientos responde 400', () => pm.response.to.have.status(400));",
-        "pm.test('respuesta 400 es ProblemDetails', () => { const body = pm.response.json(); pm.expect(body.status).to.eql(400); pm.expect(body).to.have.property('title'); pm.expect(body).to.have.property('detail'); });"
-      ] } }]
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/problem+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tripId\": \"{{tripId}}\",\n  \"tripSeatIds\": {{elevenSeatIds}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/v1/reservations/holds"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('más de diez asientos responde 400', () => pm.response.to.have.status(400));",
+              "pm.test('respuesta 400 es ProblemDetails', () => { const body = pm.response.json(); pm.expect(body.status).to.eql(400); pm.expect(body).to.have.property('title'); pm.expect(body).to.have.property('detail'); });"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "07 — Asiento retenido (409 ProblemDetails)",
-      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Accept", "value": "application/problem+json" }], "body": { "mode": "raw", "raw": "{\n  \"tripId\": \"{{tripId}}\",\n  \"tripSeatIds\": [\"{{tripSeatId}}\"]\n}", "options": { "raw": { "language": "json" } } }, "url": "{{baseUrl}}/api/v1/reservations/holds" },
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-        "pm.test('asiento ya retenido responde 409', () => pm.response.to.have.status(409));",
-        "pm.test('conflicto contiene ProblemDetails', () => { const body = pm.response.json(); pm.expect(body.status).to.eql(409); pm.expect(body).to.have.property('title'); pm.expect(body).to.have.property('detail'); });"
-      ] } }]
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/problem+json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tripId\": \"{{tripId}}\",\n  \"tripSeatIds\": [\"{{tripSeatId}}\"]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/v1/reservations/holds"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('asiento ya retenido responde 409', () => pm.response.to.have.status(409));",
+              "pm.test('conflicto contiene ProblemDetails', () => { const body = pm.response.json(); pm.expect(body.status).to.eql(409); pm.expect(body).to.have.property('title'); pm.expect(body).to.have.property('detail'); });"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "08 — Liberar hold (204)",
-      "request": { "method": "DELETE", "header": [{ "key": "X-Hold-Token", "value": "{{holdToken}}" }, { "key": "Accept", "value": "application/json" }], "url": "{{baseUrl}}/api/v1/reservations/holds/{{holdId}}" },
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-        "pm.test('liberar responde 204 No Content', () => pm.response.to.have.status(204));",
-        "pm.test('204 no contiene cuerpo', () => pm.expect(pm.response.text()).to.eql(''));"
-      ] } }]
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "X-Hold-Token",
+            "value": "{{holdToken}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/reservations/holds/{{holdId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('liberar responde 204 No Content', () => pm.response.to.have.status(204));",
+              "pm.test('204 no contiene cuerpo', () => pm.expect(pm.response.text()).to.eql(''));"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "09 — Liberar hold inexistente (404 ProblemDetails)",
-      "request": { "method": "DELETE", "header": [{ "key": "X-Hold-Token", "value": "token-invalido-de-prueba" }, { "key": "Accept", "value": "application/problem+json" }], "url": "{{baseUrl}}/api/v1/reservations/holds/00000000-0000-0000-0000-000000000001" },
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-        "pm.test('hold inexistente responde 404', () => pm.response.to.have.status(404));",
-        "pm.test('404 usa ProblemDetails', () => { const body = pm.response.json(); pm.expect(body.status).to.eql(404); pm.expect(body).to.have.property('title'); pm.expect(body).to.have.property('detail'); });"
-      ] } }]
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "X-Hold-Token",
+            "value": "token-invalido-de-prueba"
+          },
+          {
+            "key": "Accept",
+            "value": "application/problem+json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/v1/reservations/holds/00000000-0000-0000-0000-000000000001"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('hold inexistente responde 404', () => pm.response.to.have.status(404));",
+              "pm.test('404 usa ProblemDetails', () => { const body = pm.response.json(); pm.expect(body.status).to.eql(404); pm.expect(body).to.have.property('title'); pm.expect(body).to.have.property('detail'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Autenticación e identidad",
+      "item": [
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"fullName\":\"Pasajero Postman\",\"dni\":\"{{passengerDni}}\",\"email\":\"{{passengerEmail}}\",\"phoneNumber\":\"999111222\",\"password\":\"{{passengerPassword}}\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "10 — Registrar pasajero (201)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "const seed = Date.now().toString();",
+                  "pm.collectionVariables.set('passengerEmail', 'postman-' + seed + '@example.test');",
+                  "pm.collectionVariables.set('passengerDni', String(10000000 + Math.floor(Math.random() * 89999999)));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('registro responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('respuesta contiene el id de usuario', () => pm.expect(pm.response.json().userId).to.be.a('string'));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"fullName\":\"Pasajero Postman\",\"dni\":\"123\",\"email\":\"invalid-email\",\"phoneNumber\":\"999111222\",\"password\":\"123\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "11 — Registro inválido (400 ProblemDetails)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('registro inválido responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('400 usa ProblemDetails', () => { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json'); pm.expect(pm.response.json().status).to.eql(400); });"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"fullName\":\"Pasajero Postman\",\"dni\":\"{{passengerDni}}\",\"email\":\"{{passengerEmail}}\",\"phoneNumber\":\"999111222\",\"password\":\"{{passengerPassword}}\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "12 — Registro duplicado (409 ProblemDetails)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('registro duplicado responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('conflicto usa ProblemDetails', () => pm.expect(pm.response.json().status).to.eql(409));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{passengerEmail}}\",\"password\":\"{{passengerPassword}}\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "13 — Login pasajero (200, role=passenger)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('login responde 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('claim role usa código técnico passenger', () => pm.expect(body.user.role).to.eql('passenger'));",
+                  "pm.collectionVariables.set('accessToken', body.accessToken);"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/me",
+            "method": "GET",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{accessToken}}",
+                "key": "Authorization"
+              }
+            ]
+          },
+          "name": "14 — Perfil autenticado (200)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('/me responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('perfil usa role técnico y no expone hash', () => { const body = pm.response.json(); pm.expect(body.role).to.eql('passenger'); pm.expect(body).not.to.have.property('passwordHash'); });"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/me",
+            "method": "GET",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              }
+            ]
+          },
+          "name": "15 — Perfil anónimo (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('/me anónimo responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"agente@andesexpress.test\",\"password\":\"{{agentPassword}}\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "16 — Login de agente (200, role=agent)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('login de agente responde 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('claim role usa código técnico agent', () => pm.expect(body.user.role).to.eql('agent'));",
+                  "pm.collectionVariables.set('agentToken', body.accessToken);"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/staff/agencies",
+            "method": "GET",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agentToken}}",
+                "key": "Authorization"
+              }
+            ]
+          },
+          "name": "17 — Agencias asignadas (200)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('agencias asignadas responden 200', () => pm.response.to.have.status(200));",
+                  "const agencies = pm.response.json();",
+                  "pm.test('se devuelve al menos una agencia', () => pm.expect(agencies.length).to.be.greaterThan(0));",
+                  "pm.collectionVariables.set('agencyId', agencies[0].agencyId);",
+                  "pm.collectionVariables.set('otherAgencyId', pm.variables.replaceIn('{{$randomUUID}}'));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/staff/agencies/{{agencyId}}",
+            "method": "GET",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agentToken}}",
+                "key": "Authorization"
+              }
+            ]
+          },
+          "name": "18 — Agencia dentro del ámbito (200)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('agencia asignada responde 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/staff/agencies/{{otherAgencyId}}",
+            "method": "GET",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agentToken}}",
+                "key": "Authorization"
+              }
+            ]
+          },
+          "name": "19 — Agencia fuera del ámbito (403 ProblemDetails)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('agencia fuera del ámbito responde 403', () => pm.response.to.have.status(403));",
+                  "pm.test('403 usa ProblemDetails', () => pm.expect(pm.response.json().status).to.eql(403));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Límites de login (ejecución secuencial en una instancia recién iniciada)",
+      "item": [
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{lockedIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "20 — Login incorrecto: fallo 1 de 5 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('lockedIdentifier', 'postman-locked-' + Date.now() + '@example.test');"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('fallo de login responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{lockedIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "20.2 — Login incorrecto: fallo 2 de 5 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('fallo de login responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{lockedIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "20.3 — Login incorrecto: fallo 3 de 5 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('fallo de login responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{lockedIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "20.4 — Login incorrecto: fallo 4 de 5 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('fallo de login responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{lockedIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "20.5 — Login incorrecto: fallo 5 de 5 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('fallo de login responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{lockedIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "21 — Identificador bloqueado (429 ProblemDetails)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('sexto fallo responde 429', () => pm.response.to.have.status(429));",
+                  "pm.test('429 incluye Retry-After y ProblemDetails', () => { pm.expect(pm.response.headers.get('Retry-After')).to.exist; pm.expect(pm.response.json().status).to.eql(429); });"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "22.9 — Límite por IP: solicitud 9 de 20 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-9@example.test');"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('solicitud 9 de IP responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "22.10 — Límite por IP: solicitud 10 de 20 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-10@example.test');"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('solicitud 10 de IP responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "22.11 — Límite por IP: solicitud 11 de 20 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-11@example.test');"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('solicitud 11 de IP responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "22.12 — Límite por IP: solicitud 12 de 20 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-12@example.test');"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('solicitud 12 de IP responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "22.13 — Límite por IP: solicitud 13 de 20 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-13@example.test');"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('solicitud 13 de IP responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "22.14 — Límite por IP: solicitud 14 de 20 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-14@example.test');"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('solicitud 14 de IP responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "22.15 — Límite por IP: solicitud 15 de 20 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-15@example.test');"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('solicitud 15 de IP responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "22.16 — Límite por IP: solicitud 16 de 20 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-16@example.test');"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('solicitud 16 de IP responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "22.17 — Límite por IP: solicitud 17 de 20 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-17@example.test');"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('solicitud 17 de IP responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "22.18 — Límite por IP: solicitud 18 de 20 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-18@example.test');"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('solicitud 18 de IP responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "22.19 — Límite por IP: solicitud 19 de 20 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-19@example.test');"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('solicitud 19 de IP responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "22.20 — Límite por IP: solicitud 20 de 20 (401)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-20@example.test');"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('solicitud 20 de IP responde 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "name": "23 — Límite por IP superado (429)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('solicitud 21 de IP responde 429', () => pm.response.to.have.status(429));",
+                  "pm.test('429 incluye Retry-After y ProblemDetails', () => { pm.expect(pm.response.headers.get('Retry-After')).to.exist; pm.expect(pm.response.json().status).to.eql(429); });"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

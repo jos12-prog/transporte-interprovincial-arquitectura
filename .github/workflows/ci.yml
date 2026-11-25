@@ -109,6 +109,24 @@ jobs:
         working-directory: tests/api
         run: npm ci
 
+      - name: Generate ephemeral JWT keys and test credentials
+        shell: bash
+        run: |
+          bash -n scripts/generate-dev-jwt-keys.sh
+          sh scripts/generate-dev-jwt-keys.sh
+          openssl pkey -in .secrets/jwt/private.pem -pubout -out /tmp/jwt-public-check.pem
+          cmp .secrets/jwt/public.pem /tmp/jwt-public-check.pem
+          {
+            echo "JWT_ISSUER=transport-platform-ci"
+            echo "JWT_KEYS_DIRECTORY=./.secrets/jwt"
+            echo "JWT_SIGNING_PRIVATE_KEY_PATH=/run/jwt-keys/private.pem"
+            echo "JWT_SIGNING_PUBLIC_KEY_PATH=/run/jwt-keys/public.pem"
+            echo "LOGIN_ATTEMPT_HMAC_KEY=$(openssl rand -hex 32)"
+            echo "IDENTITY_SEED_SUPER_ADMIN_PASSWORD=$(openssl rand -hex 20)"
+            echo "IDENTITY_SEED_AGENCY_ADMIN_PASSWORD=$(openssl rand -hex 20)"
+            echo "IDENTITY_SEED_AGENT_PASSWORD=CI-agent-password-2026"
+          } >> "$GITHUB_ENV"
+
       - name: Start Compose stack
         run: docker compose up --build -d
 
@@ -130,6 +148,34 @@ jobs:
         env:
           API_BASE_URL: http://localhost:8080
         run: npm run test -- --coverage
+
+      - name: Restart API to reset in-memory IP limiter
+        run: docker compose restart api
+
+      - name: Wait for API after restart
+        shell: bash
+        run: |
+          for attempt in {1..60}; do
+            if curl --fail --silent http://localhost:8080/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose ps
+          exit 1
+
+      - name: Run Sprint 2 Postman collection with Newman
+        env:
+          IDENTITY_SEED_AGENT_PASSWORD: CI-agent-password-2026
+        run: npx --yes newman run tests/postman/RutaAndina-Sprint2.postman_collection.json --env-var "agentPassword=$IDENTITY_SEED_AGENT_PASSWORD" --reporters cli,json --reporter-json-export docs/evidencias/postman-sprint2.json
+
+      - name: Upload Postman report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: postman-sprint2
+          path: docs/evidencias/postman-sprint2.json
+          if-no-files-found: warn
 
       - name: Set up k6
         uses: grafana/setup-k6-action@v1
@@ -159,7 +205,9 @@ jobs:
 
       - name: Stop Compose stack
         if: always()
-        run: docker compose down --volumes --remove-orphans
+        run: |
+          docker compose down --volumes --remove-orphans
+          rm -rf .secrets/jwt
 
   openspec:
     name: OpenSpec validation
