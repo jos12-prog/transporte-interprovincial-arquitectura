@@ -14,6 +14,9 @@ public sealed class AgencyConfiguration : IEntityTypeConfiguration<Agency>
         builder.Property(agency => agency.CompanyId).HasColumnName("company_id").IsRequired();
         builder.Property(agency => agency.Name).HasColumnName("name").HasMaxLength(160).IsRequired();
         builder.Property(agency => agency.City).HasColumnName("city").HasMaxLength(100).IsRequired();
+        builder.Property(agency => agency.Address).HasColumnName("address").HasMaxLength(240);
+        builder.Property(agency => agency.Phone).HasColumnName("phone").HasMaxLength(40);
+        builder.Property(agency => agency.IsActive).HasColumnName("is_active").HasDefaultValue(true).IsRequired();
         builder.HasOne<Company>()
             .WithMany()
             .HasForeignKey(agency => agency.CompanyId)

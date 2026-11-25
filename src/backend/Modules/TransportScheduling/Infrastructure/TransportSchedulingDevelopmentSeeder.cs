@@ -16,6 +16,14 @@ public static class TransportSchedulingDevelopmentSeeder
     {
         await AddMissingAsync(db, db.Routes, routes, item => item.Id, cancellationToken);
         await AddMissingAsync(db, db.VehicleModels, models, item => item.Id, cancellationToken);
+        var modelIds = models.Select(model => model.Id).ToArray();
+        var existingModels = await db.VehicleModels.Where(model => modelIds.Contains(model.Id)).ToListAsync(cancellationToken);
+        var seededModels = models.ToDictionary(model => model.Id);
+        foreach (var existing in existingModels)
+        {
+            existing.SetCategory(seededModels[existing.Id].Category);
+        }
+        await db.SaveChangesAsync(cancellationToken);
         await AddMissingAsync(db, db.Vehicles, vehicles, item => item.Id, cancellationToken);
         await AddMissingAsync(db, db.Trips, trips, item => item.Id, cancellationToken);
     }

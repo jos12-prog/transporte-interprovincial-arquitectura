@@ -1,47 +1,12 @@
 import { ArrowLeft, Armchair, Clock3, LoaderCircle, RotateCcw } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { createReservationHold, getTripSeatMap, releaseReservationHold, TripSeatMap, TripSeatMapSeat } from '@/api/reservations';
-
-const stateLabels: Record<TripSeatMapSeat['status'], string> = {
-  Available: 'Libre',
-  Held: 'Pendiente de pago',
-  Occupied: 'Ocupado',
-};
+import { createReservationHold, getTripSeatMap, releaseReservationHold, TripSeatMap } from '@/api/reservations';
+import { SeatLayoutView } from '@/components/seats/SeatLayoutView';
 
 function formatCountdown(expiresAtUtc: string, now: number): string {
   const seconds = Math.max(0, Math.ceil((new Date(expiresAtUtc).getTime() - now) / 1000));
   return `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
-}
-
-function SeatButton({
-  seat,
-  selected,
-  onToggle,
-}: {
-  seat: TripSeatMapSeat;
-  selected: boolean;
-  onToggle: (seatNumber: number) => void;
-}) {
-  const unavailable = seat.status !== 'Available';
-  const label = selected ? 'Seleccionado' : stateLabels[seat.status];
-  return (
-    <button
-      type="button"
-      aria-label={`Asiento ${seat.number}, ${label}`}
-      aria-pressed={selected}
-      disabled={unavailable}
-      onClick={() => onToggle(seat.number)}
-      className={`grid h-14 w-14 place-items-center rounded-t-xl rounded-b-md border-2 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 ${
-        selected ? 'border-primary-700 bg-primary-700 text-white' :
-          seat.status === 'Held' ? 'cursor-not-allowed border-dashed border-accent-500 bg-accent-100 text-neutral-600' :
-            seat.status === 'Occupied' ? 'cursor-not-allowed border-neutral-200 bg-neutral-200 text-neutral-600 line-through' :
-              'border-primary-600 bg-white text-primary-700 hover:bg-primary-100'
-      }`}
-    >
-      {seat.number.toString().padStart(2, '0')}
-    </button>
-  );
 }
 
 export function SeatSelectionPage() {
@@ -78,8 +43,6 @@ export function SeatSelectionPage() {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, [hold]);
-
-  const floors = useMemo(() => [...new Set((seatMap?.seats ?? []).map(seat => seat.floor))].sort(), [seatMap]);
 
   function toggleSeat(number: number) {
     setSelected(current => current.includes(number) ? current.filter(item => item !== number) :
@@ -150,23 +113,9 @@ export function SeatSelectionPage() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="rounded-card border border-neutral-200 bg-white p-4 shadow-sm sm:p-6">
-          <div className="mb-5 flex items-center justify-center gap-2 rounded-button bg-neutral-50 py-2 text-xs font-bold tracking-[0.2em] text-neutral-600">FRENTE DEL VEHÍCULO</div>
           {loading ? <div role="status" aria-label="Cargando mapa" className="flex justify-center py-16"><LoaderCircle className="animate-spin text-primary-600" /></div> :
             !seatMap?.seats.length ? <p className="py-12 text-center text-neutral-600">No hay un mapa disponible para este viaje.</p> :
-              <div className="space-y-8">
-                {floors.map(floor => {
-                  const floorSeats = seatMap.seats.filter(seat => seat.floor === floor);
-                  const hasPositions = floorSeats.every(seat => seat.row !== null && seat.column !== null);
-                  return <section key={floor} aria-label={floors.length > 1 ? `Piso ${floor}` : 'Mapa de asientos'} className="mx-auto max-w-xl rounded-[2rem] border-2 border-neutral-200 bg-neutral-50 p-5">
-                    {floors.length > 1 && <h2 className="mb-4 text-center font-semibold text-neutral-700">Piso {floor}</h2>}
-                    <div className="mx-auto grid w-fit gap-2" style={{ gridTemplateColumns: hasPositions ? `repeat(${Math.max(...floorSeats.map(seat => seat.column ?? 1))}, minmax(3.25rem, 1fr))` : 'repeat(4, minmax(3.25rem, 1fr))' }}>
-                      {floorSeats.map((seat, index) => <div key={seat.number} style={hasPositions ? { gridRow: seat.row!, gridColumn: seat.column! } : { gridRow: Math.floor(index / 4) + 1, gridColumn: (index % 4) + 1 }}>
-                        <SeatButton seat={seat} selected={selected.includes(seat.number)} onToggle={toggleSeat} />
-                      </div>)}
-                    </div>
-                  </section>;
-                })}
-              </div>}
+              <SeatLayoutView seats={seatMap.seats} mode="select" selectedNumbers={selected} onSeatToggle={toggleSeat} ariaLabel="Mapa de asientos" />}
         </div>
 
         <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">

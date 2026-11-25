@@ -25,6 +25,7 @@ using TransportPlatform.Modules.SalesPayments.Presentation;
 using TransportPlatform.Modules.TransportScheduling.Infrastructure;
 using TransportPlatform.Modules.TransportScheduling.Presentation;
 using TransportPlatform.Shared.Infrastructure;
+using TransportPlatform.Host;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UsePlatformSerilog();
@@ -32,11 +33,7 @@ builder.Services.AddSharedInfrastructure(builder.Configuration);
 builder.Services.AddIdentityAccessInfrastructure(builder.Configuration);
 builder.Services.AddAuthentication("Bearer")
     .AddScheme<AuthenticationSchemeOptions, JwtBearerHandler>("Bearer", _ => { });
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("StaffAgencies", policy => policy.RequireAuthenticatedUser().RequireRole("agent", "agency_admin"));
-    options.AddPolicy("AgencyScope", policy => policy.RequireAuthenticatedUser().AddRequirements(new AgencyScopeRequirement()));
-});
+builder.Services.AddPlatformAuthorization();
 builder.Services.AddRateLimiter(options =>
 {
     options.AddPolicy("login-by-ip", httpContext => RateLimitPartition.GetFixedWindowLimiter(

@@ -18,7 +18,10 @@ public static class InfrastructureRegistration
         services.AddDbContext<TransportSchedulingDbContext>(options => options.UseNpgsql(connectionString,
             postgres => postgres.MigrationsHistoryTable("__EFMigrationsHistory", "transport_scheduling")));
         services.AddScoped<ITripSearchReadRepository, EfTripSearchReadRepository>();
-        services.AddScoped<ITransportSchedulingApi, TransportSchedulingApi>();
+        services.AddScoped<IVehicleModelAdministrationRepository, EfVehicleModelAdministrationRepository>();
+        services.AddScoped<TransportSchedulingApi>();
+        services.AddScoped<ITransportSchedulingApi>(provider => provider.GetRequiredService<TransportSchedulingApi>());
+        services.AddScoped<ITransportSchedulingAdminApi>(provider => provider.GetRequiredService<TransportSchedulingApi>());
         return services;
     }
 }

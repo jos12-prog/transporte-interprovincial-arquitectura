@@ -30,6 +30,11 @@ namespace TransportPlatform.Modules.CompaniesAgencies.Infrastructure.Persistence
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("Address")
+                        .HasMaxLength(240)
+                        .HasColumnType("character varying(240)")
+                        .HasColumnName("address");
+
                     b.Property<string>("City")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -40,11 +45,22 @@ namespace TransportPlatform.Modules.CompaniesAgencies.Infrastructure.Persistence
                         .HasColumnType("uuid")
                         .HasColumnName("company_id");
 
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(160)
                         .HasColumnType("character varying(160)")
                         .HasColumnName("name");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("phone");
 
                     b.HasKey("Id");
 
@@ -60,13 +76,38 @@ namespace TransportPlatform.Modules.CompaniesAgencies.Infrastructure.Persistence
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("ContactName")
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)")
+                        .HasColumnName("contact_name");
+
+                    b.Property<string>("ContactPhone")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("contact_phone");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(160)
                         .HasColumnType("character varying(160)")
                         .HasColumnName("name");
 
+                    b.Property<string>("TaxId")
+                        .HasMaxLength(11)
+                        .HasColumnType("character varying(11)")
+                        .HasColumnName("tax_id");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TaxId")
+                        .IsUnique()
+                        .HasFilter("tax_id IS NOT NULL");
 
                     b.ToTable("companies", "companies_agencies");
                 });

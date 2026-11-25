@@ -6,12 +6,15 @@ public sealed class Agency
     public Guid CompanyId { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public string City { get; private set; } = string.Empty;
+    public string? Address { get; private set; }
+    public string? Phone { get; private set; }
+    public bool IsActive { get; private set; } = true;
 
     private Agency()
     {
     }
 
-    public Agency(Guid id, Guid companyId, string name, string city)
+    public Agency(Guid id, Guid companyId, string name, string city, string? address = null, string? phone = null)
     {
         if (id == Guid.Empty)
         {
@@ -27,5 +30,20 @@ public sealed class Agency
         CompanyId = companyId;
         Name = Company.RequireName(name, nameof(name));
         City = Company.RequireName(city, nameof(city));
+        Address = NormalizeOptional(address);
+        Phone = NormalizeOptional(phone);
     }
+
+    public void UpdateProfile(string name, string city, string? address, string? phone)
+    {
+        Name = Company.RequireName(name, nameof(name));
+        City = Company.RequireName(city, nameof(city));
+        Address = NormalizeOptional(address);
+        Phone = NormalizeOptional(phone);
+    }
+
+    public void SetActive(bool isActive) => IsActive = isActive;
+
+    private static string? NormalizeOptional(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }
