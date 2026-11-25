@@ -1,12 +1,31 @@
-import { Building2, LayoutDashboard, Settings, Users } from 'lucide-react';
-import { Link, Outlet } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Building2, LayoutDashboard, LogOut, Settings, Users } from 'lucide-react';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import logo from '@/assets/brand/logo-horizontal.svg';
+import { getStaffAgencies } from '@/api/identity';
+import { useAuth } from '@/auth/AuthContext';
 
 interface StaffShellProps {
   role: string;
 }
 
 export function StaffShell({ role }: StaffShellProps) {
+  const { session, signOut } = useAuth();
+  const [agencies, setAgencies] = useState<Array<{ agencyId: string; agencyName: string; city: string }>>([]);
+  const [agencyId, setAgencyId] = useState('');
+  const [agencyError, setAgencyError] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (session?.user.role !== 'agency_admin') return;
+    getStaffAgencies(session.accessToken).then(setAgencies).catch((error: unknown) => setAgencyError(error instanceof Error ? error.message : 'No se pudieron cargar las agencias.'));
+  }, [session]);
+
+  function logout() {
+    signOut();
+    navigate('/personal/login', { replace: true });
+  }
+
   return (
     <div className="min-h-screen md:flex">
       <aside className="flex w-full flex-col bg-primary-900 text-white md:min-h-screen md:w-64">
@@ -35,9 +54,14 @@ export function StaffShell({ role }: StaffShellProps) {
       <div className="min-w-0 flex-1">
         <header className="flex h-16 items-center justify-between border-b border-neutral-200 bg-white px-6">
           <span className="text-sm font-medium text-neutral-600">Espacio de trabajo</span>
-          <span className="rounded-pill bg-primary-100 px-3 py-1 text-xs font-semibold text-primary-700">{role}</span>
+          <div className="flex items-center gap-3">
+            {session?.user.role === 'agency_admin' ? <label className="flex items-center gap-2 text-xs text-neutral-600">Agencia<select aria-label="Agencia activa" className="min-h-9 rounded-button border border-neutral-200 bg-white px-3 text-sm text-neutral-900" value={agencyId} onChange={event => setAgencyId(event.target.value)}><option value="">Seleccionar</option>{agencies.map(agency => <option key={agency.agencyId} value={agency.agencyId}>{agency.agencyName}</option>)}</select></label> : null}
+            <span className="rounded-pill bg-primary-100 px-3 py-1 text-xs font-semibold text-primary-700">{role}</span>
+            <button onClick={logout} type="button" className="inline-flex min-h-9 items-center gap-2 rounded-button px-3 text-sm text-neutral-700 hover:bg-neutral-50"><LogOut aria-hidden="true" size={16} /><span>Cerrar sesión</span></button>
+          </div>
         </header>
         <main className="mx-auto max-w-container px-page-gutter py-8">
+          {agencyError ? <p role="alert" className="mb-4 text-sm text-danger-700">{agencyError}</p> : null}
           <Outlet />
         </main>
       </div>

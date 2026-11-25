@@ -42,6 +42,7 @@ public static class DevelopmentDataSeeder
             new Agency(Id($"agency:{company.Id:N}:{city}"), company.Id, $"{company.Name} - {city}", city))).ToArray();
         await CompaniesAgenciesDevelopmentSeeder.SeedAsync(
             scope.ServiceProvider.GetRequiredService<CompaniesAgenciesDbContext>(), companies, agencies, cancellationToken);
+        await DevelopmentIdentitySeeder.SeedAsync(scope.ServiceProvider, cancellationToken);
 
         var models = StandardVehicleModels.Create();
         var modelByName = models.ToDictionary(model => model.Name);

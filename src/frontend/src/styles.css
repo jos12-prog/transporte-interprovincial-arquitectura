@@ -20,3 +20,9 @@ button,
 a {
   -webkit-tap-highlight-color: transparent;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-auth-enter { animation-name: auth-fade !important; }
+  .animate-menu-in { animation: none !important; }
+  .animate-spin { animation: none !important; }
+}

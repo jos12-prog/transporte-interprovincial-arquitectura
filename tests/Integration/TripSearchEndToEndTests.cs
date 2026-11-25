@@ -1,8 +1,5 @@
 using System.Net.Http.Json;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 using Testcontainers.Redis;
@@ -38,12 +35,7 @@ public sealed class TripSearchEndToEndTests
             ["RABBITMQ_HOST"] = "127.0.0.1",
             ["RABBITMQ_PORT"] = "1"
         };
-        using var environment = new EnvironmentScope(configuration);
-        using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(webHost =>
-        {
-            webHost.UseEnvironment("Development");
-            webHost.ConfigureAppConfiguration((_, builder) => builder.AddInMemoryCollection(configuration));
-        });
+        using var factory = new IntegrationWebApplicationFactory(configuration);
         using var client = factory.CreateClient();
 
         var serviceDate = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(-5)).DateTime);
@@ -112,28 +104,4 @@ public sealed class TripSearchEndToEndTests
 
     private sealed record SeatSnapshot(Guid TripId, int SeatNumber, TripSeatStatus Status);
 
-    private sealed class EnvironmentScope : IDisposable
-    {
-        private readonly Dictionary<string, string?> _previousValues;
-
-        public EnvironmentScope(IReadOnlyDictionary<string, string?> values)
-        {
-            _previousValues = values.Keys.ToDictionary(
-                key => key,
-                key => Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.Process));
-
-            foreach (var (key, value) in values)
-            {
-                Environment.SetEnvironmentVariable(key, value, EnvironmentVariableTarget.Process);
-            }
-        }
-
-        public void Dispose()
-        {
-            foreach (var (key, value) in _previousValues)
-            {
-                Environment.SetEnvironmentVariable(key, value, EnvironmentVariableTarget.Process);
-            }
-        }
-    }
 }

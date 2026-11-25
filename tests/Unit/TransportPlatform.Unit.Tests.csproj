@@ -16,6 +16,9 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="../../src/backend/Shared/TransportPlatform.Shared.Infrastructure/TransportPlatform.Shared.Infrastructure.csproj" />
     <ProjectReference Include="../../src/backend/Modules/CompaniesAgencies/Domain/TransportPlatform.Modules.CompaniesAgencies.Domain.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/IdentityAccess/Domain/TransportPlatform.Modules.IdentityAccess.Domain.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/IdentityAccess/Application/TransportPlatform.Modules.IdentityAccess.Application.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/IdentityAccess/Infrastructure/TransportPlatform.Modules.IdentityAccess.Infrastructure.csproj" />
     <ProjectReference Include="../../src/backend/Modules/TransportScheduling/Domain/TransportPlatform.Modules.TransportScheduling.Domain.csproj" />
     <ProjectReference Include="../../src/backend/Modules/Reservations/Domain/TransportPlatform.Modules.Reservations.Domain.csproj" />
     <ProjectReference Include="../../src/backend/Modules/CompaniesAgencies/Application/TransportPlatform.Modules.CompaniesAgencies.Application.csproj" />
