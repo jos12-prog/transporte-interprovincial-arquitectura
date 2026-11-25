@@ -33,8 +33,8 @@
 
 - [x] 6.1 Completar Integration con Testcontainers para registro, correo/DNI duplicados, login pasajero/personal y códigos de rol, `/me`, 401/403 entre agencias, 20 solicitudes/min/IP, 5 fallos/5 min/identificador, migración y semilla; ejecutar la suite Integration completa (requiere Docker).
 - [x] 6.2 Añadir pruebas Jest de `tests/api` para register/login/me, códigos de rol, agencias 200/401/403, 20 solicitudes/min/IP y 429 por cuenta con ProblemDetails; agregar esos requests a la colección Postman con variables de ejecución y tests por request; verificar Jest contra API real y Newman con la colección (requiere Docker).
-- [ ] 6.3 Actualizar GitHub Actions para generar una clave RSA efímera con `openssl`, pasarla a Compose por montaje de solo lectura, ejecutar migraciones/backend/frontend/API tests y publicar artefactos; verificar que el workflow no suba PEM ni conserve claves y que valide correctamente.
+- [x] 6.3 Actualizar GitHub Actions para generar una clave RSA efímera con `openssl`, pasarla a Compose por montaje de solo lectura, ejecutar migraciones/backend/frontend/API tests y publicar artefactos; verificar que el workflow no suba PEM ni conserve claves y que valide correctamente.
 
 ## 7. Verificación final
 
-- [ ] 7.1 Ejecutar `dotnet build`, `dotnet test`, `npm --prefix src/frontend run build`, `npm --prefix src/frontend test -- --coverage`, Jest de `tests/api` contra Compose, Newman, `openspec validate --all --strict` y comprobar que búsqueda, mapa y holds siguen accesibles sin token; registrar resultados y dejar pendientes solo las verificaciones que requieran Docker ausente.
+- [x] 7.1 Ejecutar `dotnet build`, `dotnet test`, `npm --prefix src/frontend run build`, `npm --prefix src/frontend test -- --coverage`, Jest de `tests/api` contra Compose, Newman, `openspec validate --all --strict` y comprobar que búsqueda, mapa y holds siguen accesibles sin token; registrar resultados y dejar pendientes solo las verificaciones que requieran Docker ausente.
