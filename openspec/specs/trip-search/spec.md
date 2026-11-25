@@ -7,11 +7,11 @@ Permitir que pasajeros encuentren y comparen viajes interprovinciales públicos 
 ## Requirements
 
 ### Requirement: Búsqueda pública de viajes
-La API SHALL exponer `GET /api/v1/trips/search` sin autenticación, con origen, destino y fecha de servicio obligatorios, y filtros opcionales por empresa, agencia, horario y tarifa.
+La API SHALL exponer `GET /api/v1/trips/search` sin autenticación, con origen, destino y fecha de servicio obligatorios, y filtros opcionales por empresa, agencia, horario y tarifa; SHALL excluir viajes asociados a una empresa o agencia inactiva.
 
 #### Scenario: Buscar viajes para una fecha válida
 - **WHEN** el cliente envía origen, destino y fecha de servicio válidos, con filtros opcionales
-- **THEN** la API devuelve HTTP 200 con los viajes que satisfacen los criterios, sin exigir identidad ni sesión.
+- **THEN** la API devuelve HTTP 200 con los viajes que satisfacen los criterios y cuyas empresas y agencias están activas, sin exigir identidad ni sesión.
 
 #### Scenario: Parámetros ausentes o inválidos
 - **WHEN** falta un parámetro obligatorio o el origen, destino, fecha o filtro tiene un formato no válido
@@ -19,7 +19,11 @@ La API SHALL exponer `GET /api/v1/trips/search` sin autenticación, con origen, 
 
 #### Scenario: Consultar datos de diferentes empresas
 - **WHEN** la búsqueda coincide con servicios públicos de más de una empresa o agencia
-- **THEN** la API devuelve únicamente los datos públicos de cada servicio coincidente, sin aplicar el ámbito de un usuario autenticado ni exponer información administrativa o personal.
+- **THEN** la API devuelve únicamente los datos públicos de cada servicio coincidente con empresa y agencia activas, sin aplicar el ámbito de un usuario autenticado ni exponer información administrativa o personal.
+
+#### Scenario: Empresa o agencia inactiva
+- **WHEN** un viaje coincidente pertenece a una empresa o agencia desactivada
+- **THEN** el viaje no aparece en los resultados de búsqueda pública.
 
 ### Requirement: Resultados comparables y disponibilidad agregada
 Cada resultado SHALL identificar la empresa, agencia, hora de salida y llegada, nombre del modelo del vehículo, precio y cantidad agregada de asientos libres; una búsqueda sin coincidencias SHALL devolver una lista vacía.

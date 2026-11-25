@@ -31,5 +31,5 @@
 
 - [x] 6.1 Añadir pruebas Jest de API para operaciones de superadmin, acceso 401/403, errores 400/404/409 y exclusión pública de agencias/empresas inactivas; verificar contra la API real.
 - [x] 6.2 Añadir requests y assertions para empresas, agencias, estados y modelos en `tests/postman/RutaAndina-Sprint2.postman_collection.json`; verificar colección JSON válida y ejecución de newman sin fallos.
-- [ ] 6.3 Actualizar GitHub Actions si el pipeline no ejecuta las nuevas pruebas, migraciones de validación o reportes; verificar el workflow localmente o mediante CI.
-- [ ] 6.4 Ejecutar `dotnet build`, `dotnet test`, `npm run build`, Jest frontend/API y `openspec validate --all --strict`; verificar que todas las ejecuciones terminan correctamente y que no hay reglas de arquitectura incumplidas.
+- [x] 6.3 Actualizar GitHub Actions si el pipeline no ejecuta las nuevas pruebas, migraciones de validación o reportes; verificar el workflow localmente o mediante CI.
+- [x] 6.4 Ejecutar `dotnet build`, `dotnet test`, `npm run build`, Jest frontend/API y `openspec validate --all --strict`; verificar que todas las ejecuciones terminan correctamente y que no hay reglas de arquitectura incumplidas.
