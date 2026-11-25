@@ -13,7 +13,7 @@
 <script src="../../_assets/app.js" defer></script>
 <style>
 .filters{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr auto;gap:12px;align-items:end;padding:18px 20px}
-code{font:500 12.5px ui-monospace,Menlo,monospace;background:var(--n-100);padding:3px 7px;border-radius:6px;color:var(--n-700)}
+code{font:500 11px ui-monospace,Menlo,monospace;color:var(--n-500);letter-spacing:.01em}   /* el código queda para soporte; la persona lee el texto */
 .table tr.sel td{background:var(--primary-50)!important}
 .diff{font:12.5px/1.6 ui-monospace,Menlo,monospace;border:1px solid var(--n-200);border-radius:12px;overflow:hidden}
 .diff div{padding:0 12px;white-space:pre-wrap;word-break:break-word}
@@ -26,7 +26,7 @@ code{font:500 12.5px ui-monospace,Menlo,monospace;background:var(--n-100);paddin
   <aside class="side" aria-label="Menú">
     <a class="brand" href="#"><img src="../../_assets/brand/logo-mark.svg" alt=""><b>Ruta<span>Andina</span></b></a>
     <div class="group">Plataforma</div><a href="../01-dashboard-global/code.html"><i data-i="grid"></i><span>Dashboard</span></a><a href="../02-empresas/code.html"><i data-i="building"></i><span>Empresas</span></a><a href="../03-agencias/code.html"><i data-i="store"></i><span>Agencias</span></a><a href="../04-usuarios-administrativos/code.html"><i data-i="users"></i><span>Usuarios administrativos</span></a><div class="group">Catálogos</div><a href="../05-modelos-vehiculo/code.html"><i data-i="bus"></i><span>Modelos de vehículo</span></a><a href="../06-festividades-alta-demanda/code.html"><i data-i="flame"></i><span>Festividades</span></a><div class="group">Control</div><a href="../07-auditoria/code.html" class="on" aria-current="page"><i data-i="log"></i><span>Auditoría</span></a><a href="#configuracion"><i data-i="settings"></i><span>Configuración</span></a>
-    <div class="me"><span class="avatar">JP</span><div>Jorge Pariona<small>Superadministrador</small></div></div>
+    <div class="me"><div class="me-id"><span class="avatar">JP</span><div>Jorge Pariona<small>Superadministrador</small></div></div><a class="me-out" href="../../personal/01-login/code.html" title="Cerrar sesión"><i data-i="logout" class="sm"></i><span>Cerrar sesión</span></a></div>
   </aside>
   <div>
     <header class="top">
@@ -50,12 +50,12 @@ code{font:500 12.5px ui-monospace,Menlo,monospace;background:var(--n-100);paddin
 <section class="card"><div class="table-wrap"><table class="table">
   <thead><tr><th>Fecha y hora</th><th>Usuario</th><th>Empresa</th><th>Agencia</th><th>Operación</th><th>Recurso</th><th>Resultado</th></tr></thead>
   <tbody>
-    <tr><td class="num small">21/11 14:08:12</td><td><b>Luis Mendoza</b><div class="xs muted">Agente</div></td><td class="small">Qori Ñan</td><td class="small">Terminal Norte</td><td><code>SALE_CONFIRMED</code></td><td class="small">Reserva RA-V8821</td><td><span class="badge b-success">Éxito</span></td></tr>
-    <tr class="sel"><td class="num small">21/11 13:47:55</td><td><b>Rosa Huamán</b><div class="xs muted">Admin. de agencia</div></td><td class="small">Qori Ñan</td><td class="small">Terminal Norte</td><td><code>FARE_UPDATED</code></td><td class="small">Tarifa Ayacucho → Lima</td><td><span class="badge b-success">Éxito</span></td></tr>
-    <tr><td class="num small">21/11 13:41:03</td><td><b>Karina Cisneros</b><div class="xs muted">Agente</div></td><td class="small">Qori Ñan</td><td class="small">Terminal Norte</td><td><code>SALE_CANCEL</code></td><td class="small">Reserva RA-V8810</td><td><span class="badge b-danger">Denegado</span></td></tr>
-    <tr><td class="num small">21/11 12:30:40</td><td><b>Jorge Pariona</b><div class="xs muted">Superadmin</div></td><td class="small">—</td><td class="small">—</td><td><code>AGENCY_ASSIGNED</code></td><td class="small">Usuario Jhon Cárdenas</td><td><span class="badge b-success">Éxito</span></td></tr>
-    <tr><td class="num small">21/11 11:02:19</td><td><b>Maribel Vargas</b><div class="xs muted">Admin. de agencia</div></td><td class="small">Sachapuyo</td><td class="small">Plaza Norte</td><td><code>TRIP_SCHEDULED</code></td><td class="small">14 viajes Lima → Ayacucho</td><td><span class="badge b-success">Éxito</span></td></tr>
-    <tr><td class="num small">21/11 10:15:08</td><td><b>Sistema</b><div class="xs muted">Proceso automático</div></td><td class="small">—</td><td class="small">—</td><td><code>HOLD_EXPIRED</code></td><td class="small">Reserva RA-3M8QX</td><td><span class="badge b-success">Éxito</span></td></tr>
+    <tr><td class="num small">21/11 14:08:12</td><td><b>Luis Mendoza</b><div class="xs muted">Agente</div></td><td class="small">Qori Ñan</td><td class="small">Terminal Norte</td><td><b class="small">Venta confirmada</b><div><code>SALE_CONFIRMED</code></div></td><td class="small">Reserva RA-V8821</td><td><span class="badge b-success">Éxito</span></td></tr>
+    <tr class="sel"><td class="num small">21/11 13:47:55</td><td><b>Rosa Huamán</b><div class="xs muted">Admin. de agencia</div></td><td class="small">Qori Ñan</td><td class="small">Terminal Norte</td><td><b class="small">Tarifa actualizada</b><div><code>FARE_UPDATED</code></div></td><td class="small">Tarifa Ayacucho → Lima</td><td><span class="badge b-success">Éxito</span></td></tr>
+    <tr><td class="num small">21/11 13:41:03</td><td><b>Karina Cisneros</b><div class="xs muted">Agente</div></td><td class="small">Qori Ñan</td><td class="small">Terminal Norte</td><td><b class="small">Venta cancelada</b><div><code>SALE_CANCEL</code></div></td><td class="small">Reserva RA-V8810</td><td><span class="badge b-danger">Denegado</span></td></tr>
+    <tr><td class="num small">21/11 12:30:40</td><td><b>Jorge Pariona</b><div class="xs muted">Superadmin</div></td><td class="small">—</td><td class="small">—</td><td><b class="small">Agencia asignada</b><div><code>AGENCY_ASSIGNED</code></div></td><td class="small">Usuario Jhon Cárdenas</td><td><span class="badge b-success">Éxito</span></td></tr>
+    <tr><td class="num small">21/11 11:02:19</td><td><b>Maribel Vargas</b><div class="xs muted">Admin. de agencia</div></td><td class="small">Sachapuyo</td><td class="small">Plaza Norte</td><td><b class="small">Viajes programados</b><div><code>TRIP_SCHEDULED</code></div></td><td class="small">14 viajes Lima → Ayacucho</td><td><span class="badge b-success">Éxito</span></td></tr>
+    <tr><td class="num small">21/11 10:15:08</td><td><b>Sistema</b><div class="xs muted">Proceso automático</div></td><td class="small">—</td><td class="small">—</td><td><b class="small">Retención expirada</b><div><code>HOLD_EXPIRED</code></div></td><td class="small">Reserva RA-3M8QX</td><td><span class="badge b-success">Éxito</span></td></tr>
   </tbody></table></div></section>
 
     </main>

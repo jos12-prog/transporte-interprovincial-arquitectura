@@ -13,13 +13,16 @@
 <script src="../../_assets/app.js" defer></script>
 <style>
 .layout{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start}
-.secure{border:1px solid var(--n-200);border-radius:16px;padding:20px;display:grid;gap:16px;background:linear-gradient(180deg,#fff,var(--n-50))}
+.secure{display:grid;gap:16px;padding-top:4px}
 .stubcard{position:sticky;top:88px;border-radius:20px;overflow:hidden}
 .stubcard .top-part{background:var(--primary-900);color:#fff;padding:20px 22px;position:relative}
 .stubcard .top-part::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:12px;background:radial-gradient(circle at 8px 12px,#fff 7px,transparent 7.5px) 0 0/16px 12px repeat-x}
 .stubcard .codes{display:flex;align-items:center;gap:12px;font:800 26px var(--display);letter-spacing:.02em;margin-top:6px}
 .stubcard .codes .ln{flex:1;border-top:2px dashed rgba(255,255,255,.35)}
 @media (max-width:1000px){.layout{grid-template-columns:1fr}}
+.layout > *{min-width:0}
+/* Móvil: los 3 métodos reparten el ancho (antes empujaban la tarjeta 27px fuera de la pantalla) */
+@media (max-width:560px){.card-pad-lg{padding:20px}.segmented{display:flex}.segmented button{flex:1;justify-content:center;padding:0 6px;font-size:13px;gap:5px}}
 @keyframes rot{to{rotate:360deg}}
 </style>
 </head>
@@ -30,13 +33,14 @@
     <nav class="nav-links" aria-label="Principal"><a href="../03-inicio-busqueda/code.html" class="on" aria-current="page">Buscar viajes</a><a href="../09-mis-viajes/code.html">Mis viajes</a><a href="#ayuda">Ayuda</a></nav>
     <div class="nav-user">
       <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i></button>
-      <span class="avatar">AQ</span><span class="name">Ana Quispe</span>
+      <div class="umenu"><button class="ubtn" aria-haspopup="menu" aria-expanded="false" data-menu><span class="avatar">AQ</span><span class="name">Ana Quispe</span><i data-i="chevron" class="sm"></i></button><div class="menu" role="menu" aria-label="Cuenta" hidden><div class="menu-head"><b>Ana Quispe</b><span>ana.quispe@gmail.com</span></div><a role="menuitem" href="../09-mis-viajes/code.html"><i data-i="ticket" class="sm"></i>Mis viajes</a><a role="menuitem" href="#cuenta"><i data-i="user" class="sm"></i>Mi cuenta</a><hr><a role="menuitem" class="danger" href="../01-login/code.html"><i data-i="logout" class="sm"></i>Cerrar sesión</a></div></div>
     </div>
   </div>
 </header>
 <nav class="tabbar" aria-label="Navegación inferior"><a href="../03-inicio-busqueda/code.html" class="on"><i data-i="search"></i>Buscar</a><a href="../09-mis-viajes/code.html"><i data-i="ticket"></i>Mis viajes</a><a href="#ayuda"><i data-i="help"></i>Ayuda</a><a href="#cuenta"><i data-i="user"></i>Cuenta</a></nav>
 
 <main class="container page">
+  <a class="back" href="../06-datos-pasajeros/code.html"><i data-i="back" class="sm"></i>Editar datos de pasajeros</a>
   <nav class="stepper" aria-label="Pasos de compra"><div class="stepper-top"><p>Paso 3 de 4 · <b>Pago</b></p><span class="pill-timer" data-hold="495" role="timer"><i data-i="clock" class="sm"></i>Paga antes de <b>08:15</b></span></div><ol class="steps"><li class="done"><b>✓</b><span>Asientos<small>Asientos 31 y 32</small></span></li><li class="done"><b>✓</b><span>Pasajeros<small>2 viajeros</small></span></li><li class="now" aria-current="step"><b>3</b><span>Pago<small>Paga seguro con Culqi</small></span></li><li class=""><b>4</b><span>Pasaje<small>Recibe tu boleto con QR</small></span></li></ol></nav>
   <div class="layout">
     <section class="card card-pad-lg stack">

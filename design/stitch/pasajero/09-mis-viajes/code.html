@@ -15,7 +15,11 @@
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--n-200);margin-bottom:20px}
 .tabs a{padding:12px 16px;color:var(--n-600);font-weight:500;border-bottom:2px solid transparent;margin-bottom:-1px}
 .tabs a.on{color:var(--primary-700);border-color:var(--primary-600)}
-.tabs a:hover{text-decoration:none;color:var(--n-900)}
+.tabs a{white-space:nowrap;transition:color var(--dur-fast) ease}
+.tabs a:hover{text-decoration:none}
+@media (hover:hover) and (pointer:fine){.tabs a:not(.on):hover{color:var(--n-900)}}
+/* Móvil: las 3 pestañas reparten el ancho (antes desbordaban la pantalla 25px) */
+@media (max-width:560px){.tabs a{flex:1;text-align:center;padding:12px 4px}.tabs .n{margin-left:4px}}
 .tabs .n{font-size:12px;background:var(--n-100);border-radius:999px;padding:1px 7px;margin-left:6px;color:var(--n-600)}
 .mt{display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;padding:18px 20px}
 .mt .date{width:60px;text-align:center;border-radius:12px;background:var(--primary-50);color:var(--primary-700);padding:8px 0}
@@ -30,7 +34,7 @@
     <nav class="nav-links" aria-label="Principal"><a href="../03-inicio-busqueda/code.html">Buscar viajes</a><a href="../09-mis-viajes/code.html" class="on" aria-current="page">Mis viajes</a><a href="#ayuda">Ayuda</a></nav>
     <div class="nav-user">
       <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i></button>
-      <span class="avatar">AQ</span><span class="name">Ana Quispe</span>
+      <div class="umenu"><button class="ubtn" aria-haspopup="menu" aria-expanded="false" data-menu><span class="avatar">AQ</span><span class="name">Ana Quispe</span><i data-i="chevron" class="sm"></i></button><div class="menu" role="menu" aria-label="Cuenta" hidden><div class="menu-head"><b>Ana Quispe</b><span>ana.quispe@gmail.com</span></div><a role="menuitem" href="../09-mis-viajes/code.html"><i data-i="ticket" class="sm"></i>Mis viajes</a><a role="menuitem" href="#cuenta"><i data-i="user" class="sm"></i>Mi cuenta</a><hr><a role="menuitem" class="danger" href="../01-login/code.html"><i data-i="logout" class="sm"></i>Cerrar sesión</a></div></div>
     </div>
   </div>
 </header>

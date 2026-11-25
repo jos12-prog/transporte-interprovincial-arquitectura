@@ -44,13 +44,14 @@ main:has(#un-titular:target) .per-seat{display:none}
     <nav class="nav-links" aria-label="Principal"><a href="../03-inicio-busqueda/code.html" class="on" aria-current="page">Buscar viajes</a><a href="../09-mis-viajes/code.html">Mis viajes</a><a href="#ayuda">Ayuda</a></nav>
     <div class="nav-user">
       <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i></button>
-      <span class="avatar">AQ</span><span class="name">Ana Quispe</span>
+      <div class="umenu"><button class="ubtn" aria-haspopup="menu" aria-expanded="false" data-menu><span class="avatar">AQ</span><span class="name">Ana Quispe</span><i data-i="chevron" class="sm"></i></button><div class="menu" role="menu" aria-label="Cuenta" hidden><div class="menu-head"><b>Ana Quispe</b><span>ana.quispe@gmail.com</span></div><a role="menuitem" href="../09-mis-viajes/code.html"><i data-i="ticket" class="sm"></i>Mis viajes</a><a role="menuitem" href="#cuenta"><i data-i="user" class="sm"></i>Mi cuenta</a><hr><a role="menuitem" class="danger" href="../01-login/code.html"><i data-i="logout" class="sm"></i>Cerrar sesión</a></div></div>
     </div>
   </div>
 </header>
 <nav class="tabbar" aria-label="Navegación inferior"><a href="../03-inicio-busqueda/code.html" class="on"><i data-i="search"></i>Buscar</a><a href="../09-mis-viajes/code.html"><i data-i="ticket"></i>Mis viajes</a><a href="#ayuda"><i data-i="help"></i>Ayuda</a><a href="#cuenta"><i data-i="user"></i>Cuenta</a></nav>
 
 <main class="container page">
+  <a class="back" href="../05-seleccion-asiento/code.html"><i data-i="back" class="sm"></i>Cambiar asientos</a>
   <nav class="stepper" aria-label="Pasos de compra"><div class="stepper-top"><p>Paso 2 de 4 · <b>Pasajeros</b></p><span class="pill-timer" data-hold="582" role="timer" aria-label="Tiempo de retención"><i data-i="clock" class="sm"></i>Tus asientos están reservados <b>09:42</b></span></div><ol class="steps"><li class="done"><b>✓</b><span>Asientos<small>Asientos 31 y 32</small></span></li><li class="now" aria-current="step"><b>2</b><span>Pasajeros<small>Datos de cada viajero</small></span></li><li class=""><b>3</b><span>Pago<small>Paga seguro con Culqi</small></span></li><li class=""><b>4</b><span>Pasaje<small>Recibe tu boleto con QR</small></span></li></ol></nav>
   <h1 style="margin-bottom:6px">¿Quiénes viajan?</h1>
   <p class="muted" style="margin-bottom:24px">Los datos deben coincidir con el documento que presentarán al abordar.</p>

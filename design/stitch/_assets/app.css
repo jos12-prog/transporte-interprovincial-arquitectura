@@ -5,21 +5,29 @@
 :root{
   --primary-900:#063F36; --primary-700:#0B5C4E; --primary-600:#0E6B5C; --primary-500:#1B8A75; --primary-100:#DDF2EC; --primary-50:#EFF8F5;
   --accent-600:#C97F12; --accent-500:#F2A93B; --accent-100:#FDF1DC;
-  --n-900:#0F172A; --n-700:#334155; --n-600:#475569; --n-500:#64748B; --n-400:#94A3B8; --n-300:#CBD5E1; --n-200:#E2E8F0; --n-100:#F1F5F9; --n-50:#F8FAFC;
+  /* Neutros con un toque verde de la marca (antes slate azulado): misma luminosidad, más cohesión con el teal. Todos ≥ AA en texto. */
+  --n-900:#111B19; --n-700:#33403D; --n-600:#4A5754; --n-500:#62706C; --n-400:#94A09C; --n-300:#CAD3D0; --n-200:#E0E6E4; --n-100:#EEF2F0; --n-50:#F6F8F7;
   --success-600:#16A34A; --success-100:#DCFCE7; --danger-600:#DC2626; --danger-100:#FEE2E2; --warning-500:#F59E0B; --info-600:#2563EB; --info-100:#DBEAFE;
-  --sh-sm:0 1px 2px rgba(15,23,42,.06); --sh-md:0 8px 24px rgba(15,23,42,.08); --sh-lg:0 24px 48px rgba(6,63,54,.18);
+  /* Sombras en capas: un contacto nítido + una difusa. Se leen como elevación real, no como un halo gris */
+  --sh-sm:0 1px 2px rgba(17,27,25,.05),0 1px 1px rgba(17,27,25,.03);
+  --sh-md:0 1px 2px rgba(17,27,25,.04),0 8px 24px -6px rgba(17,27,25,.10);
+  --sh-lg:0 2px 6px rgba(6,63,54,.06),0 24px 48px -12px rgba(6,63,54,.22);
   --display:"Plus Jakarta Sans",system-ui,sans-serif; --body:"Inter",system-ui,sans-serif;
-  --ease:cubic-bezier(.2,.8,.2,1);
+  /* Movimiento (DESIGN.md §6). Nunca ease-in en UI. --ease queda como alias de --ease-out para las pantallas existentes */
+  --ease-out:cubic-bezier(.23,1,.32,1); --ease-in-out:cubic-bezier(.77,0,.175,1); --ease-drawer:cubic-bezier(.32,.72,0,1);
+  --ease:var(--ease-out);
+  --dur-press:160ms; --dur-fast:150ms; --dur-base:200ms; --dur-modal:250ms; --dur-drawer:420ms;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
 body{font:400 15px/1.5 var(--body);color:var(--n-900);background:var(--n-50);-webkit-font-smoothing:antialiased}
 img,svg{display:block}
-a{color:var(--primary-600);text-decoration:none;font-weight:500}
-a:hover{text-decoration:underline;text-underline-offset:3px}
+a{color:var(--primary-600);text-decoration:none;font-weight:500;text-underline-offset:3px}
+a:hover{text-decoration:underline}
 :focus-visible{outline:2px solid var(--primary-600);outline-offset:2px;border-radius:6px}
-h1,h2,h3,h4{font-family:var(--display);letter-spacing:-.02em;line-height:1.2}
-h1{font-size:28px;font-weight:700} h2{font-size:20px;font-weight:700} h3{font-size:16px;font-weight:700}
+h1,h2,h3,h4{font-family:var(--display);letter-spacing:-.02em;line-height:1.2;text-wrap:balance}
+h1{font-size:28px;font-weight:700}
+h1 + p,h1 + .muted{margin-top:6px} h2{font-size:20px;font-weight:700} h3{font-size:16px;font-weight:700}
 .num{font-variant-numeric:tabular-nums}
 .muted{color:var(--n-600)} .small{font-size:13px} .xs{font-size:12px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
@@ -35,17 +43,25 @@ h1{font-size:28px;font-weight:700} h2{font-size:20px;font-weight:700} h3{font-si
 
 /* ---------- Botones ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 18px;border-radius:12px;border:1px solid transparent;
-  font:600 14.5px var(--body);cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s,transform .15s var(--ease),box-shadow .15s;text-decoration:none!important}
-.btn:active{transform:scale(.985)}
-.btn-primary{background:var(--primary-600);color:#fff;box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 6px 16px -8px rgba(14,107,92,.8)}
-.btn-primary:hover{background:var(--primary-700)}
-.btn-primary .ico{transition:transform .2s var(--ease)} .btn-primary:hover .ico:last-child{transform:translateX(3px)}
+  font:600 14.5px var(--body);cursor:pointer;white-space:nowrap;text-decoration:none!important;-webkit-tap-highlight-color:transparent;
+  transition:background-color var(--dur-fast) ease,border-color var(--dur-fast) ease,box-shadow var(--dur-fast) ease,transform var(--dur-press) var(--ease-out)}
+/* Presionar: escala .97 en 160ms con ease-out fuerte. Confirma el toque sin sentirse lento */
+.btn:active:not([disabled]){transform:scale(.97)}
+.btn-primary{background:var(--primary-600);color:#fff;box-shadow:0 1px 0 rgba(255,255,255,.14) inset,0 0 0 1px rgba(6,63,54,.10),0 1px 2px rgba(6,63,54,.24)}
 .btn-secondary{background:#fff;color:var(--primary-700);border-color:var(--primary-600)}
-.btn-secondary:hover{background:var(--primary-50)}
-.btn-ghost{background:transparent;color:var(--n-700);border-color:var(--n-200)}
-.btn-ghost:hover{background:var(--n-100)}
-.btn-danger{background:var(--danger-600);color:#fff} .btn-danger:hover{background:#B91C1C}
-.btn-accent{background:var(--accent-500);color:#2A1A02} .btn-accent:hover{background:#E59A26}
+.btn-ghost{background:#fff;color:var(--n-700);border-color:var(--n-200);box-shadow:var(--sh-sm)}
+.btn-danger{background:var(--danger-600);color:#fff}
+.btn-accent{background:var(--accent-500);color:#2A1A02}
+.btn-primary .ico:last-child{transition:transform var(--dur-base) var(--ease-out)}
+/* Hover solo con puntero real: en táctil el tap dispara :hover y deja el estado pegado */
+@media (hover:hover) and (pointer:fine){
+  .btn-primary:hover{background:var(--primary-700)}
+  .btn-primary:hover .ico:last-child{transform:translateX(3px)}
+  .btn-secondary:hover{background:var(--primary-50)}
+  .btn-ghost:hover{background:var(--n-50);border-color:var(--n-300)}
+  .btn-danger:hover{background:#B91C1C}
+  .btn-accent:hover{background:#E59A26}
+}
 .btn-lg{height:50px;padding:0 22px;font-size:15.5px}
 .btn-sm{height:34px;padding:0 12px;font-size:13px;border-radius:10px}
 .btn-block{width:100%}
@@ -59,12 +75,12 @@ kbd{font:600 11px var(--body);padding:2px 6px;border-radius:6px;border:1px solid
 .control{position:relative}
 .control > .ico{position:absolute;left:14px;top:50%;translate:0 -50%;color:var(--n-500);pointer-events:none}
 .input,select.input,textarea.input{width:100%;height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--n-300);background:#fff;
-  font:500 15px var(--body);color:var(--n-900);outline:none;transition:border-color .15s,box-shadow .15s}
+  font:500 15px var(--body);color:var(--n-900);outline:none;transition:border-color var(--dur-fast) ease,box-shadow var(--dur-fast) ease}
 .control > .ico + .input{padding-left:42px}
 textarea.input{height:auto;min-height:96px;padding:12px 14px;resize:vertical}
 select.input{appearance:none;-webkit-appearance:none;padding-right:38px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748B' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
 .input::placeholder{color:var(--n-400);font-weight:400}
-.input:hover{border-color:var(--n-400)}
+@media (hover:hover) and (pointer:fine){.input:hover{border-color:var(--n-400)}}
 .input:focus{border-color:var(--primary-600);box-shadow:0 0 0 4px var(--primary-100)}
 .input.invalid{border-color:var(--danger-600);box-shadow:0 0 0 4px var(--danger-100)}
 .hint{font-size:12.5px;color:var(--n-500)} .error{font-size:12.5px;color:var(--danger-600)}
@@ -72,16 +88,22 @@ select.input{appearance:none;-webkit-appearance:none;padding-right:38px;backgrou
 .prefix > span{display:grid;place-items:center;padding:0 12px;border:1px solid var(--n-300);border-right:0;border-radius:12px 0 0 12px;background:var(--n-100);font-weight:500;color:var(--n-600)}
 .prefix > .input{border-radius:0 12px 12px 0}
 .check{display:inline-flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--n-700);cursor:pointer}
-.check input{appearance:none;-webkit-appearance:none;flex:none;width:18px;height:18px;margin-top:1px;border-radius:5px;border:1.5px solid var(--n-400);background:#fff;display:grid;place-items:center;cursor:pointer}
+.check input{appearance:none;-webkit-appearance:none;flex:none;width:18px;height:18px;margin-top:1px;border-radius:5px;border:1.5px solid var(--n-400);background:#fff;display:grid;place-items:center;cursor:pointer;
+  transition:background-color var(--dur-fast) ease,border-color var(--dur-fast) ease,transform var(--dur-press) var(--ease-out)}
+.check input::after{content:"";width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;rotate:-45deg;translate:0 -1px;opacity:0;scale:.7;
+  transition:opacity var(--dur-fast) var(--ease-out),scale var(--dur-base) var(--ease-out)}
 .check input:checked{background:var(--primary-600);border-color:var(--primary-600)}
-.check input:checked::after{content:"";width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;rotate:-45deg;translate:0 -1px}
+.check input:checked::after{opacity:1;scale:1}
+.check:active input{transform:scale(.9)}
 .check input[type=radio]{border-radius:50%}
-.check input[type=radio]:checked::after{width:8px;height:8px;border:0;border-radius:50%;background:#fff;rotate:0deg;translate:0}
-.switch{appearance:none;-webkit-appearance:none;width:38px;height:22px;border-radius:999px;background:var(--n-300);position:relative;cursor:pointer;transition:background .2s;flex:none}
-.switch::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:var(--sh-sm);transition:translate .2s var(--ease)}
+.check input[type=radio]::after{width:8px;height:8px;border:0;border-radius:50%;background:#fff;rotate:0deg;translate:0}
+.switch{appearance:none;-webkit-appearance:none;width:38px;height:22px;border-radius:999px;background:var(--n-300);position:relative;cursor:pointer;transition:background-color var(--dur-base) ease;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(17,27,25,.2);transition:translate var(--dur-base) var(--ease-out),width var(--dur-press) var(--ease-out)}
+/* El pulgar se estira al presionar, como un interruptor físico */
+.switch:active::after{width:19px} .switch:checked:active::after{translate:13px 0}
 .switch:checked{background:var(--primary-600)} .switch:checked::after{translate:16px 0}
 .segmented{display:inline-flex;padding:4px;border-radius:12px;background:var(--n-100);gap:4px}
-.segmented button{height:34px;padding:0 14px;border:0;border-radius:9px;background:none;font:500 13.5px var(--body);color:var(--n-600);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.segmented button{height:34px;padding:0 14px;border:0;border-radius:9px;background:none;font:500 13.5px var(--body);color:var(--n-600);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background-color var(--dur-fast) ease,color var(--dur-fast) ease,box-shadow var(--dur-fast) ease}
 .segmented button[aria-pressed=true],.segmented button.on{background:#fff;color:var(--n-900);box-shadow:var(--sh-sm)}
 .stepper-num{display:inline-flex;align-items:center;border:1px solid var(--n-300);border-radius:12px;height:46px;background:#fff}
 .stepper-num button{width:40px;height:100%;border:0;background:none;font-size:18px;color:var(--primary-700);cursor:pointer}
@@ -97,7 +119,10 @@ select.input{appearance:none;-webkit-appearance:none;padding-right:38px;backgrou
 .badge.plain::before{display:none}
 .b-success{background:var(--success-100);color:#15803D} .b-warning{background:var(--accent-100);color:#9A5B00} .b-danger{background:var(--danger-100);color:#B91C1C}
 .b-neutral{background:var(--n-100);color:var(--n-600)} .b-info{background:var(--info-100);color:#1D4ED8} .b-primary{background:var(--primary-100);color:var(--primary-700)}
-.chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--n-300);background:#fff;font:500 13px var(--body);color:var(--n-700);cursor:pointer}
+.chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--n-300);background:#fff;font:500 13px var(--body);color:var(--n-700);cursor:pointer;
+  transition:background-color var(--dur-fast) ease,border-color var(--dur-fast) ease,color var(--dur-fast) ease,transform var(--dur-press) var(--ease-out)}
+.chip:active{transform:scale(.97)}
+@media (hover:hover) and (pointer:fine){.chip:not(.on):hover{border-color:var(--n-400);background:var(--n-50)}}
 .chip.on{background:var(--primary-600);border-color:var(--primary-600);color:#fff}
 .demand{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;background:var(--accent-100);color:#9A5B00;font:600 12px var(--body)}
 .alert{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;border:1px solid;font-size:14px}
@@ -116,6 +141,8 @@ select.input{appearance:none;-webkit-appearance:none;padding-right:38px;backgrou
 
 /* ---------- Tablas ---------- */
 .table-wrap{overflow:auto}
+.card > .table-wrap{border-radius:inherit}
+.card:has(> .table-wrap){overflow:hidden}
 table.table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
 .table th{position:sticky;top:0;background:var(--n-50);text-align:left;font:600 12px var(--body);text-transform:uppercase;letter-spacing:.04em;color:var(--n-500);padding:12px 16px;border-bottom:1px solid var(--n-200);white-space:nowrap}
 .table td{padding:0 16px;height:56px;border-bottom:1px solid var(--n-100);white-space:nowrap}
@@ -124,7 +151,7 @@ table.table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
 .table .right{text-align:right}
 .table tfoot td{font-weight:600;background:var(--n-50);border-top:1px solid var(--n-200)}
 .more{width:32px;height:32px;border-radius:8px;border:0;background:none;color:var(--n-500);cursor:pointer;display:grid;place-items:center}
-.more:hover{background:var(--n-100)}
+@media (hover:hover) and (pointer:fine){.more:hover{background:var(--n-100)}}
 
 /* ---------- Navegación pasajero ---------- */
 .nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--n-200)}
@@ -133,21 +160,46 @@ table.table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
 .brand img{width:34px;height:34px}
 .brand span{color:var(--primary-600)}
 .nav-links{display:flex;gap:4px}
-.nav-links a{padding:8px 12px;border-radius:10px;color:var(--n-600);font-weight:500;font-size:14.5px}
-.nav-links a:hover{background:var(--n-100);text-decoration:none}
+.nav-links a{padding:8px 12px;border-radius:10px;color:var(--n-600);font-weight:500;font-size:14.5px;transition:background-color var(--dur-fast) ease,color var(--dur-fast) ease}
+.nav-links a:hover{text-decoration:none}
+@media (hover:hover) and (pointer:fine){.nav-links a:not(.on):hover{background:var(--n-100);color:var(--n-900)}}
 .nav-links a.on{color:var(--primary-700);background:var(--primary-50)}
 .nav-user{margin-left:auto;display:flex;align-items:center;gap:10px;font-weight:500;font-size:14px}
 .container{max-width:1200px;margin:0 auto;padding:0 24px}
-.page{padding:32px 0 64px}
+/* Regreso: arriba a la izquierda, siempre en el mismo lugar. Dice a dónde vuelve, no solo "Volver" */
+.back{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px 0 6px;margin:0 0 12px -6px;border-radius:10px;color:var(--n-600);font:500 14px var(--body);text-decoration:none!important;
+  transition:background-color var(--dur-fast) ease,color var(--dur-fast) ease,transform var(--dur-press) var(--ease-out)}
+.back .ico{transition:transform var(--dur-base) var(--ease-out)}
+.back:active{transform:scale(.97)}
+@media (hover:hover) and (pointer:fine){.back:hover{background:var(--n-100);color:var(--n-900)}.back:hover .ico{transform:translateX(-2px)}}
+/* Menú de usuario: sale de su botón (origen arriba a la derecha), 150ms; se cierra al instante */
+.umenu{position:relative}
+.ubtn{display:flex;align-items:center;gap:10px;height:40px;padding:2px 10px 2px 2px;border:1px solid transparent;border-radius:999px;background:none;cursor:pointer;font:500 14px var(--body);color:var(--n-900);
+  transition:background-color var(--dur-fast) ease,border-color var(--dur-fast) ease,transform var(--dur-press) var(--ease-out)}
+.ubtn:active{transform:scale(.97)}
+.ubtn[aria-expanded=true]{background:var(--n-100);border-color:var(--n-200)}
+@media (hover:hover) and (pointer:fine){.ubtn:hover{background:var(--n-100)}}
+.menu{position:absolute;right:0;top:calc(100% + 8px);min-width:248px;background:#fff;border:1px solid var(--n-200);border-radius:14px;box-shadow:var(--sh-lg);padding:6px;z-index:40;transform-origin:top right;animation:menu-in 150ms var(--ease-out)}
+.menu[hidden]{display:none}
+@keyframes menu-in{from{opacity:0;transform:translateY(-4px) scale(.97)}}
+.menu-head{display:grid;gap:1px;padding:10px 12px 12px;margin-bottom:4px;border-bottom:1px solid var(--n-100)}
+.menu-head b{font-size:14px} .menu-head span{font-size:12.5px;color:var(--n-500)}
+.menu a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:var(--n-700);font-size:14px;font-weight:500;text-decoration:none!important}
+.menu a:hover,.menu a:focus-visible{background:var(--n-100);color:var(--n-900);outline:none}
+.menu hr{border:0;height:1px;background:var(--n-100);margin:4px 0}
+.menu a.danger{color:var(--danger-600)} .menu a.danger:hover,.menu a.danger:focus-visible{background:var(--danger-100);color:#B91C1C}
+/* padding-block: el shorthand anterior (32px 0 64px) borraba el margen lateral de .container y el contenido quedaba 24px fuera de línea con el logo */
+.page{padding-block:32px 64px}
 .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap}
 .crumbs{font-size:13px;color:var(--n-500);margin-bottom:6px}
 .footer{border-top:1px solid var(--n-200);padding:24px 0;font-size:13px;color:var(--n-500)}
 .tabbar{display:none}
 @media (max-width:760px){
-  .nav-links,.nav-user .name{display:none}
+  .nav-links,.nav-user .name,.ubtn > .ico{display:none}
+  .ubtn{padding:2px}
   .nav-in{padding:0 16px;height:56px}
   .container{padding:0 16px}
-  .page{padding:20px 0 96px}
+  .page{padding-block:20px 96px}
   h1{font-size:23px}
   .tabbar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:30;background:#fff;border-top:1px solid var(--n-200);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
   .tabbar a{flex:1;display:grid;justify-items:center;gap:2px;padding:6px;font-size:11px;color:var(--n-500);text-decoration:none}
@@ -193,24 +245,33 @@ table.table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
 .vfoot{margin-top:2px;padding-top:10px;border-top:1px dashed var(--n-300);text-align:center;font:700 10.5px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--n-500)}
 .seat{--sf:#fff;--ss:var(--primary-600);--sa:var(--primary-50);--st:var(--primary-700);
   width:var(--s);height:calc(var(--s) * 1.04);padding:0;border:0;background:none;color:var(--st);position:relative;cursor:pointer;display:block;
-  transition:transform .15s var(--ease)}
+  transition:transform var(--dur-press) var(--ease-out)}
 .seat-shape{width:100%;height:100%;display:block;overflow:visible}
-.seat-shape rect{stroke:var(--ss);stroke-width:2.2;transition:fill .15s,stroke .15s}
+/* libre → retenido: el color cambia en 200ms, no salta */
+.seat-shape rect{stroke:var(--ss);stroke-width:2.2;transition:fill var(--dur-base) ease,stroke var(--dur-base) ease}
 .seat-shape .back,.seat-shape .cush{fill:var(--sf)} .seat-shape .arm{fill:var(--sa)}
 .seat > span{position:absolute;left:0;right:0;top:0;height:66%;display:grid;place-items:center;font:700 14px var(--body);font-variant-numeric:tabular-nums;letter-spacing:.01em}
-.seat > em{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--be,#fff);border:2px solid var(--bb,var(--primary-600));box-shadow:0 1px 3px rgba(15,23,42,.15)}
+.seat > em{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--be,#fff);border:2px solid var(--bb,var(--primary-600));box-shadow:0 1px 3px rgba(17,27,25,.15)}
 .seat > em svg{width:12px;height:12px;fill:none;stroke:var(--bi,var(--primary-600));stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
-.seat:not(:disabled):hover{transform:translateY(-2px)}
-.seat:not(:disabled):not(.sel):hover{--sf:var(--primary-50)}
+@media (hover:hover) and (pointer:fine){
+  .seat:not(:disabled):hover{transform:translateY(-2px)}
+  .seat:not(:disabled):not(.sel):hover{--sf:var(--primary-50)}
+}
+.seat:not(:disabled):active{transform:scale(.94)}
 .seat:focus-visible{outline:none} .seat:focus-visible .seat-shape .back{stroke-width:3.5}
 /* Elegido por ti: teal oscuro + insignia de check */
-.seat.sel{--sf:var(--primary-700);--ss:var(--primary-900);--sa:var(--primary-900);--st:#fff;animation:pop .22s var(--ease)}
+.seat.sel{--sf:var(--primary-700);--ss:var(--primary-900);--sa:var(--primary-900);--st:#fff;animation:pop 260ms var(--ease-out)}
+/* El check entra justo después del pop, desde .6 (nunca desde 0) */
+.seat.sel > em{animation:badge 240ms var(--ease-out) 60ms backwards}
+@keyframes badge{from{opacity:0;transform:scale(.6)}}
 /* Pendiente de pago (HELD, 10 min): ámbar + reloj */
 .seat.held{--sf:var(--accent-100);--ss:var(--accent-500);--sa:#FBE3B8;--st:#8A5300;--be:var(--accent-500);--bb:#fff;--bi:#3A2400;cursor:not-allowed}
 .seat.held .seat-shape .back{stroke-dasharray:5 3}
 /* Ocupado (CONFIRMED): gris + insignia ✕ */
 .seat.taken{--sf:var(--n-200);--ss:var(--n-300);--sa:var(--n-300);--st:var(--n-400);--be:var(--n-500);--bb:#fff;--bi:#fff;cursor:not-allowed}
 .seat.taken > span{text-decoration:line-through;text-decoration-thickness:1.5px}
+/* Sin insignia ✕: gris + número tachado ya lo distinguen sin depender del color, y la mitad del plano deja de ser ruido */
+.seat.taken > em{display:none}
 .driver{width:var(--s);display:grid;justify-items:center;gap:4px}
 .driver b{width:calc(var(--s) - 6px);aspect-ratio:1;border-radius:12px;background:var(--n-300);color:var(--n-600);display:grid;place-items:center;font:800 15px var(--display)}
 .driver small{font:600 10.5px var(--body);color:var(--n-500);white-space:nowrap}
@@ -226,7 +287,7 @@ table.table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
 .seat-mini .seat > span,.seat-mini .seat > em,.seat-mini .driver small,.seat-mini .stairs small,.seat-mini .vfront,.seat-mini .vfoot{display:none}
 .seat-mini .driver b{border-radius:5px;font-size:0}
 .seat-mini .seat-shape rect{stroke-width:3}
-@keyframes pop{50%{transform:scale(1.12)}}
+@keyframes pop{40%{transform:scale(1.08)}}
 /* Leyenda grande con explicación */
 .seat-legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%}
 .seat-legend .li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--n-200);background:#fff}
@@ -256,50 +317,73 @@ table.table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
 .qr{width:150px;height:150px;image-rendering:pixelated}
 
 /* ---------- Modal y panel lateral ---------- */
-.scrim{position:fixed;inset:0;background:rgba(15,23,42,.45);backdrop-filter:blur(2px);z-index:50;display:grid;place-items:center;padding:16px}
-.modal{width:100%;max-width:460px;background:#fff;border-radius:24px;box-shadow:var(--sh-lg);padding:28px;animation:rise .25s var(--ease)}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(480px,100%);background:#fff;z-index:51;box-shadow:-24px 0 48px rgba(15,23,42,.16);display:flex;flex-direction:column;animation:slide .25s var(--ease)}
+.scrim{position:fixed;inset:0;background:rgba(10,24,22,.45);backdrop-filter:blur(2px);z-index:50;display:grid;place-items:center;padding:16px;animation:fade var(--dur-modal) var(--ease-out)}
+/* Modal: centrado (no sale de un disparador), escala desde .96 + opacidad. El fondo se funde a la vez: se leen como una sola superficie */
+.modal{width:100%;max-width:460px;background:#fff;border-radius:24px;box-shadow:var(--sh-lg);padding:28px;transform-origin:center;animation:modal-in var(--dur-modal) var(--ease-out)}
+/* Panel lateral: entra con su propio ancho (translateX 100%) y la curva tipo iOS */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(480px,100%);background:#fff;z-index:51;box-shadow:-24px 0 48px rgba(17,27,25,.16);display:flex;flex-direction:column;animation:slide var(--dur-drawer) var(--ease-drawer)}
 .drawer-head{padding:20px 24px;border-bottom:1px solid var(--n-200);display:flex;align-items:center;justify-content:space-between}
 .drawer-body{padding:24px;overflow:auto;flex:1;display:grid;gap:18px;align-content:start}
 .drawer-foot{padding:16px 24px;border-top:1px solid var(--n-200);display:flex;justify-content:flex-end;gap:10px}
-.drawer-scrim{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:50}
-@keyframes rise{from{opacity:0;transform:translateY(12px)}}
-@keyframes slide{from{transform:translateX(40px);opacity:0}}
-.toast{position:fixed;top:20px;right:20px;z-index:60;display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:14px;background:#fff;border:1px solid var(--n-200);box-shadow:var(--sh-md);font-size:14px;animation:rise .3s var(--ease)}
+.drawer-scrim{position:fixed;inset:0;background:rgba(10,24,22,.35);z-index:50;animation:fade var(--dur-drawer) var(--ease-out)}
+@keyframes fade{from{opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+@keyframes modal-in{from{opacity:0;transform:scale(.96)}}
+@keyframes slide{from{transform:translateX(100%)}}
+@keyframes toast-in{from{opacity:0;transform:translateY(-12px) scale(.98)}}
+/* Toast: entra y sale por arriba (mismo camino). En el frontend con Sonner, que usa transiciones interrumpibles de 400ms */
+.toast{position:fixed;top:20px;right:20px;z-index:60;display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:14px;background:#fff;border:1px solid var(--n-200);box-shadow:var(--sh-md);font-size:14px;animation:toast-in 400ms ease}
 .toast .dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--success-100);color:var(--success-600)}
 
 /* ---------- Shell del personal ---------- */
 .shell{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
-.side{background:var(--primary-900);color:rgba(255,255,255,.72);display:flex;flex-direction:column;padding:18px 12px;min-height:100vh}
+/* Verde casi negro: la marca sigue ahí, pero no pesa en jornadas largas. El ámbar queda solo para lo activo */
+.side{background:#0B2824;color:rgba(255,255,255,.72);display:flex;flex-direction:column;padding:18px 12px;position:sticky;top:0;height:100vh;height:100dvh;overflow-y:auto}
 .side .brand{color:#fff;padding:4px 10px 20px}
 .side .brand span{color:var(--accent-500)}
 .side .group{font:600 11px var(--body);letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);padding:16px 12px 6px}
-.side a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:inherit;font-weight:500;font-size:14px;position:relative;text-decoration:none}
-.side a:hover{background:rgba(255,255,255,.06);color:#fff}
+.side a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:inherit;font-weight:500;font-size:14px;position:relative;text-decoration:none;transition:background-color var(--dur-fast) ease,color var(--dur-fast) ease}
+@media (hover:hover) and (pointer:fine){.side a:hover{background:rgba(255,255,255,.06);color:#fff}}
 .side a.on{background:rgba(255,255,255,.08);color:#fff}
 .side a.on::before{content:"";position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--accent-500)}
 .side a .count{margin-left:auto;font-size:11px;font-weight:700;background:var(--accent-500);color:#2A1A02;border-radius:999px;padding:1px 7px}
-.side .me{margin-top:auto;display:flex;gap:10px;align-items:center;padding:12px;border-radius:12px;background:rgba(255,255,255,.06);color:#fff;font-size:13px}
+.side .me{margin-top:auto;display:grid;gap:6px;padding:12px 12px 6px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);color:#fff;font-size:13px}
+.side .me-id{display:flex;gap:10px;align-items:center;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.08)}
+/* Cerrar sesión: siempre visible, con texto (no solo ícono) */
+/* Rojo coral: el mismo tono de error de la superficie oscura del login. Se lee como "salir" sin gritar sobre el verde */
+.side a.me-out{gap:10px;padding:8px 6px;margin:0 -6px;font-size:13px;color:#FF9C8C}
+@media (hover:hover) and (pointer:fine){.side a.me-out:hover{background:rgba(255,156,140,.12);color:#FFB8AC}}
 .side .me .avatar{background:var(--primary-600);color:#fff}
 .side .me small{display:block;color:rgba(255,255,255,.55);font-size:12px}
 .top{height:64px;background:#fff;border-bottom:1px solid var(--n-200);display:flex;align-items:center;gap:16px;padding:0 28px;position:sticky;top:0;z-index:10}
-.agency{display:inline-flex;align-items:center;gap:10px;height:40px;padding:0 12px;border:1px solid var(--n-200);border-radius:12px;background:#fff;font:500 14px var(--body);color:var(--n-900);cursor:pointer}
+.agency{display:inline-flex;align-items:center;gap:10px;height:40px;padding:0 12px;border:1px solid var(--n-200);border-radius:12px;background:#fff;font:500 14px var(--body);color:var(--n-900);cursor:pointer;transition:border-color var(--dur-fast) ease,transform var(--dur-press) var(--ease-out)}
+.agency:active{transform:scale(.98)}
+@media (hover:hover) and (pointer:fine){.agency:hover{border-color:var(--n-300)}}
 .agency small{display:block;font-size:11.5px;color:var(--n-500);line-height:1.1}
 .agency .dot{width:28px;height:28px;border-radius:8px;background:var(--primary-100);color:var(--primary-700);display:grid;place-items:center}
 .search{position:relative;width:min(380px,40vw)}
 .search .ico{position:absolute;left:12px;top:50%;translate:0 -50%;color:var(--n-500)}
-.search input{width:100%;height:40px;border-radius:12px;border:1px solid var(--n-200);background:var(--n-50);padding:0 40px 0 38px;font:400 14px var(--body)}
+.search input{width:100%;height:40px;border-radius:12px;border:1px solid var(--n-200);background:var(--n-50);padding:0 40px 0 38px;font:400 14px var(--body);color:var(--n-900);outline:none;transition:border-color var(--dur-fast) ease,box-shadow var(--dur-fast) ease,background-color var(--dur-fast) ease}
+.search input:focus{background:#fff;border-color:var(--primary-600);box-shadow:0 0 0 4px var(--primary-100)}
 .search kbd{position:absolute;right:10px;top:50%;translate:0 -50%}
 .top .tools{margin-left:auto;display:flex;align-items:center;gap:8px}
-.icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--n-200);background:#fff;color:var(--n-600);display:grid;place-items:center;cursor:pointer;position:relative}
+.icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--n-200);background:#fff;color:var(--n-600);display:grid;place-items:center;cursor:pointer;position:relative;transition:background-color var(--dur-fast) ease,color var(--dur-fast) ease,transform var(--dur-press) var(--ease-out)}
+.icon-btn:active{transform:scale(.94)}
+@media (hover:hover) and (pointer:fine){.icon-btn:hover{background:var(--n-50);color:var(--n-900)}}
 .icon-btn .pip{position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--accent-500);border:2px solid #fff}
 .main{padding:28px;min-width:0}
 .kpi{padding:18px 20px}
+.kpi:has(> .row [data-spark]){display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"lbl lbl" "val spark" "delta delta";column-gap:10px;align-items:end}
+.kpi:has(> .row [data-spark]) > .row{display:contents}
+.kpi:has(> .row [data-spark]) .lbl{grid-area:lbl;white-space:nowrap}
+.kpi:has(> .row [data-spark]) [data-spark]{grid-area:spark;align-self:end;margin-bottom:6px;width:72px!important}
+.kpi:has(> .row [data-spark]) .val{grid-area:val;white-space:nowrap}
+.kpi:has(> .row [data-spark]) .delta{grid-area:delta}
 .kpi .lbl{font-size:13px;color:var(--n-600);font-weight:500;display:flex;align-items:center;gap:8px}
 .kpi .val{font:700 28px var(--display);letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:6px}
 .kpi .delta{font-size:12.5px;font-weight:600}
 .up{color:var(--success-600)} .down{color:var(--danger-600)}
-@media (max-width:1024px){.shell{grid-template-columns:72px 1fr}.side .brand b,.side a span,.side .group,.side .me div,.side a .count{display:none}.side a{justify-content:center}.side .brand{justify-content:center;padding:4px 0 20px}}
+@media (max-width:1024px){.shell{grid-template-columns:72px 1fr}.side .brand b,.side a span,.side .group,.side .me-id > div,.side a .count{display:none}.side .me{padding:8px 4px 4px;justify-items:center}.side .me-id{border:0;padding:0}.side a.me-out{margin:0}.side a{justify-content:center}.side .brand{justify-content:center;padding:4px 0 20px}}
 
 /* ---------- Gráficos ---------- */
 .chart{width:100%;height:auto;overflow:visible}
@@ -311,13 +395,30 @@ table.table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
 /* ---------- Estado vacío ---------- */
 .empty{display:grid;justify-items:center;gap:10px;text-align:center;padding:48px 16px;color:var(--n-600)}
 .empty svg{width:120px;height:90px;color:var(--n-300)}
-.skeleton{background:linear-gradient(90deg,var(--n-100) 25%,var(--n-200) 37%,var(--n-100) 63%);background-size:400% 100%;animation:sk 1.4s ease infinite;border-radius:8px}
+/* Movimiento constante → linear */
+.skeleton{background:linear-gradient(90deg,var(--n-100) 25%,var(--n-200) 37%,var(--n-100) 63%);background-size:400% 100%;animation:sk 1.4s linear infinite;border-radius:8px}
 @keyframes sk{from{background-position:100% 0}to{background-position:0 0}}
 
 /* ---------- Entrada de página ---------- */
-.enter > *{animation:rise .35s var(--ease) both}
-.enter > *:nth-child(2){animation-delay:.05s}.enter > *:nth-child(3){animation-delay:.1s}.enter > *:nth-child(4){animation-delay:.15s}.enter > *:nth-child(5){animation-delay:.2s}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+/* Una sola ola por página: 8px, 320ms, intervalos que se acortan (50 → 20ms). backwards para no congelar transform al terminar */
+.enter > *{animation:rise 320ms var(--ease-out) backwards}
+.enter > *:nth-child(2){animation-delay:50ms}.enter > *:nth-child(3){animation-delay:90ms}.enter > *:nth-child(4){animation-delay:120ms}.enter > *:nth-child(5){animation-delay:145ms}.enter > *:nth-child(n+6){animation-delay:165ms}
+
+/* Menos movimiento = más suave, no cero: se quedan los fundidos y los cambios de color (explican el estado);
+   se van desplazamientos, escalas, rebotes y pulsos. */
+@media (prefers-reduced-motion:reduce){
+  @keyframes rise{from{opacity:0}}
+  @keyframes modal-in{from{opacity:0}}
+  @keyframes slide{from{opacity:0}}
+  @keyframes toast-in{from{opacity:0}}
+  @keyframes menu-in{from{opacity:0}}
+  .back:active,.ubtn:active{transform:none}
+  @keyframes pop{to{opacity:1}}
+  @keyframes badge{from{opacity:0}}
+  .skeleton,.pill-timer.late{animation:none}
+  .btn:active:not([disabled]),.chip:active,.icon-btn:active,.agency:active,.seat:not(:disabled):active,.check:active input,.seat:not(:disabled):hover{transform:none}
+  .btn-primary .ico:last-child{transition:none}
+}
 .brand b{font:inherit}
 /* Estados alternos de una pantalla (modal, panel): se muestran con #id en la URL */
 .state:not(:target){display:none}
