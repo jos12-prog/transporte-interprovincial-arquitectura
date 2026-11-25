@@ -18,7 +18,7 @@
 .models{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
 .mobilebar{display:none}
 @media (max-width:1000px){.layout{grid-template-columns:1fr}.sum{display:none}.models{grid-template-columns:1fr}
-  .mobilebar{display:flex;position:fixed;left:0;right:0;bottom:62px;z-index:25;background:#fff;border-top:1px solid var(--n-200);padding:12px 16px;align-items:center;gap:12px;box-shadow:0 -8px 24px rgba(15,23,42,.08)}}
+  .mobilebar{display:flex;position:fixed;left:0;right:0;bottom:62px;z-index:25;background:#fff;border-top:1px solid var(--n-200);padding:12px 16px;align-items:center;gap:12px;box-shadow:0 -8px 24px rgba(17,27,25,.08)}}
 </style>
 </head>
 <body>
@@ -28,13 +28,14 @@
     <nav class="nav-links" aria-label="Principal"><a href="../03-inicio-busqueda/code.html" class="on" aria-current="page">Buscar viajes</a><a href="../09-mis-viajes/code.html">Mis viajes</a><a href="#ayuda">Ayuda</a></nav>
     <div class="nav-user">
       <button class="icon-btn" aria-label="Notificaciones"><i data-i="bell"></i></button>
-      <span class="avatar">AQ</span><span class="name">Ana Quispe</span>
+      <div class="umenu"><button class="ubtn" aria-haspopup="menu" aria-expanded="false" data-menu><span class="avatar">AQ</span><span class="name">Ana Quispe</span><i data-i="chevron" class="sm"></i></button><div class="menu" role="menu" aria-label="Cuenta" hidden><div class="menu-head"><b>Ana Quispe</b><span>ana.quispe@gmail.com</span></div><a role="menuitem" href="../09-mis-viajes/code.html"><i data-i="ticket" class="sm"></i>Mis viajes</a><a role="menuitem" href="#cuenta"><i data-i="user" class="sm"></i>Mi cuenta</a><hr><a role="menuitem" class="danger" href="../01-login/code.html"><i data-i="logout" class="sm"></i>Cerrar sesión</a></div></div>
     </div>
   </div>
 </header>
 <nav class="tabbar" aria-label="Navegación inferior"><a href="../03-inicio-busqueda/code.html" class="on"><i data-i="search"></i>Buscar</a><a href="../09-mis-viajes/code.html"><i data-i="ticket"></i>Mis viajes</a><a href="#ayuda"><i data-i="help"></i>Ayuda</a><a href="#cuenta"><i data-i="user"></i>Cuenta</a></nav>
 
 <main class="container page">
+  <a class="back" href="../04-resultados/code.html"><i data-i="back" class="sm"></i>Volver a los horarios</a>
   <nav class="stepper" aria-label="Pasos de compra"><div class="stepper-top"><p>Paso 1 de 4 · <b>Asientos</b></p><span class="row xs muted" style="gap:6px"><i data-i="wifi" class="sm"></i>Disponibilidad en tiempo real</span></div><ol class="steps"><li class="now" aria-current="step"><b>1</b><span>Asientos<small>Elige dónde viajar</small></span></li><li class=""><b>2</b><span>Pasajeros<small>Datos de cada viajero</small></span></li><li class=""><b>3</b><span>Pago<small>Paga seguro con Culqi</small></span></li><li class=""><b>4</b><span>Pasaje<small>Recibe tu boleto con QR</small></span></li></ol></nav>
   <div class="page-head">
     <div><h1>Elige tus asientos</h1><p class="muted small">Ayacucho 22:30 → Lima 07:15 · Transportes Qori Ñan · Bus 2 pisos (52 asientos)</p></div>
@@ -44,7 +45,7 @@
       <div class="segmented" role="group" aria-label="Piso"><button aria-pressed="false">Piso 1 · 12</button><button aria-pressed="true">Piso 2 · 40</button></div>
       <div data-model="bus2" data-floor="1" data-sel="31,32" data-held="18,27" data-taken="13,14,15,16,21,22,25,26,29,33,34,37,41,42,45,46,49,50,51"></div>
       <div data-legend></div>
-      <div class="toast" style="position:static;animation:none;box-shadow:none;background:var(--accent-100);border-color:#F6D49A;color:#7A4A00"><i data-i="clock"></i><span>Los asientos 18 y 27 están <b>pendientes de pago</b>: otra persona los está pagando. Si no paga en 10 min, se liberan y podrás elegirlos.</span></div>
+      <div class="toast" style="position:static;z-index:auto;animation:none;box-shadow:none;background:var(--accent-100);border-color:#F6D49A;color:#7A4A00"><i data-i="clock"></i><span>Los asientos 18 y 27 están <b>pendientes de pago</b>: otra persona los está pagando. Si no paga en 10 min, se liberan y podrás elegirlos.</span></div>
     </section>
     <aside class="card card-pad stack sum">
   <div class="stack-sm">
@@ -60,16 +61,6 @@
   <p class="xs muted">Al continuar, tus asientos quedan retenidos 10 minutos para que completes el pago.</p><a class="btn btn-primary btn-lg btn-block" href="../06-datos-pasajeros/code.html">Continuar <i data-i="arrow"></i></a>
 </aside>
   </div>
-
-  <section class="stack" style="margin-top:40px">
-    <div><h2>El plano cambia según el vehículo</h2><p class="small muted">Cada viaje usa el plano de su modelo. Así se ven los asientos en los vehículos más pequeños.</p></div>
-    <div class="models">
-      <article class="card vcard"><div class="vcard-head"><div><h3>Toyota Yaris</h3><p>Sedán · 4 pasajeros</p></div><span class="cap">04</span></div><div data-model="yaris" data-sel="2" data-taken="3" data-held=""></div></article>
-      <article class="card vcard"><div class="vcard-head"><div><h3>Minivan</h3><p>Familiar · 7 pasajeros</p></div><span class="cap">07</span></div><div data-model="minivan" data-sel="5" data-taken="2,6" data-held=""></div></article>
-      <article class="card vcard"><div class="vcard-head"><div><h3>Van</h3><p>Transporte · 15 pasajeros</p></div><span class="cap">15</span></div><div data-model="van" data-sel="10" data-taken="3,6,13,14" data-held="11"></div></article>
-    </div>
-    <div data-legend></div>
-  </section>
 </main>
 <div class="mobilebar"><div class="grow"><b class="num">S/ 170.00</b><div class="xs muted">Asientos 31 y 32</div></div><a class="btn btn-primary" href="../06-datos-pasajeros/code.html">Continuar <i data-i="arrow" class="sm"></i></a></div>
 

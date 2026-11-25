@@ -1,0 +1,217 @@
+/* RutaAndina · pantallas de acceso (pasajero/01-login, pasajero/02-registro, personal/01-login).
+   Especificación en ../DESIGN.md §6 (movimiento) y §9 (inicio de sesión).
+   En el frontend: <AuthLayout> + <AuthCard> + <SubmitButton state> + <GoogleButton>, con estas mismas curvas y duraciones. */
+
+:root{
+  /* Marca (DESIGN.md §2) */
+  --primary-900:#063F36; --primary-700:#0B5C4E; --primary-600:#0E6B5C; --primary-500:#11806D; --primary-100:#DDF2EC;
+  --accent-500:#F2A93B; --accent-100:#FDF1DC;
+
+  /* Superficie oscura del acceso (DESIGN.md §9) */
+  --surface:rgba(8,26,23,.76); --line:rgba(255,255,255,.10); --line-strong:rgba(255,255,255,.18); --line-hover:rgba(255,255,255,.30);
+  --fill:rgba(255,255,255,.05); --fill-focus:rgba(255,255,255,.08);
+  --text:#F2F7F5; --text-2:rgba(242,247,245,.74); --text-3:rgba(242,247,245,.54);
+  --danger:#FF9C8C; --ok:#7FD8BE;
+
+  /* Movimiento (DESIGN.md §6) — curvas fuertes, nunca ease-in */
+  --ease-out:cubic-bezier(.23,1,.32,1);
+  --ease-in-out:cubic-bezier(.77,0,.175,1);
+  --ease-drawer:cubic-bezier(.32,.72,0,1);
+  --dur-press:160ms; --dur-fast:150ms; --dur-base:200ms; --dur-enter:560ms;
+
+  --display:"Plus Jakarta Sans",system-ui,sans-serif; --body:"Inter",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{position:relative}
+body{font:400 15px/1.5 var(--body);color:var(--text);background:#061614;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--accent-500);text-decoration:none;font-weight:500;text-underline-offset:3px;transition:color var(--dur-fast) ease}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--accent-500);outline-offset:2px;border-radius:6px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* ---------- Fondo: fotos + degradado ---------- */
+.bg{position:fixed;inset:0;overflow:hidden;background:radial-gradient(120% 80% at 70% 100%,#0E6B5C 0%,#063F36 45%,#04201C 100%)}
+.pan{position:absolute;inset:0;transition:transform 900ms var(--ease-out)}            /* parallax: la transición suaviza el puntero */
+.slide{position:absolute;inset:0;opacity:0;transition:opacity 1400ms ease}
+.slide.active{opacity:1}
+.slide img{position:absolute;max-width:none;-webkit-user-select:none;user-select:none}
+.slide.active img{animation:kb 12s linear forwards}                                   /* movimiento constante → linear */
+@keyframes kb{from{transform:scale(1.06)}to{transform:scale(1)}}
+.shade{position:fixed;inset:0;pointer-events:none;background:
+    radial-gradient(38% 55% at 50% 50%,rgba(3,18,16,.58),rgba(3,18,16,0) 75%),
+    linear-gradient(180deg,rgba(3,18,16,.55) 0%,rgba(3,18,16,.05) 35%,rgba(3,18,16,.10) 60%,rgba(3,18,16,.82) 100%),
+    linear-gradient(90deg,rgba(6,63,54,.45),rgba(6,63,54,0) 45%,rgba(242,169,59,0) 70%,rgba(242,169,59,.10))}
+.staff .shade{background:
+    radial-gradient(38% 55% at 50% 50%,rgba(3,18,16,.58),rgba(3,18,16,0) 75%),
+    linear-gradient(180deg,rgba(3,18,16,.55) 0%,rgba(3,18,16,.05) 35%,rgba(3,18,16,.10) 60%,rgba(3,18,16,.82) 100%),
+    linear-gradient(90deg,rgba(6,63,54,.55),rgba(6,63,54,.12) 45%,rgba(6,63,54,.12) 55%,rgba(6,63,54,.55))}
+
+/* ---------- Layout ---------- */
+.stage{position:relative;min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:48px 16px 104px}
+
+/* ---------- Tarjeta ----------
+   Entrada única por visita (nivel "rara vez"): sube 14px, aclara un desenfoque de 6px y escala desde .985.
+   fill-mode backwards: al terminar no "congela" el transform, así :active y la sacudida siguen funcionando. */
+.card{width:100%;max-width:420px;padding:32px;border-radius:24px;background:var(--surface);
+  border:1px solid var(--line);
+  box-shadow:0 0 0 1px rgba(0,0,0,.18),0 1px 0 rgba(255,255,255,.06) inset,0 24px 64px -24px rgba(0,0,0,.70);
+  -webkit-backdrop-filter:blur(20px) saturate(140%);backdrop-filter:blur(20px) saturate(140%);
+  animation:card-in var(--dur-enter) var(--ease-out) 80ms backwards}
+@keyframes card-in{from{opacity:0;transform:translateY(14px) scale(.985);filter:blur(6px)}}
+/* Error: sacudida corta que se amortigua (no rebota igual en cada lado) */
+.card.shake{animation:shake 380ms var(--ease-out)}
+@keyframes shake{15%{transform:translateX(-7px)}35%{transform:translateX(5px)}55%{transform:translateX(-3px)}75%{transform:translateX(1.5px)}}
+
+/* Contenido en cascada, con intervalos que se acortan (48ms → 14ms): se siente como una sola ola, no como una fila */
+.in{animation:in 420ms var(--ease-out) backwards;animation-delay:calc(140ms + var(--i,0) * 48ms - var(--i,0) * var(--i,0) * 2ms)}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+
+/* ---------- Marca ---------- */
+.lockup{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.lockup svg{width:46px;height:46px;flex:none;overflow:visible}
+.wordmark{font:800 20px/1 var(--display);letter-spacing:-.02em}
+.wordmark span{color:var(--accent-500)}
+.badge{margin-left:auto;font:600 11px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent-100);
+  padding:6px 9px;border-radius:999px;border:1px solid rgba(242,169,59,.40);background:rgba(242,169,59,.10)}
+.ra-road-line{animation:road 1.6s linear infinite paused}
+@media (hover:hover) and (pointer:fine){.lockup:hover .ra-road-line{animation-play-state:running}}
+@keyframes road{to{stroke-dashoffset:-15}}
+/* El pin cae sobre Huamanga una sola vez, con un asentamiento de 1px */
+.ra-pin{animation:pin 620ms var(--ease-out) 420ms backwards}
+@keyframes pin{0%{opacity:0;transform:translate(57px,29px)}70%{opacity:1;transform:translate(57px,40px)}100%{transform:translate(57px,39px)}}
+
+h1{font:700 26px/1.2 var(--display);letter-spacing:-.022em;text-wrap:balance}
+.lead{color:var(--text-2);margin-top:6px;text-wrap:pretty}
+
+/* ---------- Google ----------
+   Estilo oscuro oficial de Google Identity (relleno #131314, borde #8E918F, texto #E3E3E3, Roboto 500).
+   No se recolorea el logo ni se cambia el texto aprobado ("Continuar con Google" / "Registrarse con Google"). */
+.gbtn{position:relative;width:100%;height:48px;margin-top:22px;border-radius:12px;cursor:pointer;
+  background:#131314;border:1px solid #8E918F;color:#E3E3E3;font:500 14.5px/1 "Roboto",var(--body);letter-spacing:.1px;
+  display:grid;place-items:center;
+  transition:background-color var(--dur-fast) ease,border-color var(--dur-fast) ease,transform var(--dur-press) var(--ease-out)}
+.gbtn .g{width:18px;height:18px;flex:none}
+@media (hover:hover) and (pointer:fine){.gbtn:hover{background:#1E1F20;border-color:#A8ABA9}}
+.gbtn:active{transform:scale(.97)}
+.gbtn[data-state=loading]{cursor:progress}
+
+/* Separador "o" */
+.sep{display:flex;align-items:center;gap:12px;margin:18px 0 0;font-size:12.5px;color:var(--text-3)}
+.sep::before,.sep::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* ---------- Capas de estado de un botón ----------
+   Las tres capas (normal, cargando, listo) ocupan la misma celda; se cruzan con opacidad + 3px + blur(3px)
+   para que el ojo vea UNA transformación y no dos cosas superpuestas. */
+.layers{display:grid;place-items:center}
+.layer{grid-area:1/1;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out),filter var(--dur-base) var(--ease-out)}
+.layer:not(.on){opacity:0;transform:translateY(3px) scale(.96);filter:blur(3px);pointer-events:none}
+.spin{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.30);border-top-color:#fff;animation:rot 600ms linear infinite}
+.gbtn .spin{border-color:rgba(227,227,227,.25);border-top-color:#E3E3E3}
+@keyframes rot{to{transform:rotate(360deg)}}
+/* El check se dibuja al llegar a "listo" */
+.tick path{stroke-dasharray:24;stroke-dashoffset:24}
+.on .tick path{transition:stroke-dashoffset 320ms var(--ease-out) 80ms;stroke-dashoffset:0}
+
+/* ---------- Formulario ---------- */
+form{display:grid;gap:16px;margin-top:16px}
+.field{display:flex;flex-direction:column}
+.label-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.field > label{margin-bottom:8px}
+label{font-size:13.5px;font-weight:500;color:var(--text-2)}
+.label-row a{font-size:13px}
+.control{position:relative}
+.control > svg{position:absolute;left:14px;top:50%;translate:0 -50%;width:18px;height:18px;color:var(--text-3);pointer-events:none;transition:color var(--dur-fast) ease}
+input[type=text],input[type=email],input[type=password],select{width:100%;height:48px;padding:0 44px 0 42px;border-radius:12px;
+  font:500 15px var(--body);color:var(--text);background:var(--fill);border:1px solid var(--line-strong);outline:none;
+  transition:border-color var(--dur-fast) ease,box-shadow var(--dur-fast) ease,background-color var(--dur-fast) ease}
+input::placeholder{color:var(--text-3);font-weight:400}
+@media (hover:hover) and (pointer:fine){input:hover,select:hover{border-color:var(--line-hover)}}
+input:focus,select:focus{border-color:var(--accent-500);background:var(--fill-focus);box-shadow:0 0 0 4px rgba(242,169,59,.16)}
+.control:focus-within > svg{color:var(--accent-500)}
+.field.invalid input{border-color:var(--danger);box-shadow:0 0 0 4px rgba(255,156,140,.13)}
+.field.invalid .control > svg{color:var(--danger)}
+input:-webkit-autofill{-webkit-text-fill-color:var(--text);-webkit-box-shadow:0 0 0 48px #12302B inset;caret-color:var(--text)}
+
+.toggle{position:absolute;right:6px;top:50%;translate:0 -50%;width:36px;height:36px;border:0;border-radius:8px;background:none;color:var(--text-3);cursor:pointer;display:grid;place-items:center;
+  transition:color var(--dur-fast) ease,background-color var(--dur-fast) ease,transform var(--dur-press) var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.toggle:hover{color:var(--text);background:rgba(255,255,255,.08)}}
+.toggle:active{transform:scale(.92)}
+
+/* Mensajes bajo el campo: la fila se abre (0fr → 1fr) y el texto baja 4px mientras aparece.
+   El alto es la única excepción a "solo transform/opacity": es un acordeón, no hay equivalente con transform. */
+.reveal{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--dur-base) var(--ease-out)}
+.reveal > *{overflow:hidden;min-height:0}
+.reveal p{padding-top:7px;font-size:13px;opacity:0;transform:translateY(-4px);transition:opacity var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out)}
+.reveal.show{grid-template-rows:1fr}
+.reveal.show p{opacity:1;transform:none}
+.msg{color:var(--danger)}
+.caps{color:var(--accent-100)}
+
+/* Casilla */
+.check{display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--text-2);cursor:pointer;width:max-content;-webkit-tap-highlight-color:transparent}
+.check input{appearance:none;-webkit-appearance:none;flex:none;width:18px;height:18px;border-radius:5px;border:1.5px solid rgba(255,255,255,.35);display:grid;place-items:center;cursor:pointer;
+  transition:background-color var(--dur-fast) ease,border-color var(--dur-fast) ease,transform var(--dur-press) var(--ease-out)}
+.check input::after{content:"";width:9px;height:5px;border:2px solid #0A1F1D;border-top:0;border-right:0;rotate:-45deg;translate:0 -1px;
+  opacity:0;scale:.7;transition:opacity var(--dur-fast) var(--ease-out),scale var(--dur-base) var(--ease-out)}
+.check input:checked{background:var(--accent-500);border-color:var(--accent-500)}
+.check input:checked::after{opacity:1;scale:1}
+.check:active input{transform:scale(.9)}
+
+/* ---------- Botón principal ---------- */
+.btn{position:relative;width:100%;height:50px;border:0;border-radius:12px;cursor:pointer;
+  font:700 15.5px var(--display);color:#fff;background:var(--primary-600);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 0 0 1px rgba(0,0,0,.12),0 8px 20px -8px rgba(14,107,92,.9);
+  transition:background-color var(--dur-fast) ease,transform var(--dur-press) var(--ease-out)}
+@media (hover:hover) and (pointer:fine){
+  .btn:hover{background:var(--primary-500)}
+  .btn .arrow{transition:transform var(--dur-base) var(--ease-out)}
+  .btn:hover .arrow{transform:translateX(3px)}
+}
+.btn:active{transform:scale(.97)}
+.btn[data-state=loading]{cursor:progress}
+.btn[data-state=done]{background:var(--primary-700)}
+
+/* ---------- Pie de tarjeta ---------- */
+.alt{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);display:grid;gap:10px;font-size:14px;color:var(--text-2);text-align:center}
+.alt .quiet{font-size:13px;color:var(--text-3)}
+.alt .quiet a{color:var(--text)}
+
+/* ---------- Leyenda de la foto y pie ---------- */
+.caption{position:fixed;left:24px;bottom:22px;display:grid;gap:8px;font-size:13px;color:rgba(255,255,255,.86);text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.caption[hidden]{display:none}
+.caption .where{display:flex;align-items:center;gap:8px;font-weight:500;transition:opacity 280ms ease,filter 280ms ease}
+.caption .where.out{opacity:0;filter:blur(2px)}
+.caption .where svg{color:var(--accent-500);flex:none}
+.dots{display:flex;gap:6px;padding-left:22px}
+.dots i{width:28px;height:2px;border-radius:2px;background:rgba(255,255,255,.28);position:relative;overflow:hidden}
+.dots i::after{content:"";position:absolute;inset:0;background:#fff;transform:scaleX(0);transform-origin:left}
+.dots i.done::after{transform:none}
+.dots i.run::after{animation:fill var(--dur) linear forwards}
+@keyframes fill{to{transform:none}}
+.legal{position:fixed;right:24px;bottom:22px;font-size:12px;color:rgba(255,255,255,.55)}
+/* Si la tarjeta no entra en la altura, la leyenda deja de flotar y baja con la página (nunca la tapa) */
+@media (max-height:900px){.caption,.legal{position:absolute}}
+
+@media (max-width:520px){
+  .stage{padding:24px 12px 88px;place-items:start center}
+  .card{padding:24px 20px;margin-top:4vh}
+  h1{font-size:23px}
+  .caption{left:16px;bottom:16px}
+  .legal{display:none}
+}
+
+/* Menos movimiento = movimiento más suave, no cero: se conservan los fundidos que explican un cambio
+   y se quitan desplazamientos, escalas, desenfoques, parallax, zoom y sacudidas. */
+@keyframes fade{from{opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  .card,.in,.ra-pin{animation-name:fade}
+  .card.shake,.slide.active img,.ra-road-line{animation:none}
+  .pan{transition:none}
+  .layer:not(.on){transform:none;filter:none}
+  .reveal p{transform:none}
+  .btn:active,.gbtn:active,.toggle:active,.check:active input{transform:none}
+  .btn .arrow{transition:none}
+  .caption .where.out{filter:none}
+}

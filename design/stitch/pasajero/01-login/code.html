@@ -2,11 +2,13 @@
 <html lang="es">
 <head>
 <!--
-  RutaAndina · pasajero/01-login  (maqueta de referencia; especificación en ../../DESIGN.md §9)
-  - HTML autocontenido para revisión visual. Codex lo replica en React + Tailwind + Framer Motion.
-  - Fotos: ../../_assets/login/fondo*.jpg (optimizadas, 1920 px). En el frontend: src/frontend/src/assets/login/.
-  - Logo: ../../_assets/brand/logo-mark.svg (aquí va en línea).
+  RutaAndina · pasajero/01-login  (maqueta de referencia; especificación en ../../DESIGN.md §6 y §9)
+  - Estilos y comportamiento compartidos con registro y portal de agencias: ../../_assets/auth.css y auth.js.
+  - Fotos: ../../_assets/login/fondo*.jpg (1920 px). En el frontend: src/frontend/src/assets/login/.
+  - Logo: ../../_assets/brand/logo-mark.svg (aquí va en línea para animar el pin).
   - Envío simulado: la contraseña "rutaandina" entra. En el frontend real: POST /api/auth/login.
+  - "Continuar con Google" es simulado. Su integración (Google Identity Services + verificación del ID token
+    en el backend) requiere un change de OpenSpec antes de implementarse.
 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,142 +16,8 @@
 <title>Iniciar sesión · RutaAndina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    /* DESIGN.md §2 */
-    --primary-900:#063F36; --primary-700:#0B5C4E; --primary-600:#0E6B5C; --primary-100:#DDF2EC;
-    --accent-500:#F2A93B; --accent-100:#FDF1DC;
-    /* superficie oscura del login (DESIGN.md §9) */
-    --surface:rgba(7,28,25,.74); --line:rgba(255,255,255,.12); --line-strong:rgba(255,255,255,.22);
-    --text:#F3F8F6; --text-2:rgba(243,248,246,.72); --text-3:rgba(243,248,246,.52);
-    --danger:#FF9585;
-    --ease:cubic-bezier(.2,.8,.2,1);
-    --display:"Plus Jakarta Sans",system-ui,sans-serif; --body:"Inter",system-ui,sans-serif;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{min-height:100%}
-  body{font:400 15px/1.5 var(--body);color:var(--text);background:#061614;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-  a{color:var(--accent-500);text-decoration:none;font-weight:500}
-  a:hover{text-decoration:underline;text-underline-offset:3px}
-  :focus-visible{outline:2px solid var(--accent-500);outline-offset:2px;border-radius:6px}
-
-  /* ---------- Fondo: fotos + degradado ---------- */
-  .bg{position:fixed;inset:0;overflow:hidden;background:radial-gradient(120% 80% at 70% 100%,#0E6B5C 0%,#063F36 45%,#04201C 100%)}
-  .pan{position:absolute;inset:0;transition:transform 1.2s var(--ease)}
-  .slide{position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease}
-  .slide.active{opacity:1}
-  .slide img{position:absolute;max-width:none;-webkit-user-select:none;user-select:none}
-  .slide.active img{animation:kb 12s linear forwards}
-  @keyframes kb{from{transform:scale(1.06)}to{transform:scale(1)}}
-  .shade{position:fixed;inset:0;pointer-events:none;background:
-      radial-gradient(38% 55% at 50% 50%,rgba(3,18,16,.55),rgba(3,18,16,0) 75%),
-      linear-gradient(180deg,rgba(3,18,16,.55) 0%,rgba(3,18,16,.05) 35%,rgba(3,18,16,.10) 60%,rgba(3,18,16,.80) 100%),
-      linear-gradient(90deg,rgba(6,63,54,.45),rgba(6,63,54,0) 45%,rgba(242,169,59,0) 70%,rgba(242,169,59,.10))}
-
-  /* ---------- Layout ---------- */
-  .stage{position:relative;min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:48px 16px 104px}
-
-  /* ---------- Tarjeta ---------- */
-  .card{width:100%;max-width:420px;padding:32px;border-radius:24px;background:var(--surface);
-    border:1px solid var(--line);box-shadow:0 24px 64px -24px rgba(0,0,0,.65);
-    -webkit-backdrop-filter:blur(20px) saturate(140%);backdrop-filter:blur(20px) saturate(140%);
-    animation:enter .6s var(--ease) .15s both}
-  @keyframes enter{from{opacity:0;transform:translateY(16px)}}
-  .card.shake{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
-  @keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
-  .in{animation:enter .5s var(--ease) both;animation-delay:calc(.3s + var(--i,0)*.05s)}
-
-  .lockup{display:flex;align-items:center;gap:10px;margin-bottom:28px}
-  .lockup svg{width:46px;height:46px;flex:none;overflow:visible}
-  .wordmark{font:800 20px/1 var(--display);letter-spacing:-.02em}
-  .wordmark span{color:var(--accent-500)}
-  .badge{margin-left:auto;font:600 11px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent-100);
-    padding:6px 9px;border-radius:999px;border:1px solid rgba(242,169,59,.45);background:rgba(242,169,59,.10)}
-  .ra-road-line{stroke-dashoffset:0;animation:roadMove 1.6s linear infinite paused}
-  .lockup:hover .ra-road-line{animation-play-state:running}
-  @keyframes roadMove{to{stroke-dashoffset:-15}}
-  .ra-pin{animation:pin .7s var(--ease) .5s both}
-  @keyframes pin{from{opacity:0;transform:translate(57px,31px)}to{opacity:1;transform:translate(57px,39px)}}
-
-  h1{font:700 26px/1.2 var(--display);letter-spacing:-.02em}
-  .lead{color:var(--text-2);margin-top:6px}
-
-  form{display:grid;gap:18px;margin-top:24px}
-  .field{display:grid;gap:8px}
-  .label-row{display:flex;justify-content:space-between;align-items:baseline}
-  label{font-size:13.5px;font-weight:500;color:var(--text-2)}
-  .label-row a{font-size:13px}
-  .control{position:relative}
-  .control > svg{position:absolute;left:14px;top:50%;translate:0 -50%;width:18px;height:18px;color:var(--text-3);pointer-events:none;transition:color .2s}
-  input[type=text],input[type=email],input[type=password]{width:100%;height:48px;padding:0 44px 0 42px;border-radius:12px;
-    font:500 15px var(--body);color:var(--text);background:rgba(255,255,255,.06);border:1px solid var(--line-strong);outline:none;
-    transition:border-color .2s,box-shadow .2s,background .2s}
-  input::placeholder{color:var(--text-3);font-weight:400}
-  input:hover{border-color:rgba(255,255,255,.32)}
-  input:focus{border-color:var(--accent-500);background:rgba(255,255,255,.08);box-shadow:0 0 0 4px rgba(242,169,59,.18)}
-  .control:focus-within > svg{color:var(--accent-500)}
-  .field.invalid input{border-color:var(--danger);box-shadow:0 0 0 4px rgba(255,149,133,.14)}
-  .toggle{position:absolute;right:6px;top:50%;translate:0 -50%;width:36px;height:36px;border:0;border-radius:8px;background:none;color:var(--text-3);cursor:pointer;display:grid;place-items:center}
-  .toggle:hover{color:var(--text);background:rgba(255,255,255,.08)}
-  .msg{font-size:13px;color:var(--danger);display:none}
-  .msg.show{display:block}
-  .caps{font-size:12.5px;color:var(--accent-100);display:none}
-  .caps.show{display:block}
-
-  .check{display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--text-2);cursor:pointer;width:max-content}
-  .check input{appearance:none;-webkit-appearance:none;width:18px;height:18px;border-radius:5px;border:1.5px solid rgba(255,255,255,.35);display:grid;place-items:center;cursor:pointer;transition:.15s}
-  .check input:checked{background:var(--accent-500);border-color:var(--accent-500)}
-  .check input:checked::after{content:"";width:9px;height:5px;border:2px solid #0A1F1D;border-top:0;border-right:0;rotate:-45deg;translate:0 -1px}
-
-  .btn{height:50px;border:0;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
-    font:700 15.5px var(--display);color:#fff;background:var(--primary-600);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 8px 20px -8px rgba(14,107,92,.9);
-    transition:background .2s,transform .2s var(--ease)}
-  .btn:hover{background:#11806D}
-  .btn:active{transform:scale(.985)}
-  .btn svg{transition:transform .2s var(--ease)}
-  .btn:hover .arrow{transform:translateX(3px)}
-  .btn .spin{display:none;width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:rot .7s linear infinite}
-  @keyframes rot{to{rotate:360deg}}
-  .btn.loading{cursor:progress}
-  .btn.loading .txt,.btn.loading .arrow{display:none}
-  .btn.loading .spin{display:block}
-  .btn .ok{display:none;align-items:center;gap:8px}
-  .btn.done{background:var(--primary-700)}
-  .btn.done .txt,.btn.done .arrow{display:none}
-  .btn.done .ok{display:flex}
-
-  .alt{margin-top:24px;padding-top:20px;border-top:1px solid var(--line);display:grid;gap:10px;font-size:14px;color:var(--text-2);text-align:center}
-  .alt .quiet{font-size:13px;color:var(--text-3)}
-  .alt .quiet a{color:var(--text)}
-
-  /* ---------- Leyenda de la foto y pie ---------- */
-  .caption{position:fixed;left:24px;bottom:22px;display:grid;gap:8px;font-size:13px;color:rgba(255,255,255,.85);text-shadow:0 1px 8px rgba(0,0,0,.5)}
-  .caption[hidden]{display:none}
-  .caption .where{display:flex;align-items:center;gap:8px;font-weight:500;transition:opacity .4s}
-  .caption .where.out{opacity:0}
-  .caption .where svg{color:var(--accent-500);flex:none}
-  .dots{display:flex;gap:6px;padding-left:22px}
-  .dots i{width:28px;height:2px;border-radius:2px;background:rgba(255,255,255,.3);position:relative;overflow:hidden}
-  .dots i::after{content:"";position:absolute;inset:0;background:#fff;transform:scaleX(0);transform-origin:left}
-  .dots i.done::after{transform:none}
-  .dots i.run::after{animation:fill var(--dur) linear forwards}
-  @keyframes fill{to{transform:none}}
-  .legal{position:fixed;right:24px;bottom:22px;font-size:12px;color:rgba(255,255,255,.55)}
-
-  @media (max-width:520px){
-    .stage{padding:24px 12px 88px;place-items:start center}
-    .card{padding:24px 20px;margin-top:4vh}
-    h1{font-size:23px}
-    .caption{left:16px;bottom:16px}
-    .legal{display:none}
-  }
-  @media (prefers-reduced-motion:reduce){
-    *,*::before,*::after{animation:none!important;transition:none!important}
-  }
-  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&family=Roboto:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../_assets/auth.css">
 </head>
 <body>
 
@@ -175,50 +43,63 @@
         </g>
       </svg>
       <span class="wordmark">Ruta<span>Andina</span></span>
-
     </div>
 
     <h1 id="titulo" class="in" style="--i:1">Inicia sesión</h1>
     <p class="lead in" style="--i:2">Reserva tu asiento y revisa tus pasajes en un solo lugar.</p>
 
+    <!-- Opción más directa primero: un toque y entra con su cuenta de Google -->
+    <button type="button" class="gbtn in" style="--i:3" id="google" data-state="idle">
+      <span class="layers">
+        <span class="layer" data-layer="idle">
+          <svg class="g" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Continuar con Google
+        </span>
+        <span class="layer" data-layer="loading"><span class="spin" aria-hidden="true"></span>Conectando con Google…</span>
+      </span>
+    </button>
+
+    <div class="sep in" style="--i:4" role="separator"><span>o con tu correo o DNI</span></div>
+
     <form id="form" novalidate>
-      <div class="field in" id="f-user" style="--i:3">
+      <div class="field in" id="f-user" style="--i:5">
         <label for="user">Correo o DNI</label>
         <div class="control">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"/></svg>
           <input id="user" name="user" type="text" placeholder="nombre@correo.com" autocomplete="username" autocapitalize="off" spellcheck="false" required aria-describedby="e-user">
         </div>
-        <p class="msg" id="e-user" role="alert"></p>
+        <div class="reveal" id="r-user"><div><p class="msg" id="e-user" role="alert"></p></div></div>
       </div>
 
-      <div class="field in" id="f-pass" style="--i:4">
+      <div class="field in" id="f-pass" style="--i:6">
         <div class="label-row">
           <label for="pass">Contraseña</label>
           <a href="#recuperar">¿La olvidaste?</a>
         </div>
         <div class="control">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-          <input id="pass" name="pass" type="password" placeholder="Mínimo 8 caracteres" autocomplete="current-password" required aria-describedby="e-pass caps">
+          <input id="pass" name="pass" type="password" placeholder="Mínimo 8 caracteres" autocomplete="current-password" required aria-describedby="e-pass e-caps">
           <button type="button" class="toggle" id="toggle" aria-label="Mostrar contraseña" aria-pressed="false">
             <svg id="eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
         </div>
-        <p class="msg" id="e-pass" role="alert"></p>
-        <p class="caps" id="caps">Bloq Mayús está activado.</p>
+        <div class="reveal" id="r-pass"><div><p class="msg" id="e-pass" role="alert"></p></div></div>
+        <div class="reveal" id="r-caps"><div><p class="caps" id="e-caps"></p></div></div>
       </div>
 
-      <label class="check in" style="--i:5"><input type="checkbox" id="remember"> Mantener la sesión iniciada</label>
+      <label class="check in" style="--i:7"><input type="checkbox" id="remember"> Mantener la sesión iniciada</label>
 
-      <button class="btn in" style="--i:6" type="submit" id="submit">
-        <span class="txt">Iniciar sesión</span>
-        <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        <span class="spin" aria-hidden="true"></span>
-        <span class="ok"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg> Sesión iniciada</span>
+      <button class="btn in" style="--i:8" type="submit" id="submit" data-state="idle">
+        <span class="layers">
+          <span class="layer" data-layer="idle">Iniciar sesión <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <span class="layer" data-layer="loading"><span class="spin" aria-hidden="true"></span><span class="sr-only">Verificando</span></span>
+          <span class="layer" data-layer="done"><svg class="tick" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg> Sesión iniciada</span>
+        </span>
       </button>
       <span class="sr-only" id="live" aria-live="polite"></span>
     </form>
 
-    <div class="alt in" style="--i:7">
+    <div class="alt in" style="--i:9">
       <p>¿No tienes cuenta? <a href="../02-registro/code.html">Regístrate gratis</a></p>
       <p class="quiet">¿Trabajas en una agencia? <a href="../../personal/01-login/code.html">Portal de agencias</a></p>
     </div>
@@ -232,102 +113,24 @@
 <p class="legal">© 2026 RutaAndina · Ayacucho, Perú</p>
 
 <script>
-(() => {
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const A = '../../_assets/login/';
-  /* focus: punto (0–1) donde está el vehículo; side: en pantallas anchas se lleva a la derecha de la tarjeta;
-     zoom: acercamiento máximo permitido (1.2 por defecto) */
-  const SLIDES = [
-    {file:'fondo.jpg',   focus:{x:.62,y:.85}, side:true,  place:'Carretera interprovincial · Ayacucho'},
-    {file:'fondo-2.jpg', focus:{x:.38,y:.58}, side:true,  zoom:1.5, place:'Bus interprovincial en ruta'},
-    {file:'fondo-4.jpg', focus:{x:.47,y:.61}, side:true,  zoom:1.6, place:'Por la puna ayacuchana'},
-    {file:'fondo-3.jpg', focus:{x:.50,y:.60}, side:false, place:'Camino a Vilcashuamán · Ayacucho'},
-  ];
-  const DURATION = 8000;
-
-  const pan = document.getElementById('pan'), cap = document.getElementById('caption'),
-        where = document.getElementById('where'), whereTxt = document.getElementById('where-txt'), dots = document.getElementById('dots');
-  const ready = []; let current = -1, timer = null;
-  const load = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = src; });
-
-  const frame = it => {
-    const img = it.img, f = it.focus, M = 24, w = img.naturalWidth, h = img.naturalHeight;
-    const vw = innerWidth + M*2, vh = innerHeight + M*2, side = innerWidth >= 980 && it.side;
-    const tx = M + innerWidth * (side ? .80 : .5), ty = M + innerHeight * (side ? .72 : (innerWidth < 520 ? .88 : .62));
-    const cover = Math.max(vw/w, vh/h);                                   // nunca más de 1.2× el encuadre mínimo (evita fotos borrosas)
-    const s = Math.min(cover*(it.zoom||1.2), Math.max(cover, tx/(f.x*w), (vw-tx)/((1-f.x)*w), ty/(f.y*h), (vh-ty)/((1-f.y)*h)));
-    const W = w*s, H = h*s, clamp = (v, lo) => Math.min(0, Math.max(lo, v));
-    const L = clamp(tx-f.x*W, vw-W), T = clamp(ty-f.y*H, vh-H);
-    Object.assign(img.style, {width:W+'px', height:H+'px', left:(L-M)+'px', top:(T-M)+'px', transformOrigin:`${f.x*100}% ${f.y*100}%`});
+  window.RA_AUTH = {
+    /* focus: punto (0–1) donde está el vehículo; side: en pantallas anchas se lleva a la derecha de la tarjeta; zoom: acercamiento máximo */
+    slides: [
+      {file:'fondo.jpg',   focus:{x:.62,y:.85}, side:true,  place:'Carretera interprovincial · Ayacucho'},
+      {file:'fondo-2.jpg', focus:{x:.38,y:.58}, side:true,  zoom:1.5, place:'Bus interprovincial en ruta'},
+      {file:'fondo-4.jpg', focus:{x:.47,y:.61}, side:true,  zoom:1.6, place:'Por la puna ayacuchana'},
+      {file:'fondo-3.jpg', focus:{x:.50,y:.60}, side:false, place:'Camino a Vilcashuamán · Ayacucho'},
+    ],
+    fields: ['user', 'pass'],
+    validate: ({user, pass}) => ({
+      user: !user ? 'Escribe tu correo o DNI.' : (/^\d{8}$/.test(user) || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user)) ? '' : 'Usa un correo válido o un DNI de 8 dígitos.',
+      pass: !pass ? 'Escribe tu contraseña.' : pass.length < 8 ? 'La contraseña tiene al menos 8 caracteres.' : '',
+    }),
+    accept: ({pass}) => pass === 'rutaandina',
+    wrong: {field:'pass', text:'El correo, DNI o contraseña no coinciden.'},
+    ok: 'Sesión iniciada',
   };
-  addEventListener('resize', () => ready.forEach(frame));
-
-  const show = i => {
-    const prev = ready[current]; current = i; const it = ready[i];
-    frame(it); it.el.classList.remove('active'); void it.el.offsetWidth; it.el.classList.add('active');
-    if (prev && prev !== it) setTimeout(() => prev.el.classList.remove('active'), 60);
-    where.classList.add('out'); setTimeout(() => { whereTxt.textContent = it.place; where.classList.remove('out'); }, 300);
-    [...dots.children].forEach((d, k) => d.className = k < i ? 'done' : '');
-    const d = dots.children[i]; if (d && !reduce) { d.style.setProperty('--dur', DURATION + 'ms'); void d.offsetWidth; d.className = 'run'; }
-  };
-  const play = () => { clearInterval(timer); if (!reduce && ready.length > 1) timer = setInterval(() => show((current + 1) % ready.length), DURATION); };
-  document.addEventListener('visibilitychange', () => document.hidden ? clearInterval(timer) : play());
-
-  const loads = SLIDES.map(cfg => load(A + cfg.file));   // la primera foto de la lista siempre abre el carrusel
-  SLIDES.forEach((cfg, idx) => (async () => {
-    const img = await loads[idx]; if (idx > 0) await loads[0]; if (!img) return;
-    const el = document.createElement('div'); el.className = 'slide'; img.alt = ''; el.appendChild(img); pan.appendChild(el);
-    const it = {...cfg, img, el, order: idx}, active = ready[current];
-    ready.push(it); ready.sort((a, b) => a.order - b.order);
-    const pos = ready.indexOf(it); dots.insertBefore(document.createElement('i'), dots.children[pos] || null);
-    dots.style.display = ready.length > 1 ? 'flex' : 'none';
-    if (current === -1) { cap.hidden = false; show(pos); }
-    else { current = ready.indexOf(active); if (pos < current) dots.children[pos].className = 'done'; }
-    if (!timer) play();
-  })());
-
-  if (!reduce && matchMedia('(pointer:fine)').matches) {
-    let raf; addEventListener('pointermove', e => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => {
-      pan.style.transform = `translate(${-(e.clientX/innerWidth-.5)*14}px,${-(e.clientY/innerHeight-.5)*8}px)`; }); });
-  }
-
-  /* Contraseña: mostrar/ocultar y Bloq Mayús */
-  const pass = document.getElementById('pass'), tg = document.getElementById('toggle'), eye = document.getElementById('eye');
-  const OPEN = '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>';
-  const SHUT = '<path d="M3 3l18 18"/><path d="M10.6 5.1A10.6 10.6 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.9 8.4 2 12 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>';
-  tg.addEventListener('click', () => { const s = pass.type === 'password'; pass.type = s ? 'text' : 'password'; eye.innerHTML = s ? SHUT : OPEN;
-    tg.setAttribute('aria-pressed', s); tg.setAttribute('aria-label', s ? 'Ocultar contraseña' : 'Mostrar contraseña'); pass.focus(); });
-  const caps = document.getElementById('caps');
-  ['keydown','keyup'].forEach(ev => pass.addEventListener(ev, e => caps.classList.toggle('show', !!(e.getModifierState && e.getModifierState('CapsLock')))));
-
-  /* Validación y envío (simulado) */
-  const MSG = {
-    userValid: v => /^\d{8}$/.test(v) || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
-    userEmpty: 'Escribe tu correo o DNI.', userBad: 'Usa un correo válido o un DNI de 8 dígitos.',
-    passEmpty: 'Escribe tu contraseña.', passShort: 'La contraseña tiene al menos 8 caracteres.',
-    wrong: 'El correo, DNI o contraseña no coinciden.', ok: 'Sesión iniciada'
-  };
-  const form = document.getElementById('form'), card = document.getElementById('card'), user = document.getElementById('user'),
-        btn = document.getElementById('submit'), live = document.getElementById('live');
-  const setErr = (id, m) => { const f = document.getElementById('f-' + id), e = document.getElementById('e-' + id);
-    f.classList.toggle('invalid', !!m); e.textContent = m || ''; e.classList.toggle('show', !!m); document.getElementById(id).setAttribute('aria-invalid', !!m); };
-  const shake = () => { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); };
-  user.addEventListener('input', () => setErr('user', '')); pass.addEventListener('input', () => setErr('pass', ''));
-
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const u = user.value.trim(), p = pass.value; let ok = true;
-    if (!u) { setErr('user', MSG.userEmpty); ok = false; } else if (!MSG.userValid(u)) { setErr('user', MSG.userBad); ok = false; }
-    if (!p) { setErr('pass', MSG.passEmpty); ok = false; } else if (p.length < 8) { setErr('pass', MSG.passShort); ok = false; }
-    if (!ok) { shake(); (form.querySelector('[aria-invalid="true"]') || user).focus(); return; }
-    btn.classList.add('loading'); btn.disabled = true; live.textContent = 'Verificando…';
-    setTimeout(() => {
-      btn.classList.remove('loading'); btn.disabled = false;
-      if (p === 'rutaandina') { btn.classList.add('done'); live.textContent = MSG.ok; setTimeout(() => btn.classList.remove('done'), 2400); }
-      else { setErr('pass', MSG.wrong); shake(); live.textContent = MSG.wrong; pass.select(); }
-    }, 1200);
-  });
-})();
 </script>
+<script src="../../_assets/auth.js"></script>
 </body>
 </html>

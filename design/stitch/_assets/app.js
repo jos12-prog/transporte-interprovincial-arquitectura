@@ -38,7 +38,7 @@
     settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>',
     log:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
     help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/>',
-    logout:'<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11"/>',
+    logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
     more:'<circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/>',
     edit:'<path d="M4 20h4L19 9l-4-4L4 16Z"/><path d="m14 6 4 4"/>', trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
     eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
@@ -181,10 +181,10 @@
     const s = svgEl(w, h), suf = el.dataset.suffix || '';
     items.forEach((it, i) => {
       const y = i * rowH + 8, bw = (w - L - 60) * it.v / mx;
-      add(s, 'text', {x: 0, y: y + 13, style: 'font-size:12.5px;fill:#334155'}).textContent = it.k;
-      add(s, 'rect', {x: L, y, width: w - L - 60, height: 18, rx: 6, fill: '#F1F5F9'});
+      add(s, 'text', {x: 0, y: y + 13, style: 'font-size:12.5px;fill:#33403D'}).textContent = it.k;
+      add(s, 'rect', {x: L, y, width: w - L - 60, height: 18, rx: 6, fill: '#EEF2F0'});
       add(s, 'rect', {x: L, y, width: bw, height: 18, rx: 6, fill: it.c || (suf === '%' && it.v >= 70 ? '#F2A93B' : '#0E6B5C')});
-      add(s, 'text', {x: L + (w - L - 60) + 10, y: y + 13, style: 'font-size:12.5px;font-weight:600;fill:#0F172A'}).textContent = it.v.toLocaleString('es-PE') + suf;
+      add(s, 'text', {x: L + (w - L - 60) + 10, y: y + 13, style: 'font-size:12.5px;font-weight:600;fill:#111B19'}).textContent = it.v.toLocaleString('es-PE') + suf;
     });
     el.replaceChildren(s);
   }
@@ -219,16 +219,16 @@
 
   function donut(el) {
     const v = +el.dataset.donut, s = svgEl(64, 64), r = 26, c = 2 * Math.PI * r;
-    add(s, 'circle', {cx: 32, cy: 32, r, fill: 'none', stroke: '#F1F5F9', 'stroke-width': 7});
+    add(s, 'circle', {cx: 32, cy: 32, r, fill: 'none', stroke: '#EEF2F0', 'stroke-width': 7});
     add(s, 'circle', {cx: 32, cy: 32, r, fill: 'none', stroke: v >= 70 ? '#F2A93B' : '#0E6B5C', 'stroke-width': 7, 'stroke-linecap': 'round', 'stroke-dasharray': `${c * v / 100} ${c}`, transform: 'rotate(-90 32 32)'});
-    add(s, 'text', {x: 32, y: 36, 'text-anchor': 'middle', style: 'font:700 13px Inter;fill:#0F172A'}).textContent = v + '%';
+    add(s, 'text', {x: 32, y: 36, 'text-anchor': 'middle', style: 'font:700 13px Inter;fill:#111B19'}).textContent = v + '%';
     el.replaceChildren(s);
   }
 
   /* ---------- QR de muestra (patrón determinista; el real lo genera el backend) ---------- */
   function qr(el) {
     const N = 29, c = document.createElement('canvas'); c.width = c.height = N; c.className = 'qr';
-    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, N, N); x.fillStyle = '#0F172A';
+    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, N, N); x.fillStyle = '#111B19';
     let seed = [...(el.dataset.qr || 'RA')].reduce((a, ch) => a + ch.charCodeAt(0), 0);
     const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
     const finder = (ox, oy) => { for (let i = 0; i < 7; i++) for (let j = 0; j < 7; j++) if (i === 0 || i === 6 || j === 0 || j === 6 || (i > 1 && i < 5 && j > 1 && j < 5)) x.fillRect(ox + i, oy + j, 1, 1); };
@@ -275,3 +275,21 @@
   };
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', run) : run();
 })();
+
+/* Menú de usuario (pasajero): botón con aria-expanded, cierra con Esc o clic fuera.
+   La pestaña "Cuenta" de la barra inferior (móvil) abre el mismo menú. #menu-usuario lo deja abierto (captura). */
+(() => {
+  document.querySelectorAll('[data-menu]').forEach(btn => {
+    const m = btn.nextElementSibling;
+    const set = (open, kb) => {
+      btn.setAttribute('aria-expanded', open); m.hidden = !open;
+      if (open && kb) m.querySelector('[role=menuitem]')?.focus({preventScroll:true});
+    };
+    btn.addEventListener('click', e => { e.stopPropagation(); set(m.hidden, e.detail === 0); });
+    document.addEventListener('click', e => { if (!m.hidden && !m.contains(e.target)) set(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !m.hidden) { set(false); btn.focus(); } });
+    document.querySelectorAll('.tabbar a[href="#cuenta"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); scrollTo({top:0}); set(true); }));
+    if (location.hash === '#menu-usuario') set(true);
+  });
+})();
+

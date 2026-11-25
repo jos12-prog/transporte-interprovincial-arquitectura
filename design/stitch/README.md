@@ -14,6 +14,7 @@ Los datos son de ejemplo (empresas y personas ficticias). Los textos, estados y 
 |---|---|
 | `app.css` | Tokens y componentes: botones, campos, tarjetas, badges, tablas, mapa de asientos, boleto, modal, panel lateral, shell del personal |
 | `app.js` | Íconos (trazos Lucide), **mapa de asientos por `VehicleModel`**, gráficos SVG, QR de muestra, contadores |
+| `auth.css` · `auth.js` | Pantallas de acceso (login pasajero, registro, portal de agencias): superficie oscura, carrusel de fotos, botón con estados, Google, mensajes y movimiento (DESIGN.md §6 y §9) |
 | `brand/` | Logo: `logo-mark.svg`, `logo-horizontal.svg`, `logo-horizontal-dark.svg` |
 | `login/` | Fotos de fondo optimizadas (1920 px) |
 
@@ -23,11 +24,11 @@ En el frontend: tokens en `tailwind.config`, íconos con `lucide-react`, el mapa
 
 | Rol | Pantalla | Estados extra |
 |---|---|---|
-| Pasajero | `01-login` · Iniciar sesión | — |
-| | `02-registro` · Crear cuenta | — |
-| | `03-inicio-busqueda` · Buscador, alta demanda, próximo viaje | — |
+| Pasajero | `01-login` · Iniciar sesión con Google o correo/DNI | — |
+| | `02-registro` · Crear cuenta con Google o formulario | — |
+| | `03-inicio-busqueda` · Buscador, confianza, alta demanda, próximo viaje | `#menu-usuario` (cerrar sesión) |
 | | `04-resultados` · Resultados con filtros y skeleton | — |
-| | `05-seleccion-asiento` · Mapa del bus de 2 pisos + modelos | — |
+| | `05-seleccion-asiento` · Mapa del bus de 2 pisos (los demás modelos están en `superadmin/05-modelos-vehiculo`) | — |
 | | `06-datos-pasajeros` · Un pasajero por asiento o un solo nombre para todos + contador HELD | `#un-titular` |
 | | `07-pago` · Pago con Culqi | `#confirmando` |
 | | `08-pasaje-emitido` · Boletos con QR | — |
