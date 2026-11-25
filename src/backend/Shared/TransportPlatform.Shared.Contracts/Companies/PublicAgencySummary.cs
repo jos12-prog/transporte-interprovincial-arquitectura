@@ -5,4 +5,6 @@ public sealed record PublicAgencySummary(
     string CompanyName,
     Guid AgencyId,
     string AgencyName,
-    string City);
+    string City,
+    bool CompanyIsActive = true,
+    bool AgencyIsActive = true);

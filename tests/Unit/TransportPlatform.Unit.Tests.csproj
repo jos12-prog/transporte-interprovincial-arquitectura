@@ -15,6 +15,7 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="../../src/backend/Shared/TransportPlatform.Shared.Infrastructure/TransportPlatform.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/backend/Host/TransportPlatform.Host.csproj" />
     <ProjectReference Include="../../src/backend/Modules/CompaniesAgencies/Domain/TransportPlatform.Modules.CompaniesAgencies.Domain.csproj" />
     <ProjectReference Include="../../src/backend/Modules/IdentityAccess/Domain/TransportPlatform.Modules.IdentityAccess.Domain.csproj" />
     <ProjectReference Include="../../src/backend/Modules/IdentityAccess/Application/TransportPlatform.Modules.IdentityAccess.Application.csproj" />
@@ -22,7 +23,9 @@
     <ProjectReference Include="../../src/backend/Modules/TransportScheduling/Domain/TransportPlatform.Modules.TransportScheduling.Domain.csproj" />
     <ProjectReference Include="../../src/backend/Modules/Reservations/Domain/TransportPlatform.Modules.Reservations.Domain.csproj" />
     <ProjectReference Include="../../src/backend/Modules/CompaniesAgencies/Application/TransportPlatform.Modules.CompaniesAgencies.Application.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/CompaniesAgencies/Presentation/TransportPlatform.Modules.CompaniesAgencies.Presentation.csproj" />
     <ProjectReference Include="../../src/backend/Modules/TransportScheduling/Application/TransportPlatform.Modules.TransportScheduling.Application.csproj" />
+    <ProjectReference Include="../../src/backend/Modules/TransportScheduling/Presentation/TransportPlatform.Modules.TransportScheduling.Presentation.csproj" />
     <ProjectReference Include="../../src/backend/Modules/Reservations/Application/TransportPlatform.Modules.Reservations.Application.csproj" />
     <ProjectReference Include="../../src/backend/Modules/Reservations/Presentation/TransportPlatform.Modules.Reservations.Presentation.csproj" />
     <ProjectReference Include="../../src/backend/Modules/QueriesReports/Application/TransportPlatform.Modules.QueriesReports.Application.csproj" />

@@ -85,6 +85,16 @@
       "key": "ipAttemptIdentifier",
       "type": "string",
       "value": ""
+    },
+    {
+      "value": "",
+      "type": "string",
+      "key": "platformAgencyId"
+    },
+    {
+      "value": "",
+      "type": "string",
+      "key": "platformVehicleModelId"
     }
   ],
   "event": [
@@ -752,6 +762,348 @@
       ]
     },
     {
+      "item": [
+        {
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('login de superadministrador responde 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json(); pm.test('emite rol super_admin', () => pm.expect(body.user.role).to.eql('super_admin')); pm.collectionVariables.set('superAdminToken', body.accessToken);"
+                ]
+              }
+            }
+          ],
+          "name": "24 — Login de superadministrador (200)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"identifier\":\"superadmin@rutaandina.test\",\"password\":\"{{superAdminPassword}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('listado de empresas responde 200', () => pm.response.to.have.status(200));",
+                  "const rows = pm.response.json(); pm.test('devuelve un catálogo de empresas', () => pm.expect(rows).to.be.an('array')); const seed = rows.find(company => company.name === 'Andes Express') || rows[0]; if (seed) pm.collectionVariables.set('platformCompanyId', seed.companyId);"
+                ]
+              }
+            }
+          ],
+          "name": "25 — Listar empresas de plataforma (200)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "value": "Bearer {{superAdminToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/companies"
+          }
+        },
+        {
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('listado de agencias responde 200', () => pm.response.to.have.status(200));",
+                  "const rows = pm.response.json(); pm.test('el catálogo de agencias es un arreglo', () => pm.expect(rows).to.be.an('array')); const seed = rows.find(agency => agency.name === 'Andes Express - Ayacucho') || rows[0]; if (seed) pm.collectionVariables.set('platformAgencyId', seed.agencyId);"
+                ]
+              }
+            }
+          ],
+          "name": "26 — Listar agencias de una empresa (200)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "value": "Bearer {{superAdminToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/companies/{{platformCompanyId}}/agencies"
+          }
+        },
+        {
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('listado de modelos responde 200', () => pm.response.to.have.status(200));",
+                  "const rows = pm.response.json(); pm.test('cada modelo declara estado y capacidad', () => rows.forEach(model => { pm.expect(model).to.have.property('isActive'); pm.expect(model.capacity).to.be.above(0); })); const seed = rows.find(model => model.name === 'Toyota Yaris') || rows[0]; if (seed) pm.collectionVariables.set('platformVehicleModelId', seed.vehicleModelId);"
+                ]
+              }
+            }
+          ],
+          "name": "27 — Listar modelos de vehículo (200)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "value": "Bearer {{superAdminToken}}",
+                "key": "Authorization"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/vehicle-models"
+          }
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/admin/companies/{{platformCompanyId}}/status",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"isActive\":false}"
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('28 — Desactivar empresa (200)', () => pm.response.to.have.status(200));",
+                  "pm.test('el estado queda inactivo', () => pm.expect(pm.response.json().isActive).to.eql(false));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "name": "28 — Desactivar empresa (200)"
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/admin/companies/{{platformCompanyId}}/status",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"isActive\":true}"
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('29 — Reactivar empresa (200)', () => pm.response.to.have.status(200));",
+                  "pm.test('el estado queda activo', () => pm.expect(pm.response.json().isActive).to.eql(true));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "name": "29 — Reactivar empresa (200)"
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/admin/agencies/{{platformAgencyId}}/status",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"isActive\":false}"
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('30 — Desactivar agencia (200)', () => pm.response.to.have.status(200));",
+                  "pm.test('el estado queda inactivo', () => pm.expect(pm.response.json().isActive).to.eql(false));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "name": "30 — Desactivar agencia (200)"
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/admin/agencies/{{platformAgencyId}}/status",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"isActive\":true}"
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('31 — Reactivar agencia (200)', () => pm.response.to.have.status(200));",
+                  "pm.test('el estado queda activo', () => pm.expect(pm.response.json().isActive).to.eql(true));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "name": "31 — Reactivar agencia (200)"
+        },
+        {
+          "request": {
+            "url": "{{baseUrl}}/api/v1/admin/vehicle-models/{{platformVehicleModelId}}/status",
+            "body": {
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "mode": "raw",
+              "raw": "{\"isActive\":false}"
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('32 — Desactivar modelo de vehículo (200)', () => pm.response.to.have.status(200));",
+                  "pm.test('el estado queda inactivo', () => pm.expect(pm.response.json().isActive).to.eql(false));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "name": "32 — Desactivar modelo de vehículo (200)"
+        },
+        {
+          "name": "33 — Reactivar modelo de vehículo (200)",
+          "request": {
+            "url": "{{baseUrl}}/api/v1/admin/vehicle-models/{{platformVehicleModelId}}/status",
+            "method": "PATCH",
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\"isActive\":true}"
+            },
+            "header": [
+              {
+                "value": "Bearer {{superAdminToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('reactivar modelo responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('el modelo vuelve a quedar activo', () => pm.expect(pm.response.json().isActive).to.eql(true));"
+                ]
+              },
+              "listen": "test"
+            }
+          ]
+        }
+      ],
+      "name": "Administración de plataforma (super_admin)"
+    },
+    {
       "name": "Límites de login (ejecución secuencial en una instancia recién iniciada)",
       "item": [
         {
@@ -979,52 +1331,6 @@
                 "exec": [
                   "pm.test('sexto fallo responde 429', () => pm.response.to.have.status(429));",
                   "pm.test('429 incluye Retry-After y ProblemDetails', () => { pm.expect(pm.response.headers.get('Retry-After')).to.exist; pm.expect(pm.response.json().status).to.eql(429); });"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ]
-        },
-        {
-          "request": {
-            "url": "{{baseUrl}}/api/v1/auth/login",
-            "body": {
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "mode": "raw",
-              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "value": "application/json",
-                "key": "Accept"
-              },
-              {
-                "value": "application/json",
-                "key": "Content-Type"
-              }
-            ]
-          },
-          "name": "22.9 — Límite por IP: solicitud 9 de 20 (401)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-9@example.test');"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "prerequest"
-            },
-            {
-              "script": {
-                "exec": [
-                  "pm.test('solicitud 9 de IP responde 401', () => pm.response.to.have.status(401));"
                 ],
                 "type": "text/javascript"
               },

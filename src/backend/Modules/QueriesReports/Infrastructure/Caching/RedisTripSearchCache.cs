@@ -10,6 +10,7 @@ public sealed class RedisTripSearchCache(IDistributedCache distributedCache) : I
     private static readonly TimeSpan MaximumTtl = TimeSpan.FromSeconds(60);
     private static readonly TimeSpan OperationTimeout = TimeSpan.FromMilliseconds(300);
     private static readonly TimeSpan BreakDuration = TimeSpan.FromSeconds(30);
+    private const string GenerationKey = "trip-search:generation:v1";
 
     // Circuit breaker: while open, Redis is skipped and searches go straight to PostgreSQL.
     private long _openUntilTicks;
@@ -18,6 +19,41 @@ public sealed class RedisTripSearchCache(IDistributedCache distributedCache) : I
 
     private void Open() =>
         Interlocked.Exchange(ref _openUntilTicks, DateTime.UtcNow.Add(BreakDuration).Ticks);
+
+    public async Task<string> GetGenerationAsync(CancellationToken cancellationToken = default)
+    {
+        if (IsOpen) return "cache-bypass";
+        try
+        {
+            var generation = await distributedCache.GetStringAsync(GenerationKey, cancellationToken)
+                .WaitAsync(OperationTimeout, cancellationToken);
+            if (generation is not null) return generation;
+
+            generation = Guid.NewGuid().ToString("N");
+            await distributedCache.SetStringAsync(GenerationKey, generation, new DistributedCacheEntryOptions(), cancellationToken)
+                .WaitAsync(OperationTimeout, cancellationToken);
+            return generation;
+        }
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            Open();
+            return "cache-bypass";
+        }
+    }
+
+    public async Task InvalidateAsync(CancellationToken cancellationToken = default)
+    {
+        if (IsOpen) return;
+        try
+        {
+            await distributedCache.SetStringAsync(GenerationKey, Guid.NewGuid().ToString("N"), new DistributedCacheEntryOptions(), cancellationToken)
+                .WaitAsync(OperationTimeout, cancellationToken);
+        }
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            Open();
+        }
+    }
 
     public async Task<IReadOnlyList<TripSearchResult>?> GetAsync(
         string key,

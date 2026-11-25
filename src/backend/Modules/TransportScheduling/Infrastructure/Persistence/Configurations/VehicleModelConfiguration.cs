@@ -25,7 +25,9 @@ public sealed class VehicleModelConfiguration : IEntityTypeConfiguration<Vehicle
         builder.HasKey(model => model.Id);
         builder.Property(model => model.Id).HasColumnName("id");
         builder.Property(model => model.Name).HasColumnName("name").HasMaxLength(120).IsRequired();
+        builder.Property(model => model.Category).HasColumnName("category").HasMaxLength(80);
         builder.Property(model => model.Capacity).HasColumnName("capacity").IsRequired();
+        builder.Property(model => model.IsActive).HasColumnName("is_active").HasDefaultValue(true).IsRequired();
         var seatLayout = builder.Property(model => model.SeatLayout)
             .HasColumnName("seat_layout")
             .HasColumnType("jsonb")

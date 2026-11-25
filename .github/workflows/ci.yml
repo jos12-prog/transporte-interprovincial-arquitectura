@@ -143,13 +143,13 @@ jobs:
           docker compose ps
           exit 1
 
-      - name: Test API over HTTP with coverage
+      - name: Test API contracts before login rate-limit suite
         working-directory: tests/api
         env:
           API_BASE_URL: http://localhost:8080
-        run: npm run test -- --coverage
+        run: npm run test -- --coverage --coverageDirectory=coverage/platform --runInBand --testPathIgnorePatterns=identity-access.test.ts
 
-      - name: Restart API to reset in-memory IP limiter
+      - name: Restart API before login rate-limit suite
         run: docker compose restart api
 
       - name: Wait for API after restart
@@ -164,10 +164,31 @@ jobs:
           docker compose ps
           exit 1
 
+      - name: Test identity and login rate limits
+        working-directory: tests/api
+        env:
+          API_BASE_URL: http://localhost:8080
+        run: npm run test -- --coverage --coverageDirectory=coverage/identity --runInBand src/identity-access.test.ts
+
+      - name: Restart API before Postman login limit checks
+        run: docker compose restart api
+
+      - name: Wait for API before Newman
+        shell: bash
+        run: |
+          for attempt in {1..60}; do
+            if curl --fail --silent http://localhost:8080/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose ps
+          exit 1
+
       - name: Run Sprint 2 Postman collection with Newman
         env:
           IDENTITY_SEED_AGENT_PASSWORD: CI-agent-password-2026
-        run: npx --yes newman run tests/postman/RutaAndina-Sprint2.postman_collection.json --env-var "agentPassword=$IDENTITY_SEED_AGENT_PASSWORD" --reporters cli,json --reporter-json-export docs/evidencias/postman-sprint2.json
+        run: npx --yes newman run tests/postman/RutaAndina-Sprint2.postman_collection.json --env-var "agentPassword=$IDENTITY_SEED_AGENT_PASSWORD" --env-var "superAdminPassword=$IDENTITY_SEED_SUPER_ADMIN_PASSWORD" --reporters cli,json --reporter-json-export docs/evidencias/postman-sprint2.json
 
       - name: Upload Postman report
         if: always()

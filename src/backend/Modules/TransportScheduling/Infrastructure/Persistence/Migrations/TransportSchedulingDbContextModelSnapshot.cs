@@ -151,6 +151,17 @@ namespace TransportPlatform.Modules.TransportScheduling.Infrastructure.Persisten
                         .HasColumnType("integer")
                         .HasColumnName("capacity");
 
+                    b.Property<string>("Category")
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)")
+                        .HasColumnName("category");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(120)

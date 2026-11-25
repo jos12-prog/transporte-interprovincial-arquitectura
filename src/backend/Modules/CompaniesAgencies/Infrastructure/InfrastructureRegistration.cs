@@ -18,7 +18,10 @@ public static class InfrastructureRegistration
         services.AddDbContext<CompaniesAgenciesDbContext>(options => options.UseNpgsql(connectionString,
             postgres => postgres.MigrationsHistoryTable("__EFMigrationsHistory", "companies_agencies")));
         services.AddScoped<IAgencyDirectoryRepository, EfAgencyDirectoryRepository>();
-        services.AddScoped<ICompaniesAgenciesApi, CompaniesAgenciesApi>();
+        services.AddScoped<ICompaniesAgenciesAdministrationRepository, EfCompaniesAgenciesAdministrationRepository>();
+        services.AddScoped<CompaniesAgenciesApi>();
+        services.AddScoped<ICompaniesAgenciesApi>(provider => provider.GetRequiredService<CompaniesAgenciesApi>());
+        services.AddScoped<ICompaniesAgenciesAdminApi>(provider => provider.GetRequiredService<CompaniesAgenciesApi>());
         return services;
     }
 }

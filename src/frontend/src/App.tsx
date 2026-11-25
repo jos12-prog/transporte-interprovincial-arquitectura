@@ -8,6 +8,7 @@ import { SeatSelectionPage } from '@/pages/SeatSelectionPage';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { RegisterPage } from '@/pages/auth/RegisterPage';
 import { RequireRole } from '@/auth/RequireRole';
+import { PlatformAdminPage } from '@/pages/admin/PlatformAdminPage';
 
 export function AppRoutes() {
   return (
@@ -36,8 +37,8 @@ export function AppRoutes() {
       </Route>
       <Route element={<RequireRole allowed={['super_admin']} />}>
         <Route path="/superadmin" element={<StaffShell role="Superadministrador" />}>
-          <Route index element={<RoleLanding title="Superadministrador" />} />
-          <Route path="*" element={<RoleLanding title="Superadministrador" />} />
+          <Route index element={<PlatformAdminPage />} />
+          <Route path="*" element={<PlatformAdminPage />} />
         </Route>
       </Route>
       <Route path="*" element={<RoleLanding title="Página no encontrada" />} />

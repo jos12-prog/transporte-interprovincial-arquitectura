@@ -42,9 +42,11 @@ export function StaffShell({ role }: StaffShellProps) {
           <Link className="flex items-center gap-3 rounded-button px-3 py-3 text-sm text-white/80 hover:bg-white/10" to="/admin-agencia">
             <Building2 aria-hidden="true" size={20} /> Agencias
           </Link>
-          <Link className="flex items-center gap-3 rounded-button px-3 py-3 text-sm text-white/80 hover:bg-white/10" to="/superadmin">
+          {session?.user.role === 'super_admin' ? <Link className="flex items-center gap-3 rounded-button px-3 py-3 text-sm text-white/80 hover:bg-white/10" to="/superadmin">
+            <Building2 aria-hidden="true" size={20} /> Catálogo de plataforma
+          </Link> : <Link className="flex items-center gap-3 rounded-button px-3 py-3 text-sm text-white/80 hover:bg-white/10" to="/superadmin">
             <Users aria-hidden="true" size={20} /> Usuarios
-          </Link>
+          </Link>}
           <Link className="flex items-center gap-3 rounded-button px-3 py-3 text-sm text-white/80 hover:bg-white/10" to="/admin-agencia/configuracion">
             <Settings aria-hidden="true" size={20} /> Configuración
           </Link>

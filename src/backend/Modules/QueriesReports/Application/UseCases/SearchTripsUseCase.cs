@@ -25,7 +25,8 @@ public sealed class SearchTripsUseCase(
             Origin = request.Origin!.Trim(),
             Destination = request.Destination!.Trim()
         };
-        var cacheKey = CreateCacheKey(normalizedRequest);
+        var cacheGeneration = await tripSearchCache.GetGenerationAsync(cancellationToken);
+        var cacheKey = CreateCacheKey(normalizedRequest, cacheGeneration);
         try
         {
             var cached = await tripSearchCache.GetAsync(cacheKey, cancellationToken);
@@ -62,12 +63,17 @@ public sealed class SearchTripsUseCase(
             trips.Select(trip => trip.AgencyId).Distinct().ToArray(), cancellationToken);
         var agenciesById = agencies.ToDictionary(agency => agency.AgencyId);
 
-        var results = trips.Select(trip =>
+        var results = trips.Where(trip =>
         {
             if (!agenciesById.TryGetValue(trip.AgencyId, out var agency) || agency.CompanyId != trip.CompanyId)
             {
                 throw new InvalidOperationException("A scheduled trip refers to an unavailable public agency.");
             }
+
+            return agency.CompanyIsActive && agency.AgencyIsActive;
+        }).Select(trip =>
+        {
+            var agency = agenciesById[trip.AgencyId];
 
             return new TripSearchResult(
                 trip.TripId,
@@ -104,7 +110,7 @@ public sealed class SearchTripsUseCase(
         }
     }
 
-    private static string CreateCacheKey(SearchTripsRequest request)
+    private static string CreateCacheKey(SearchTripsRequest request, string generation)
     {
         var canonicalCriteria = new
         {
@@ -119,7 +125,7 @@ public sealed class SearchTripsUseCase(
             MaximumPrice = request.MaximumPrice?.ToString("G29", System.Globalization.CultureInfo.InvariantCulture)
         };
         var digest = SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(canonicalCriteria));
-        return $"trip-search:v1:{Convert.ToHexString(digest)}";
+        return $"trip-search:{generation}:{Convert.ToHexString(digest)}";
     }
 
     private static void Validate(SearchTripsRequest request)
