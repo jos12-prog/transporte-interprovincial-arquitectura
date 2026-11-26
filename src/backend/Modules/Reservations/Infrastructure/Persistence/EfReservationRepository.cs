@@ -1,14 +1,16 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Npgsql;
 using TransportPlatform.Modules.Reservations.Application.Contracts;
 using TransportPlatform.Modules.Reservations.Domain.Entities;
 using TransportPlatform.Modules.Reservations.Domain.Enums;
+using TransportPlatform.Shared.Contracts.Modules;
 
 namespace TransportPlatform.Modules.Reservations.Infrastructure.Persistence;
 
-internal sealed class EfReservationRepository(ReservationsDbContext dbContext) : IReservationRepository
+internal sealed class EfReservationRepository(ReservationsDbContext dbContext, ITripReservationGuard? tripGuard = null) : IReservationRepository
 {
     public async Task<IReadOnlyList<TripSeat>?> GetTripSeatsAsync(Guid tripId, CancellationToken cancellationToken = default) =>
         await dbContext.TripSeats.AsNoTracking()
@@ -22,6 +24,8 @@ internal sealed class EfReservationRepository(ReservationsDbContext dbContext) :
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
         try
         {
+            if (tripGuard is not null && !await tripGuard.LockActiveTripAsync(reservation.TripId, transaction.GetDbTransaction(), cancellationToken))
+                throw new ReservationConflictException("A cancelled or unavailable trip cannot accept seat holds.");
             var ids = reservation.Seats.Select(seat => seat.TripSeatId).Order().ToArray();
             var lockedSeats = await dbContext.TripSeats
                 .FromSqlInterpolated($"SELECT * FROM reservations.trip_seats WHERE id = ANY ({ids}) ORDER BY id FOR UPDATE")

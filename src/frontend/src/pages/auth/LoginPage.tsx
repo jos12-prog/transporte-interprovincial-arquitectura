@@ -40,6 +40,7 @@ export function LoginPage({ staff = false }: { staff?: boolean }) {
           <SubmitButton state={state}>{staff ? 'Entrar al portal' : 'Iniciar sesión'}</SubmitButton>
         </form>
         {!staff ? <p className="mt-6 text-center text-sm text-neutral-600">¿Aún no tienes cuenta? <Link className="font-semibold text-primary-700 underline-offset-4 hover:underline" to="/pasajero/registro">Crear cuenta</Link></p> : null}
+        {!staff ? <p className="mt-3 text-center text-sm text-neutral-600">¿Eres personal de agencia? <Link className="font-semibold text-primary-700 underline-offset-4 hover:underline" to="/personal/login">Inicia sesión aquí</Link></p> : null}
         <p className="mt-5 text-center text-sm text-white/65"><Link to="/pasajero" className="underline-offset-4 hover:underline">Volver a buscar viajes</Link></p>
       </AuthCard>
     </AuthLayout>

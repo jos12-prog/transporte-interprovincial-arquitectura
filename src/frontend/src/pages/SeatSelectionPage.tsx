@@ -93,6 +93,7 @@ export function SeatSelectionPage() {
           <p className="text-sm font-semibold uppercase tracking-wide text-primary-700">Paso 1 de 3 · Selección</p>
           <h1 className="mt-1 font-display text-3xl font-extrabold text-neutral-900">Elige tus asientos</h1>
           <p className="mt-2 text-sm text-neutral-600">Selecciona hasta 10 asientos libres. La retención dura 10 minutos.</p>
+          {seatMap?.vehicleDisplayName ? <p className="mt-1 text-sm font-medium text-neutral-700">Vehículo: {seatMap.vehicleDisplayName}</p> : null}
         </div>
         <button type="button" onClick={() => refreshMap().catch(reason => setError(String(reason)))} className="inline-flex h-10 items-center gap-2 rounded-button border border-neutral-200 bg-white px-3 text-sm font-semibold text-primary-700">
           <RotateCcw aria-hidden="true" size={16} /> Actualizar mapa

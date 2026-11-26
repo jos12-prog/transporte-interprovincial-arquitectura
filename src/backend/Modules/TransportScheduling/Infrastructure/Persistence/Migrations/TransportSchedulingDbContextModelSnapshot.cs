@@ -23,6 +23,61 @@ namespace TransportPlatform.Modules.TransportScheduling.Infrastructure.Persisten
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("TransportPlatform.Modules.TransportScheduling.Domain.Entities.Fare", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)")
+                        .HasColumnName("currency");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("price");
+
+                    b.Property<Guid>("RouteId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("route_id");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("type");
+
+                    b.Property<DateOnly>("ValidFrom")
+                        .HasColumnType("date")
+                        .HasColumnName("valid_from");
+
+                    b.Property<DateOnly?>("ValidTo")
+                        .HasColumnType("date")
+                        .HasColumnName("valid_to");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RouteId");
+
+                    b.HasIndex("CompanyId", "RouteId", "Type", "ValidFrom", "ValidTo");
+
+                    b.ToTable("fares", "transport_scheduling");
+                });
+
             modelBuilder.Entity("TransportPlatform.Modules.TransportScheduling.Domain.Entities.Route", b =>
                 {
                     b.Property<Guid>("Id")
@@ -30,11 +85,21 @@ namespace TransportPlatform.Modules.TransportScheduling.Infrastructure.Persisten
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
                     b.Property<string>("DestinationCity")
                         .IsRequired()
                         .HasMaxLength(120)
                         .HasColumnType("character varying(120)")
                         .HasColumnName("destination_city");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
 
                     b.Property<string>("OriginCity")
                         .IsRequired()
@@ -44,8 +109,10 @@ namespace TransportPlatform.Modules.TransportScheduling.Infrastructure.Persisten
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OriginCity", "DestinationCity")
+                    b.HasIndex("CompanyId", "OriginCity", "DestinationCity")
                         .IsUnique();
+
+                    b.HasIndex("OriginCity", "DestinationCity");
 
                     b.ToTable("routes", "transport_scheduling");
                 });
@@ -79,6 +146,18 @@ namespace TransportPlatform.Modules.TransportScheduling.Infrastructure.Persisten
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("departure_at_utc");
 
+                    b.Property<string>("DestinationCitySnapshot")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("destination_city_snapshot");
+
+                    b.Property<string>("OriginCitySnapshot")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("origin_city_snapshot");
+
                     b.Property<decimal>("Price")
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)")
@@ -88,9 +167,29 @@ namespace TransportPlatform.Modules.TransportScheduling.Infrastructure.Persisten
                         .HasColumnType("uuid")
                         .HasColumnName("route_id");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasDefaultValue("Scheduled")
+                        .HasColumnName("status");
+
+                    b.Property<string>("VehicleDisplayNameSnapshot")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("vehicle_display_name_snapshot");
+
                     b.Property<Guid>("VehicleId")
                         .HasColumnType("uuid")
                         .HasColumnName("vehicle_id");
+
+                    b.Property<string>("VehicleModelNameSnapshot")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("vehicle_model_name_snapshot");
 
                     b.HasKey("Id");
 
@@ -117,6 +216,18 @@ namespace TransportPlatform.Modules.TransportScheduling.Infrastructure.Persisten
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("uuid")
                         .HasColumnName("company_id");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("display_name");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
 
                     b.Property<string>("Plate")
                         .IsRequired()
@@ -179,6 +290,15 @@ namespace TransportPlatform.Modules.TransportScheduling.Infrastructure.Persisten
                         .IsUnique();
 
                     b.ToTable("vehicle_models", "transport_scheduling");
+                });
+
+            modelBuilder.Entity("TransportPlatform.Modules.TransportScheduling.Domain.Entities.Fare", b =>
+                {
+                    b.HasOne("TransportPlatform.Modules.TransportScheduling.Domain.Entities.Route", null)
+                        .WithMany()
+                        .HasForeignKey("RouteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("TransportPlatform.Modules.TransportScheduling.Domain.Entities.Trip", b =>

@@ -188,7 +188,7 @@ jobs:
       - name: Run Sprint 2 Postman collection with Newman
         env:
           IDENTITY_SEED_AGENT_PASSWORD: CI-agent-password-2026
-        run: npx --yes newman run tests/postman/RutaAndina-Sprint2.postman_collection.json --env-var "agentPassword=$IDENTITY_SEED_AGENT_PASSWORD" --env-var "superAdminPassword=$IDENTITY_SEED_SUPER_ADMIN_PASSWORD" --reporters cli,json --reporter-json-export docs/evidencias/postman-sprint2.json
+        run: npx --yes newman run tests/postman/RutaAndina-Sprint2.postman_collection.json --env-var "agentPassword=$IDENTITY_SEED_AGENT_PASSWORD" --env-var "agencyAdminPassword=$IDENTITY_SEED_AGENCY_ADMIN_PASSWORD" --env-var "superAdminPassword=$IDENTITY_SEED_SUPER_ADMIN_PASSWORD" --reporters cli,json --reporter-json-export docs/evidencias/postman-sprint2.json
 
       - name: Upload Postman report
         if: always()

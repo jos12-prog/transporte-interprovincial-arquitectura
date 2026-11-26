@@ -95,6 +95,66 @@
       "value": "",
       "type": "string",
       "key": "platformVehicleModelId"
+    },
+    {
+      "key": "agencyAdminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "agencyAdminPassword",
+      "value": "replace-with-IDENTITY_SEED_AGENCY_ADMIN_PASSWORD",
+      "type": "string"
+    },
+    {
+      "key": "catalogRouteId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "catalogVehicleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "catalogVehicleModelId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "catalogFareId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "catalogTripId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "catalogOrigin",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "catalogDestination",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "catalogDepartureUtc",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "catalogArrivalUtc",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "loginRequestCounter",
+      "value": "0",
+      "type": "string"
     }
   ],
   "event": [
@@ -103,6 +163,9 @@
       "script": {
         "type": "text/javascript",
         "exec": [
+          "const requestUrl = pm.request.url.toString();",
+          "if (requestUrl.endsWith('/health')) pm.collectionVariables.set('loginRequestCounter', '0');",
+          "if (requestUrl.includes('/api/v1/auth/login')) { const count = Number(pm.collectionVariables.get('loginRequestCounter') || 0); pm.collectionVariables.set('loginRequestCounter', String(count + 1)); }",
           "// Convert UTC to the Lima service date (UTC-5), then keep yyyy-MM-dd.",
           "const limaNow = new Date(Date.now() - 5 * 60 * 60 * 1000);",
           "pm.collectionVariables.set('serviceDate', limaNow.toISOString().slice(0, 10));"
@@ -131,6 +194,15 @@
             "exec": [
               "pm.test('health responde 200', () => pm.response.to.have.status(200));",
               "pm.test('health reporta todos los componentes', () => { const body = pm.response.json(); pm.expect(body.status).to.eql('healthy'); pm.expect(body.components).to.have.property('postgresql', 'healthy'); pm.expect(body.components).to.have.property('redis', 'healthy'); pm.expect(body.components).to.have.property('rabbitmq', 'healthy'); });"
+            ]
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('loginRequestCounter', '0');"
             ]
           }
         }
@@ -569,6 +641,7 @@
                   "pm.test('login responde 200', () => pm.response.to.have.status(200));",
                   "const body = pm.response.json();",
                   "pm.test('claim role usa código técnico passenger', () => pm.expect(body.user.role).to.eql('passenger'));",
+                  "pm.test('perfil de login incluye nombre y correo', () => { pm.expect(body.user.fullName).to.be.a('string').and.not.empty; pm.expect(body.user.email).to.be.a('string').and.not.empty; });",
                   "pm.collectionVariables.set('accessToken', body.accessToken);"
                 ],
                 "type": "text/javascript"
@@ -662,6 +735,7 @@
                   "pm.test('login de agente responde 200', () => pm.response.to.have.status(200));",
                   "const body = pm.response.json();",
                   "pm.test('claim role usa código técnico agent', () => pm.expect(body.user.role).to.eql('agent'));",
+                  "pm.test('perfil de login incluye nombre y correo', () => { pm.expect(body.user.fullName).to.be.a('string').and.not.empty; pm.expect(body.user.email).to.be.a('string').and.not.empty; });",
                   "pm.collectionVariables.set('agentToken', body.accessToken);"
                 ],
                 "type": "text/javascript"
@@ -771,7 +845,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('login de superadministrador responde 200', () => pm.response.to.have.status(200));",
-                  "const body = pm.response.json(); pm.test('emite rol super_admin', () => pm.expect(body.user.role).to.eql('super_admin')); pm.collectionVariables.set('superAdminToken', body.accessToken);"
+                  "const body = pm.response.json(); pm.test('emite rol super_admin', () => pm.expect(body.user.role).to.eql('super_admin')); pm.test('perfil de login incluye nombre y correo', () => { pm.expect(body.user.fullName).to.be.a('string').and.not.empty; pm.expect(body.user.email).to.be.a('string').and.not.empty; }); pm.collectionVariables.set('superAdminToken', body.accessToken);"
                 ]
               }
             }
@@ -1104,6 +1178,515 @@
       "name": "Administración de plataforma (super_admin)"
     },
     {
+      "name": "Administración de catálogo de agencia (agency_admin)",
+      "item": [
+        {
+          "name": "34 — Login admin de agencia (200)",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\"identifier\":\"admin.agencia@andesexpress.test\",\"password\":\"{{agencyAdminPassword}}\"}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"login admin agencia\", () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('perfil de login incluye nombre y correo', () => { pm.expect(body.user.fullName).to.be.a('string').and.not.empty; pm.expect(body.user.email).to.be.a('string').and.not.empty; });",
+                  "pm.collectionVariables.set(\"agencyAdminToken\", body.accessToken);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "35 — Agencias asignadas (200)",
+          "request": {
+            "url": "{{baseUrl}}/api/v1/staff/agencies",
+            "method": "GET",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agencyAdminToken}}",
+                "key": "Authorization"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"admin consulta sus agencias\", () => pm.response.to.have.status(200));",
+                  "const agencies = pm.response.json();",
+                  "pm.expect(agencies.length).to.be.greaterThan(0);",
+                  "pm.collectionVariables.set(\"agencyId\", agencies[0].agencyId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "36 — Crear ruta [Prueba] (201)",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\"originCity\":\"{{catalogOrigin}}\",\"destinationCity\":\"{{catalogDestination}}\"}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/agencies/{{agencyId}}/routes",
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agencyAdminToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const suffix = pm.variables.replaceIn('{{$randomUUID}}').replaceAll(\"-\", \"\").slice(0, 8);",
+                  "pm.collectionVariables.set(\"catalogOrigin\", `[Prueba] Origen ${suffix}`);",
+                  "pm.collectionVariables.set(\"catalogDestination\", `[Prueba] Destino ${suffix}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"ruta creada\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"catalogRouteId\", pm.response.json().routeId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "37 — Registrar tarifa base (201)",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\"type\":\"Base\",\"validFrom\":\"{{catalogFareFrom}}\",\"validTo\":null,\"price\":82,\"currency\":\"PEN\"}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/agencies/{{agencyId}}/routes/{{catalogRouteId}}/fares",
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agencyAdminToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"catalogFareFrom\", new Date(Date.now() - 86400000).toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"tarifa base creada\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"catalogFareId\", pm.response.json().fareId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "38 — Modelos activos (200)",
+          "request": {
+            "url": "{{baseUrl}}/api/v1/admin/agencies/{{agencyId}}/vehicle-models",
+            "method": "GET",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agencyAdminToken}}",
+                "key": "Authorization"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"modelos activos disponibles\", () => pm.response.to.have.status(200));",
+                  "const model = pm.response.json().find(item => item.isActive);",
+                  "pm.expect(model).to.exist;",
+                  "pm.collectionVariables.set(\"catalogVehicleModelId\", model.vehicleModelId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "39 — Crear vehículo [Prueba] (201)",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\"plate\":\"{{catalogPlate}}\",\"displayName\":\"[Prueba] Vehículo catálogo\",\"vehicleModelId\":\"{{catalogVehicleModelId}}\"}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/agencies/{{agencyId}}/vehicles",
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agencyAdminToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"catalogPlate\", `TST-${pm.variables.replaceIn('{{$randomUUID}}').replaceAll(\"-\", \"\").slice(0, 8)}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"vehículo creado\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"catalogVehicleId\", pm.response.json().vehicleId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "40 — Programar viaje (201)",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\"routeId\":\"{{catalogRouteId}}\",\"vehicleId\":\"{{catalogVehicleId}}\",\"departureAtUtc\":\"{{catalogDepartureUtc}}\",\"arrivalAtUtc\":\"{{catalogArrivalUtc}}\"}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/agencies/{{agencyId}}/trips",
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agencyAdminToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const departure = new Date(Date.now() + 2 * 86400000);",
+                  "pm.collectionVariables.set(\"catalogDepartureUtc\", departure.toISOString());",
+                  "pm.collectionVariables.set(\"catalogArrivalUtc\", new Date(departure.getTime() + 9 * 3600000).toISOString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"viaje programado con precio copiado\", () => pm.response.to.have.status(201));",
+                  "const trip = pm.response.json();",
+                  "pm.expect(trip.price).to.eql(82);",
+                  "pm.collectionVariables.set(\"catalogTripId\", trip.tripId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "41 — Vehículo ocupado en el horario (409)",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\"routeId\":\"{{catalogRouteId}}\",\"vehicleId\":\"{{catalogVehicleId}}\",\"departureAtUtc\":\"{{catalogDepartureUtc}}\",\"arrivalAtUtc\":\"{{catalogArrivalUtc}}\"}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/agencies/{{agencyId}}/trips",
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agencyAdminToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"horario duplicado retorna 409 ProblemDetails\", () => { pm.response.to.have.status(409); pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "42 — Cancelar viaje (200)",
+          "request": {
+            "url": "{{baseUrl}}/api/v1/admin/agencies/{{agencyId}}/trips/{{catalogTripId}}/cancel",
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agencyAdminToken}}",
+                "key": "Authorization"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"viaje cancelado\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json().status).to.eql(\"Cancelled\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "43 — Desactivar vehículo de prueba (200)",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\"isActive\":false}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/agencies/{{agencyId}}/vehicles/{{catalogVehicleId}}/active",
+            "method": "PATCH",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agencyAdminToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"vehículo de prueba desactivado\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "44 — Desactivar ruta de prueba (200)",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\"isActive\":false}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/agencies/{{agencyId}}/routes/{{catalogRouteId}}/active",
+            "method": "PATCH",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agencyAdminToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"ruta de prueba desactivada\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "45 — Desactivar tarifa de prueba (200)",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\"isActive\":false}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/agencies/{{agencyId}}/routes/{{catalogRouteId}}/fares/{{catalogFareId}}/active",
+            "method": "PATCH",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Accept"
+              },
+              {
+                "value": "Bearer {{agencyAdminToken}}",
+                "key": "Authorization"
+              },
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"tarifa de prueba desactivada\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Límites de login (ejecución secuencial en una instancia recién iniciada)",
       "item": [
         {
@@ -1362,485 +1945,28 @@
               }
             ]
           },
-          "name": "22.10 — Límite por IP: solicitud 10 de 20 (401)",
+          "name": "22 — Límite por IP: intentos restantes hasta 20 (401)",
           "event": [
             {
+              "listen": "prerequest",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-10@example.test');"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "prerequest"
-            },
-            {
-              "script": {
-                "exec": [
-                  "pm.test('solicitud 10 de IP responde 401', () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ]
-        },
-        {
-          "request": {
-            "url": "{{baseUrl}}/api/v1/auth/login",
-            "body": {
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "mode": "raw",
-              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "value": "application/json",
-                "key": "Accept"
-              },
-              {
-                "value": "application/json",
-                "key": "Content-Type"
+                  "const attempt = Number(pm.collectionVariables.get('loginRequestCounter'));",
+                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-' + attempt + '@example.test');"
+                ]
               }
-            ]
-          },
-          "name": "22.11 — Límite por IP: solicitud 11 de 20 (401)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-11@example.test');"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "prerequest"
             },
             {
+              "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.test('solicitud 11 de IP responde 401', () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ]
-        },
-        {
-          "request": {
-            "url": "{{baseUrl}}/api/v1/auth/login",
-            "body": {
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "mode": "raw",
-              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "value": "application/json",
-                "key": "Accept"
-              },
-              {
-                "value": "application/json",
-                "key": "Content-Type"
+                  "const attempt = Number(pm.collectionVariables.get('loginRequestCounter'));",
+                  "pm.test('intento ' + attempt + ' de IP responde 401', () => pm.response.to.have.status(401));",
+                  "if (attempt < 20) pm.execution.setNextRequest('22 — Límite por IP: intentos restantes hasta 20 (401)'); else pm.execution.setNextRequest('23 — Límite por IP superado (429)');"
+                ]
               }
-            ]
-          },
-          "name": "22.12 — Límite por IP: solicitud 12 de 20 (401)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-12@example.test');"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "prerequest"
-            },
-            {
-              "script": {
-                "exec": [
-                  "pm.test('solicitud 12 de IP responde 401', () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ]
-        },
-        {
-          "request": {
-            "url": "{{baseUrl}}/api/v1/auth/login",
-            "body": {
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "mode": "raw",
-              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "value": "application/json",
-                "key": "Accept"
-              },
-              {
-                "value": "application/json",
-                "key": "Content-Type"
-              }
-            ]
-          },
-          "name": "22.13 — Límite por IP: solicitud 13 de 20 (401)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-13@example.test');"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "prerequest"
-            },
-            {
-              "script": {
-                "exec": [
-                  "pm.test('solicitud 13 de IP responde 401', () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ]
-        },
-        {
-          "request": {
-            "url": "{{baseUrl}}/api/v1/auth/login",
-            "body": {
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "mode": "raw",
-              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "value": "application/json",
-                "key": "Accept"
-              },
-              {
-                "value": "application/json",
-                "key": "Content-Type"
-              }
-            ]
-          },
-          "name": "22.14 — Límite por IP: solicitud 14 de 20 (401)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-14@example.test');"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "prerequest"
-            },
-            {
-              "script": {
-                "exec": [
-                  "pm.test('solicitud 14 de IP responde 401', () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ]
-        },
-        {
-          "request": {
-            "url": "{{baseUrl}}/api/v1/auth/login",
-            "body": {
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "mode": "raw",
-              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "value": "application/json",
-                "key": "Accept"
-              },
-              {
-                "value": "application/json",
-                "key": "Content-Type"
-              }
-            ]
-          },
-          "name": "22.15 — Límite por IP: solicitud 15 de 20 (401)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-15@example.test');"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "prerequest"
-            },
-            {
-              "script": {
-                "exec": [
-                  "pm.test('solicitud 15 de IP responde 401', () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ]
-        },
-        {
-          "request": {
-            "url": "{{baseUrl}}/api/v1/auth/login",
-            "body": {
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "mode": "raw",
-              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "value": "application/json",
-                "key": "Accept"
-              },
-              {
-                "value": "application/json",
-                "key": "Content-Type"
-              }
-            ]
-          },
-          "name": "22.16 — Límite por IP: solicitud 16 de 20 (401)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-16@example.test');"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "prerequest"
-            },
-            {
-              "script": {
-                "exec": [
-                  "pm.test('solicitud 16 de IP responde 401', () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ]
-        },
-        {
-          "request": {
-            "url": "{{baseUrl}}/api/v1/auth/login",
-            "body": {
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "mode": "raw",
-              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "value": "application/json",
-                "key": "Accept"
-              },
-              {
-                "value": "application/json",
-                "key": "Content-Type"
-              }
-            ]
-          },
-          "name": "22.17 — Límite por IP: solicitud 17 de 20 (401)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-17@example.test');"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "prerequest"
-            },
-            {
-              "script": {
-                "exec": [
-                  "pm.test('solicitud 17 de IP responde 401', () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ]
-        },
-        {
-          "request": {
-            "url": "{{baseUrl}}/api/v1/auth/login",
-            "body": {
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "mode": "raw",
-              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "value": "application/json",
-                "key": "Accept"
-              },
-              {
-                "value": "application/json",
-                "key": "Content-Type"
-              }
-            ]
-          },
-          "name": "22.18 — Límite por IP: solicitud 18 de 20 (401)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-18@example.test');"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "prerequest"
-            },
-            {
-              "script": {
-                "exec": [
-                  "pm.test('solicitud 18 de IP responde 401', () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ]
-        },
-        {
-          "request": {
-            "url": "{{baseUrl}}/api/v1/auth/login",
-            "body": {
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "mode": "raw",
-              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "value": "application/json",
-                "key": "Accept"
-              },
-              {
-                "value": "application/json",
-                "key": "Content-Type"
-              }
-            ]
-          },
-          "name": "22.19 — Límite por IP: solicitud 19 de 20 (401)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-19@example.test');"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "prerequest"
-            },
-            {
-              "script": {
-                "exec": [
-                  "pm.test('solicitud 19 de IP responde 401', () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
-            }
-          ]
-        },
-        {
-          "request": {
-            "url": "{{baseUrl}}/api/v1/auth/login",
-            "body": {
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "mode": "raw",
-              "raw": "{\"identifier\":\"{{ipAttemptIdentifier}}\",\"password\":\"wrong-password\"}"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "value": "application/json",
-                "key": "Accept"
-              },
-              {
-                "value": "application/json",
-                "key": "Content-Type"
-              }
-            ]
-          },
-          "name": "22.20 — Límite por IP: solicitud 20 de 20 (401)",
-          "event": [
-            {
-              "script": {
-                "exec": [
-                  "pm.collectionVariables.set('ipAttemptIdentifier', 'postman-ip-' + Date.now() + '-20@example.test');"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "prerequest"
-            },
-            {
-              "script": {
-                "exec": [
-                  "pm.test('solicitud 20 de IP responde 401', () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              },
-              "listen": "test"
             }
           ]
         },
@@ -1873,7 +1999,7 @@
             {
               "script": {
                 "exec": [
-                  "pm.test('solicitud 21 de IP responde 429', () => pm.response.to.have.status(429));",
+                  "pm.test('la solicitud 21 de IP responde 429', () => { pm.expect(Number(pm.collectionVariables.get('loginRequestCounter'))).to.eql(21); pm.response.to.have.status(429); });",
                   "pm.test('429 incluye Retry-After y ProblemDetails', () => { pm.expect(pm.response.headers.get('Retry-After')).to.exist; pm.expect(pm.response.json().status).to.eql(429); });"
                 ],
                 "type": "text/javascript"

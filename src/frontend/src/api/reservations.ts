@@ -12,6 +12,7 @@ export interface TripSeatMapSeat {
 export interface TripSeatMap {
   tripId: string;
   seats: TripSeatMapSeat[];
+  vehicleDisplayName?: string;
 }
 
 export interface ReservationHold {

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TransportPlatform.Modules.TransportScheduling.Application.Contracts;
+using TransportPlatform.Modules.TransportScheduling.Domain.Entities;
 using TransportPlatform.Shared.Contracts.Trips;
 
 namespace TransportPlatform.Modules.TransportScheduling.Infrastructure.Persistence;
@@ -23,9 +24,10 @@ internal sealed class EfTripSearchReadRepository(TransportSchedulingDbContext db
                     join model in dbContext.VehicleModels.AsNoTracking() on vehicle.VehicleModelId equals model.Id
                     where EF.Functions.ILike(route.OriginCity, EscapeLikeLiteral(criteria.Origin), "\\")
                        && EF.Functions.ILike(route.DestinationCity, EscapeLikeLiteral(criteria.Destination), "\\")
+                       && trip.Status == TripStatus.Scheduled && route.IsActive && vehicle.IsActive && model.IsActive
                        && trip.DepartureAtUtc >= fromUtc
                        && trip.DepartureAtUtc < untilUtc
-                    select new { trip, route, model };
+                    select new { trip, route, vehicle, model };
 
         if (criteria.CompanyId.HasValue)
         {
@@ -66,14 +68,15 @@ internal sealed class EfTripSearchReadRepository(TransportSchedulingDbContext db
                 item.trip.Id,
                 item.trip.CompanyId,
                 item.trip.AgencyId,
-                item.route.OriginCity,
-                item.route.DestinationCity,
+                string.IsNullOrEmpty(item.trip.OriginCitySnapshot) ? item.route.OriginCity : item.trip.OriginCitySnapshot,
+                string.IsNullOrEmpty(item.trip.DestinationCitySnapshot) ? item.route.DestinationCity : item.trip.DestinationCitySnapshot,
                 item.trip.DepartureAtUtc,
                 item.trip.ArrivalAtUtc,
                 item.model.Name,
                 item.trip.Price,
                 item.trip.Currency,
-                0))
+                0,
+                string.IsNullOrEmpty(item.trip.VehicleDisplayNameSnapshot) ? item.vehicle.DisplayName : item.trip.VehicleDisplayNameSnapshot))
             .ToArrayAsync(cancellationToken);
     }
 
@@ -82,15 +85,15 @@ internal sealed class EfTripSearchReadRepository(TransportSchedulingDbContext db
         var layout = await (from trip in dbContext.Trips.AsNoTracking()
                             join vehicle in dbContext.Vehicles.AsNoTracking() on trip.VehicleId equals vehicle.Id
                             join model in dbContext.VehicleModels.AsNoTracking() on vehicle.VehicleModelId equals model.Id
-                            where trip.Id == tripId
-                            select model.SeatLayout)
+                            where trip.Id == tripId && trip.Status == TripStatus.Scheduled
+                            select new { model.SeatLayout, vehicle.DisplayName, trip.VehicleDisplayNameSnapshot })
             .SingleOrDefaultAsync(cancellationToken);
 
         return layout is null
             ? null
-            : new SeatLayoutDto(layout.Seats
+            : new SeatLayoutDto(layout.SeatLayout.Seats
                 .Select(seat => new SeatPositionDto(seat.Number, seat.Row, seat.Column, seat.Floor))
-                .ToArray());
+                .ToArray(), string.IsNullOrEmpty(layout.VehicleDisplayNameSnapshot) ? layout.DisplayName : layout.VehicleDisplayNameSnapshot);
     }
 
     private static string EscapeLikeLiteral(string value) => value

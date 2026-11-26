@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TransportPlatform.Modules.TransportScheduling.Application.Contracts;
 using TransportPlatform.Modules.TransportScheduling.Application.Services;
 using TransportPlatform.Modules.TransportScheduling.Infrastructure.Persistence;
+using TransportPlatform.Shared.Contracts.Administration;
 using TransportPlatform.Shared.Contracts.Modules;
 
 namespace TransportPlatform.Modules.TransportScheduling.Infrastructure;
@@ -18,6 +19,9 @@ public static class InfrastructureRegistration
         services.AddDbContext<TransportSchedulingDbContext>(options => options.UseNpgsql(connectionString,
             postgres => postgres.MigrationsHistoryTable("__EFMigrationsHistory", "transport_scheduling")));
         services.AddScoped<ITripSearchReadRepository, EfTripSearchReadRepository>();
+        services.AddScoped<IAgencyCatalogRepository, EfAgencyCatalogRepository>();
+        services.AddScoped<IAgencyScopeValidator, AgencyScopeValidator>();
+        services.AddScoped<IAgencyCatalogAdminApi, AgencyCatalogAdminApi>();
         services.AddScoped<IVehicleModelAdministrationRepository, EfVehicleModelAdministrationRepository>();
         services.AddScoped<TransportSchedulingApi>();
         services.AddScoped<ITransportSchedulingApi>(provider => provider.GetRequiredService<TransportSchedulingApi>());

@@ -48,7 +48,7 @@ function TripCard({ trip }: { trip: TripSearchResult }) {
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-pill bg-neutral-50 px-3 py-1.5 text-sm text-neutral-600">
-            <BusFront aria-hidden="true" size={16} className="text-primary-700" /> {trip.vehicleModelName}
+            <BusFront aria-hidden="true" size={16} className="text-primary-700" /> {trip.vehicleDisplayName && trip.vehicleDisplayName !== trip.vehicleModelName ? `${trip.vehicleDisplayName} · ${trip.vehicleModelName}` : trip.vehicleModelName}
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-pill bg-primary-100 px-3 py-1.5 text-sm font-medium text-primary-700">
             <Clock3 aria-hidden="true" size={15} /> {trip.availableSeats} asientos libres

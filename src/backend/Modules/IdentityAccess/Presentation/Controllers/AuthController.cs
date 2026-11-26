@@ -59,7 +59,7 @@ public sealed class AuthController(
             accessToken = access.Token,
             tokenType = "Bearer",
             expiresAtUtc = access.ExpiresAtUtc,
-            user = new { id = access.User.Id, role = access.User.Role }
+            user = new { id = access.User.Id, role = access.User.Role, fullName = access.User.FullName, email = access.User.NormalizedEmail.ToLowerInvariant() }
         });
     }
 

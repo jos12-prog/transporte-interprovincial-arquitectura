@@ -15,6 +15,8 @@ public sealed class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
         builder.Property(vehicle => vehicle.AgencyId).HasColumnName("agency_id").IsRequired();
         builder.Property(vehicle => vehicle.VehicleModelId).HasColumnName("vehicle_model_id").IsRequired();
         builder.Property(vehicle => vehicle.Plate).HasColumnName("plate").HasMaxLength(16).IsRequired();
+        builder.Property(vehicle => vehicle.DisplayName).HasColumnName("display_name").HasMaxLength(120).IsRequired();
+        builder.Property(vehicle => vehicle.IsActive).HasColumnName("is_active").HasDefaultValue(true).IsRequired();
         builder.HasOne<VehicleModel>()
             .WithMany()
             .HasForeignKey(vehicle => vehicle.VehicleModelId)

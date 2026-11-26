@@ -4,7 +4,7 @@ namespace TransportPlatform.Modules.Reservations.Application.Contracts;
 
 public sealed record SeatMapSeat(Guid TripSeatId, int Number, int? Row, int? Column, int Floor, TripSeatStatus Status);
 
-public sealed record TripSeatMap(Guid TripId, IReadOnlyList<SeatMapSeat> Seats);
+public sealed record TripSeatMap(Guid TripId, IReadOnlyList<SeatMapSeat> Seats, string VehicleDisplayName = "");
 
 public sealed record CreateReservationHoldRequest(
     Guid TripId,

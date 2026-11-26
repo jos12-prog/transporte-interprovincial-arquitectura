@@ -89,7 +89,8 @@ public sealed class SearchTripsUseCase(
                 trip.VehicleModelName,
                 trip.Price,
                 trip.Currency,
-                trip.AvailableSeats);
+                trip.AvailableSeats,
+                trip.VehicleDisplayName);
         }).ToArray();
         await TryCacheAsync(cacheKey, results, cancellationToken);
         return new TripSearchExecutionResult(results, CacheHit: false);

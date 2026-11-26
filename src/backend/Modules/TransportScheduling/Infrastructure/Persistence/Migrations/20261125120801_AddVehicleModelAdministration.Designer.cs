@@ -47,8 +47,7 @@ namespace TransportPlatform.Modules.TransportScheduling.Infrastructure.Persisten
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OriginCity", "DestinationCity")
-                        .IsUnique();
+                    b.HasIndex("OriginCity", "DestinationCity");
 
                     b.ToTable("routes", "transport_scheduling");
                 });

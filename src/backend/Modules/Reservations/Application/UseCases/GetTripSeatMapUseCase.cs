@@ -33,6 +33,6 @@ public sealed class GetTripSeatMapUseCase(
             }
 
             return new SeatMapSeat(tripSeat.Id, position.Number, position.Row, position.Column, position.Floor, tripSeat.Status);
-        }).ToArray());
+        }).ToArray(), layout.VehicleDisplayName);
     }
 }

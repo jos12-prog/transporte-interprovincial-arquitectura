@@ -39,6 +39,11 @@ describe('authentication forms', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Credenciales incorrectas.');
   });
 
+  it('links passenger login to the agency staff login', () => {
+    renderPage(<LoginPage />);
+    expect(screen.getByRole('link', { name: 'Inicia sesión aquí' })).toHaveAttribute('href', '/personal/login');
+  });
+
   it('registers the supplied passenger fields and redirects to login', async () => {
     jest.mocked(identityApi.registerPassenger).mockResolvedValue({ userId: 'user-1' });
     renderPage(<RegisterPage />);

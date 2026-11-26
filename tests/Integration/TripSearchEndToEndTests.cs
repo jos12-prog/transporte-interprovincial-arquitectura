@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
@@ -6,6 +7,7 @@ using Testcontainers.Redis;
 using TransportPlatform.Modules.QueriesReports.Application.UseCases;
 using TransportPlatform.Modules.Reservations.Domain.Enums;
 using TransportPlatform.Modules.Reservations.Infrastructure.Persistence;
+using TransportPlatform.Modules.TransportScheduling.Infrastructure.Persistence;
 using Xunit;
 
 namespace TransportPlatform.Integration.Tests;
@@ -40,13 +42,28 @@ public sealed class TripSearchEndToEndTests
 
         var serviceDate = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(-5)).DateTime);
         var basePath = $"/api/v1/trips/search?origin=Ayacucho&destination=Lima&date={serviceDate:yyyy-MM-dd}";
+        var localOffset = TimeSpan.FromHours(-5);
+        var serviceStart = new DateTimeOffset(serviceDate.ToDateTime(TimeOnly.MinValue), localOffset).ToUniversalTime();
+        var serviceEnd = serviceStart.AddDays(1);
+        await using var schedulingScope = factory.Services.CreateAsyncScope();
+        var scheduling = schedulingScope.ServiceProvider.GetRequiredService<TransportSchedulingDbContext>();
+        var seededTrips = await (from trip in scheduling.Trips.AsNoTracking()
+                                 join vehicle in scheduling.Vehicles.AsNoTracking() on trip.VehicleId equals vehicle.Id
+                                 join model in scheduling.VehicleModels.AsNoTracking() on vehicle.VehicleModelId equals model.Id
+                                 where trip.OriginCitySnapshot == "Ayacucho"
+                                       && trip.DestinationCitySnapshot == "Lima"
+                                       && trip.DepartureAtUtc >= serviceStart
+                                       && trip.DepartureAtUtc < serviceEnd
+                                 select new { trip.Id, model.Capacity }).ToArrayAsync();
         using var missResponse = await client.GetAsync(basePath);
         Assert.Equal(200, (int)missResponse.StatusCode);
         Assert.Equal("MISS", Assert.Single(missResponse.Headers.GetValues("X-Cache")));
         var initialTrips = await missResponse.Content.ReadFromJsonAsync<TripSearchResult[]>();
         Assert.NotNull(initialTrips);
-        Assert.Equal(2, initialTrips.Length);
-        Assert.Equal(new[] { 44, 52 }, initialTrips.Select(trip => trip.AvailableSeats).OrderBy(count => count).ToArray());
+        Assert.Equal(seededTrips.Length, initialTrips.Length);
+        Assert.Equal(seededTrips.Select(trip => trip.Id).OrderBy(id => id), initialTrips.Select(trip => trip.TripId).OrderBy(id => id));
+        foreach (var result in initialTrips)
+            Assert.Equal(Assert.Single(seededTrips, seeded => seeded.Id == result.TripId).Capacity, result.AvailableSeats);
         Assert.Contains(initialTrips, trip => trip.CompanyName == "Andes Express" && trip.AgencyCity == "Ayacucho");
         Assert.Contains(initialTrips, trip => trip.CompanyName == "Wari Bus" && trip.VehicleModelName == "Bus 2 pisos");
 
@@ -54,16 +71,19 @@ public sealed class TripSearchEndToEndTests
         Assert.Equal(200, (int)hitResponse.StatusCode);
         Assert.Equal("HIT", Assert.Single(hitResponse.Headers.GetValues("X-Cache")));
 
-        var andesTrip = Assert.Single(initialTrips, trip => trip.CompanyName == "Andes Express");
-        var filteredPath = $"{basePath}&companyId={andesTrip.CompanyId}&agencyId={andesTrip.AgencyId}&departureFrom=08%3A00&departureTo=08%3A00&minPrice=75&maxPrice=75";
+        var andesTrip = Assert.Single(initialTrips, trip => trip.CompanyName == "Andes Express"
+            && trip.DepartureAtUtc.ToOffset(localOffset).TimeOfDay == new TimeSpan(6, 0, 0));
+        var departureTime = andesTrip.DepartureAtUtc.ToOffset(localOffset).ToString("HH:mm", CultureInfo.InvariantCulture);
+        var encodedDepartureTime = Uri.EscapeDataString(departureTime);
+        var filteredPath = $"{basePath}&companyId={andesTrip.CompanyId}&agencyId={andesTrip.AgencyId}&departureFrom={encodedDepartureTime}&departureTo={encodedDepartureTime}";
         using var filteredResponse = await client.GetAsync(filteredPath);
         Assert.Equal(200, (int)filteredResponse.StatusCode);
         var filteredTrips = await filteredResponse.Content.ReadFromJsonAsync<TripSearchResult[]>();
         var filteredTrip = Assert.Single(filteredTrips!);
         Assert.Equal("Andes Express", filteredTrip.CompanyName);
-        Assert.Equal(75m, filteredTrip.Price);
+        Assert.Equal(andesTrip.Price, filteredTrip.Price);
 
-        var concurrentPath = $"{basePath}&companyId={andesTrip.CompanyId}&minPrice=74&maxPrice=76";
+        var concurrentPath = $"{basePath}&companyId={andesTrip.CompanyId}&agencyId={andesTrip.AgencyId}&departureFrom={encodedDepartureTime}&departureTo={encodedDepartureTime}";
         var tripIds = initialTrips.Select(trip => trip.TripId).ToArray();
         var seatsBefore = await ReadSeatStateAsync(factory.Services, tripIds);
         var concurrentResponses = await Task.WhenAll(Enumerable.Range(0, 16)
@@ -75,7 +95,7 @@ public sealed class TripSearchEndToEndTests
             {
                 var results = await response.Content.ReadFromJsonAsync<TripSearchResult[]>();
                 Assert.Single(results!);
-                Assert.Equal(44, results![0].AvailableSeats);
+                Assert.Equal(andesTrip.AvailableSeats, results![0].AvailableSeats);
             }
         }
         finally
