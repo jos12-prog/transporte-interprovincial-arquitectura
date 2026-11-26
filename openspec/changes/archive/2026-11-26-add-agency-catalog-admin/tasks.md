@@ -38,7 +38,7 @@
 
 ## 7. Verificación final
 
-- [ ] 7.1 Ejecutar `dotnet build`, toda la suite `dotnet test`, build y Jest frontend, Jest API/Newman contra Compose y `openspec validate --all --strict`; corregir fallos y conservar resultados antes de cerrar el change.
+- [x] 7.1 Ejecutar `dotnet build`, toda la suite `dotnet test`, build y Jest frontend, Jest API/Newman contra Compose y `openspec validate --all --strict`; verificación reportada: CI #22 verde en `feat/add-agency-catalog-admin` (commit `0ebadda`), Integration 17/17, Jest API 9/9 e identidad 4/4; Newman local 58 requests y 92/92 assertions.
 
 ## 8. Ajustes de revisión
 

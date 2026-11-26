@@ -7,7 +7,7 @@ Permitir que pasajeros encuentren y comparen viajes interprovinciales públicos 
 ## Requirements
 
 ### Requirement: Búsqueda pública de viajes
-La API SHALL exponer `GET /api/v1/trips/search` sin autenticación, con origen, destino y fecha de servicio obligatorios, y filtros opcionales por empresa, agencia, horario y tarifa; SHALL excluir viajes asociados a una empresa o agencia inactiva.
+La API SHALL exponer `GET /api/v1/trips/search` sin autenticación, con origen, destino y fecha de servicio obligatorios, y filtros opcionales por empresa, agencia, horario y tarifa; SHALL excluir viajes asociados a una empresa o agencia inactiva y viajes cuyo estado sea `Cancelled`.
 
 #### Scenario: Buscar viajes para una fecha válida
 - **WHEN** el cliente envía origen, destino y fecha de servicio válidos, con filtros opcionales
@@ -25,12 +25,16 @@ La API SHALL exponer `GET /api/v1/trips/search` sin autenticación, con origen, 
 - **WHEN** un viaje coincidente pertenece a una empresa o agencia desactivada
 - **THEN** el viaje no aparece en los resultados de búsqueda pública.
 
+#### Scenario: Viaje cancelado
+- **WHEN** un viaje coincidente tiene estado `Cancelled`
+- **THEN** el viaje no aparece en los resultados de búsqueda pública, aunque la ruta, vehículo, empresa y agencia continúen activos.
+
 ### Requirement: Resultados comparables y disponibilidad agregada
-Cada resultado SHALL identificar la empresa, agencia, hora de salida y llegada, nombre del modelo del vehículo, precio y cantidad agregada de asientos libres; una búsqueda sin coincidencias SHALL devolver una lista vacía.
+Cada resultado SHALL identificar la empresa, agencia, hora de salida y llegada, nombre del modelo y nombre visible del vehículo, precio y cantidad agregada de asientos libres; una búsqueda sin coincidencias SHALL devolver una lista vacía.
 
 #### Scenario: Mostrar resultados coincidentes
 - **WHEN** existen viajes programados para la ruta y fecha solicitadas
-- **THEN** cada resultado incluye empresa, agencia, horarios, modelo, tarifa y conteo de asientos libres obtenido mediante el contrato público de disponibilidad.
+- **THEN** cada resultado incluye empresa, agencia, horarios, modelo, nombre visible del vehículo, tarifa y conteo de asientos libres obtenido mediante el contrato público de disponibilidad.
 
 #### Scenario: No hay viajes disponibles
 - **WHEN** no existe viaje coincidente o ninguno tiene asientos libres
@@ -65,3 +69,14 @@ La búsqueda SHALL cumplir el objetivo EQ-01 de percentil 95 no mayor de 2 segun
 #### Scenario: Medir consultas repetitivas
 - **WHEN** la carga repite consultas configuradas para caché
 - **THEN** al menos 80 % de esas solicitudes se atiende mediante Redis durante la prueba definida en EQ-08.
+
+### Requirement: Invalidación de búsqueda tras cambios administrativos
+Las mutaciones de rutas, tarifas, vehículos y viajes que puedan cambiar los resultados SHALL invalidar la caché de búsqueda después de confirmar su transacción.
+
+#### Scenario: Consultar después de una mutación confirmada
+- **WHEN** una mutación administrativa que afecta la búsqueda se confirma y se ejecuta una nueva consulta
+- **THEN** la API obtiene resultados actualizados, sin depender de una entrada anterior a la mutación.
+
+#### Scenario: Mutación no confirmada
+- **WHEN** una mutación falla y su transacción se revierte
+- **THEN** la operación no invalida la caché como si el cambio se hubiera confirmado.

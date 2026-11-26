@@ -49,7 +49,7 @@ npx newman run tests/postman/RutaAndina-Sprint2.postman_collection.json --env-va
 docker compose down
 ```
 
-Si hay un volumen local de una versión anterior del esquema, recrearlo antes del arranque con `docker compose down -v`; esto elimina el volumen local de PostgreSQL. Resultado reportado por el usuario: Integration **17/17** (incluye la regresión del seeder con empresa ajena), Jest API plataforma/catálogo **9/9**, Jest identidad **4/4** y Newman **58/58 requests, 92/92 assertions, 0 fallos**. El cambio de CI y la verificación integral 7.1 continúan pendientes.
+Si hay un volumen local de una versión anterior del esquema, recrearlo antes del arranque con `docker compose down -v`; esto elimina el volumen local de PostgreSQL. Verificación reportada: CI #22 verde en `feat/add-agency-catalog-admin` (commit `0ebadda`), Integration **17/17**, Jest API plataforma/catálogo **9/9**, Jest identidad **4/4** y Newman local **58 requests, 92/92 assertions, 0 fallos**.
 
 ### Criterios de la rúbrica relacionados
 
