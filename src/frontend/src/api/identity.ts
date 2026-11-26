@@ -3,6 +3,8 @@ export type TechnicalRole = 'passenger' | 'agent' | 'agency_admin' | 'super_admi
 export interface AuthUser {
   id: string;
   role: TechnicalRole;
+  fullName?: string;
+  email?: string;
 }
 
 export interface AuthSession {
@@ -38,7 +40,9 @@ export function registerPassenger(input: {
   return request('/auth/register', input);
 }
 
-export async function getStaffAgencies(accessToken: string): Promise<Array<{ agencyId: string; agencyName: string; city: string }>> {
+export interface StaffAgencySummary { agencyId: string; agencyName: string; companyName: string; city: string }
+
+export async function getStaffAgencies(accessToken: string): Promise<StaffAgencySummary[]> {
   const response = await fetch(`${baseUrl}/api/v1/staff/agencies`, { headers: { Authorization: `Bearer ${accessToken}` } });
   if (!response.ok) throw new Error('No se pudieron cargar las agencias.');
   return response.json();

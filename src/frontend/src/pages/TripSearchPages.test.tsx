@@ -79,7 +79,7 @@ describe('passenger trip search screens', () => {
   it('shows an empty state when the API returns no trips', async () => {
     mockApiResponse([]);
 
-    renderRoutes('/pasajero/resultados?origin=Ayacucho&destination=Cusco&date=2026-11-23');
+    renderRoutes('/pasajero/resultados?origin=Ayacucho&destination=Huanta&date=2026-11-23');
 
     expect(await screen.findByRole('heading', { name: 'No encontramos salidas para esta ruta' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Nueva búsqueda' })).toHaveAttribute('href', '/pasajero');

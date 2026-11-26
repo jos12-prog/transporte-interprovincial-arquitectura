@@ -1,3 +1,5 @@
+export {};
+
 const baseUrl = (process.env.API_BASE_URL ?? 'http://127.0.0.1:8080').replace(/\/$/, '');
 
 describe('identity-access HTTP contract', () => {
@@ -42,6 +44,8 @@ describe('identity-access HTTP contract', () => {
     expect(login.status).toBe(200);
     const session = await login.json();
     expect(session.user.role).toBe('passenger');
+    expect(session.user.fullName).toBe('Pasajero API');
+    expect(session.user.email).toBe(email.toLowerCase());
     expect(session.tokenType).toBe('Bearer');
     expect(new Date(session.expiresAtUtc).getTime()).toBeGreaterThan(Date.now());
 
@@ -61,6 +65,8 @@ describe('identity-access HTTP contract', () => {
     expect(login.status).toBe(200);
     const session = await login.json();
     expect(session.user.role).toBe('agent');
+    expect(session.user.fullName).toEqual(expect.any(String));
+    expect(session.user.email).toBe('agente@andesexpress.test');
     const headers = { Authorization: `Bearer ${session.accessToken}` };
 
     const agencies = await fetch(`${baseUrl}/api/v1/staff/agencies`, { headers });

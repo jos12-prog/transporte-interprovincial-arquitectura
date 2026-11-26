@@ -6,6 +6,7 @@ export default {
     extend: {
       colors: {
         primary: {
+          950: '#0B2824',
           900: '#063F36',
           700: '#0B5C4E',
           600: '#0E6B5C',
@@ -24,7 +25,7 @@ export default {
           200: '#E0E6E4',
           50: '#F6F8F7',
         },
-        success: { 600: '#16A34A' },
+        success: { 50: '#F0FDF4', 100: '#DCFCE7', 600: '#16A34A' },
         danger: { 700: '#B91C1C', 600: '#DC2626', 100: '#FEE2E2', 50: '#FEF2F2' },
         warning: { 500: '#F59E0B' },
       },

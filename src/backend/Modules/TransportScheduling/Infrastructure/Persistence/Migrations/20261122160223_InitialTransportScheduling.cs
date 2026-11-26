@@ -104,8 +104,7 @@ namespace TransportPlatform.Modules.TransportScheduling.Infrastructure.Persisten
                 name: "IX_routes_origin_city_destination_city",
                 schema: "transport_scheduling",
                 table: "routes",
-                columns: new[] { "origin_city", "destination_city" },
-                unique: true);
+                columns: new[] { "origin_city", "destination_city" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_trips_company_id_agency_id_departure_at_utc",

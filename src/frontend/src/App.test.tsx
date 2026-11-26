@@ -28,14 +28,14 @@ describe('role routes and layouts', () => {
     ['/superadmin', 'super_admin', 'Superadministrador'],
   ] as const)('renders the protected route for %s only for its technical role', async (path, role, title) => {
     if (role === 'agency_admin') {
-      jest.mocked(getStaffAgencies).mockResolvedValue([{ agencyId: 'agency-1', agencyName: 'Andes Express - Ayacucho', city: 'Ayacucho' }]);
+      jest.mocked(getStaffAgencies).mockResolvedValue([{ agencyId: 'agency-1', agencyName: 'Andes Express', companyName: 'Andes Express', city: 'Ayacucho' }]);
     }
     renderRoute(path, role);
-    if (role === 'agency_admin') expect(await screen.findByRole('option', { name: 'Andes Express - Ayacucho' })).toBeInTheDocument();
+    if (role === 'agency_admin') expect(await screen.findByRole('button', { name: 'Agencia activa' })).toHaveTextContent('Andes Express');
     if (role === 'super_admin') {
-      expect(await screen.findByRole('heading', { level: 1, name: 'Empresas' })).toBeInTheDocument();
+      expect(await screen.findByRole('heading', { level: 1, name: 'Empresas de transporte' })).toBeInTheDocument();
     } else {
-      expect(screen.getByRole('heading', { level: 1, name: title })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1, name: role === 'agency_admin' ? 'Rutas' : title })).toBeInTheDocument();
     }
     expect(screen.getByRole('button', { name: /cerrar sesión/i })).toBeInTheDocument();
   });

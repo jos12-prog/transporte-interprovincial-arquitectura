@@ -7,6 +7,7 @@ namespace TransportPlatform.Modules.TransportScheduling.Infrastructure.Persisten
 public sealed class TransportSchedulingDbContext : DbContext
 {
     public DbSet<Route> Routes => Set<Route>();
+    public DbSet<Fare> Fares => Set<Fare>();
     public DbSet<VehicleModel> VehicleModels => Set<VehicleModel>();
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
     public DbSet<Trip> Trips => Set<Trip>();

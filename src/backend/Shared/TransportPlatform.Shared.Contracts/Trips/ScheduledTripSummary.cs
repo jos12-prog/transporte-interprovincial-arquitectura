@@ -11,4 +11,5 @@ public sealed record ScheduledTripSummary(
     string VehicleModelName,
     decimal Price,
     string Currency,
-    int AvailableSeats);
+    int AvailableSeats,
+    string VehicleDisplayName = "");

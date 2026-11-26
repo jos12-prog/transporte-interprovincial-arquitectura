@@ -64,6 +64,8 @@ builder.Services.AddScoped<IAuthorizationHandler, AgencyScopeAuthorizationHandle
 builder.Services.AddCompaniesAgenciesInfrastructure(builder.Configuration);
 builder.Services.AddTransportSchedulingInfrastructure(builder.Configuration);
 builder.Services.AddReservationsInfrastructure(builder.Configuration);
+builder.Services.AddScoped<TransportPlatform.Modules.TransportScheduling.Application.Contracts.ITripSchedulingCoordinator, EfTripSchedulingCoordinator>();
+builder.Services.AddScoped<TransportPlatform.Shared.Contracts.Modules.ITripReservationGuard, EfTripReservationGuard>();
 builder.Services.AddSalesPaymentsInfrastructure(builder.Configuration);
 builder.Services.AddQueriesReportsInfrastructure(builder.Configuration);
 builder.Services.AddAuditNotificationsInfrastructure(builder.Configuration);
@@ -93,6 +95,7 @@ builder.Services.AddSwaggerGen(options =>
         Assembly.GetExecutingAssembly(),
         typeof(TransportPlatform.Modules.QueriesReports.Presentation.PresentationAssemblyMarker).Assembly,
         typeof(TransportPlatform.Modules.Reservations.Presentation.PresentationAssemblyMarker).Assembly
+        ,typeof(TransportPlatform.Modules.TransportScheduling.Presentation.PresentationAssemblyMarker).Assembly
         ,typeof(TransportPlatform.Modules.IdentityAccess.Presentation.PresentationAssemblyMarker).Assembly
     };
     foreach (var assembly in documentedAssemblies)

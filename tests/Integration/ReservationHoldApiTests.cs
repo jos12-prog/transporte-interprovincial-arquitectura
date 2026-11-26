@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 using Testcontainers.Redis;
+using TransportPlatform.Modules.CompaniesAgencies.Infrastructure.Persistence;
 using TransportPlatform.Modules.Reservations.Domain.Entities;
 using TransportPlatform.Modules.Reservations.Domain.Enums;
 using TransportPlatform.Modules.Reservations.Infrastructure.Persistence;
+using TransportPlatform.Modules.TransportScheduling.Infrastructure.Persistence;
 using TransportPlatform.Shared.Contracts.Trips;
 using Xunit;
 
@@ -29,7 +31,7 @@ public sealed class ReservationHoldApiTests
         var mapJson = JsonDocument.Parse(await mapResponse.Content.ReadAsStringAsync());
         var map = mapJson.RootElement;
         Assert.Equal(trip.TripId, map.GetProperty("tripId").GetGuid());
-        Assert.Equal(44, map.GetProperty("seats").GetArrayLength());
+        Assert.Equal(trip.SeatCapacity, map.GetProperty("seats").GetArrayLength());
         Assert.DoesNotContain("passenger", mapJson.RootElement.GetRawText(), StringComparison.OrdinalIgnoreCase);
         var seats = map.GetProperty("seats").EnumerateArray().Take(11).ToArray();
         var seatIds = seats.Take(10).Select(seat => seat.GetProperty("tripSeatId").GetGuid()).ToArray();
@@ -143,7 +145,7 @@ public sealed class ReservationHoldApiTests
     private sealed record HoldResponse(Guid ReservationId, string HoldToken, DateTimeOffset ExpiresAtUtc);
     private sealed record TripSeatMapResponse(Guid TripId, SeatResponse[] Seats);
     private sealed record SeatResponse(Guid TripSeatId, string Status);
-    private sealed record SeedTrip(Guid TripId, Guid CompanyId, Guid AgencyId);
+    private sealed record SeedTrip(Guid TripId, Guid CompanyId, Guid AgencyId, int SeatCapacity);
 
     private sealed class ReservationTestEnvironment : IAsyncDisposable
     {
@@ -185,12 +187,28 @@ public sealed class ReservationHoldApiTests
         public async Task<SeedTrip> FindSeedTripAsync()
         {
             var date = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(-5)).DateTime);
-            var response = await Client.GetAsync($"/api/v1/trips/search?origin=Ayacucho&destination=Lima&date={date:yyyy-MM-dd}");
+            Guid andesExpressId;
+            await using (var scope = Factory.Services.CreateAsyncScope())
+            {
+                andesExpressId = await scope.ServiceProvider.GetRequiredService<CompaniesAgenciesDbContext>().Companies
+                    .Where(company => company.Name == "Andes Express")
+                    .Select(company => company.Id)
+                    .SingleAsync();
+            }
+
+            // Viaje determinista de Ayacucho → Lima: Andes Express, salida local 06:00.
+            var response = await Client.GetAsync($"/api/v1/trips/search?origin=Ayacucho&destination=Lima&date={date:yyyy-MM-dd}&companyId={andesExpressId}&departureFrom=06%3A00&departureTo=06%3A00");
             response.EnsureSuccessStatusCode();
             var trips = await response.Content.ReadFromJsonAsync<ScheduledTripSummary[]>();
-            Assert.NotEmpty(trips!);
-            var trip = trips![0];
-            return new SeedTrip(trip.TripId, trip.CompanyId, trip.AgencyId);
+            var trip = Assert.Single(trips!);
+            await using var schedulingScope = Factory.Services.CreateAsyncScope();
+            var scheduling = schedulingScope.ServiceProvider.GetRequiredService<TransportSchedulingDbContext>();
+            var seatCapacity = await (from scheduled in scheduling.Trips
+                                      join vehicle in scheduling.Vehicles on scheduled.VehicleId equals vehicle.Id
+                                      join model in scheduling.VehicleModels on vehicle.VehicleModelId equals model.Id
+                                      where scheduled.Id == trip.TripId
+                                      select model.Capacity).SingleAsync();
+            return new SeedTrip(trip.TripId, trip.CompanyId, trip.AgencyId, seatCapacity);
         }
 
         public async Task<int> CountActiveReservationsAsync()

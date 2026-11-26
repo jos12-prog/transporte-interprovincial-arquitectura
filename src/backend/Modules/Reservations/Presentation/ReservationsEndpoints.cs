@@ -34,7 +34,7 @@ public static class ReservationsEndpoints
                             TripSeatStatus.Held => "Held",
                             TripSeatStatus.Confirmed => "Occupied",
                             _ => "Occupied"
-                        })).ToArray());
+                        })).ToArray(), map.VehicleDisplayName);
                     return (IResult)Results.Ok(response);
                 }
                 catch (ReservationValidationException exception)
@@ -115,6 +115,6 @@ public static class ReservationsEndpoints
         Results.Problem(statusCode: statusCode, title: title, detail: detail);
 }
 
-public sealed record SeatMapResponse(Guid TripId, IReadOnlyList<SeatMapSeatResponse> Seats);
+public sealed record SeatMapResponse(Guid TripId, IReadOnlyList<SeatMapSeatResponse> Seats, string VehicleDisplayName = "");
 
 public sealed record SeatMapSeatResponse(Guid TripSeatId, int Number, int? Row, int? Column, int Floor, string Status);

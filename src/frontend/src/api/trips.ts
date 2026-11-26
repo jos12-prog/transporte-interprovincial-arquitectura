@@ -22,6 +22,7 @@ export interface TripSearchResult {
   departureAtUtc: string;
   arrivalAtUtc: string;
   vehicleModelName: string;
+  vehicleDisplayName?: string;
   price: number;
   currency: string;
   availableSeats: number;

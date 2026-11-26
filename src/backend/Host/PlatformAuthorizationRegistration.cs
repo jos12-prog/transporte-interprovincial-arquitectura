@@ -13,6 +13,7 @@ public static class PlatformAuthorizationRegistration
             options.AddPolicy("SuperAdmin", policy => policy.RequireAuthenticatedUser().RequireRole("super_admin"));
             options.AddPolicy("StaffAgencies", policy => policy.RequireAuthenticatedUser().RequireRole("agent", "agency_admin"));
             options.AddPolicy("AgencyScope", policy => policy.RequireAuthenticatedUser().AddRequirements(new AgencyScopeRequirement()));
+            options.AddPolicy("AgencyCatalogAdmin", policy => policy.RequireAuthenticatedUser().RequireRole("agency_admin"));
         });
         return services;
     }

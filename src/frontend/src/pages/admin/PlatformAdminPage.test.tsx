@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { AuthProvider } from '@/auth/AuthContext';
 import { PlatformAdminPage } from '@/pages/admin/PlatformAdminPage';
@@ -17,7 +17,7 @@ jest.mock('@/api/platform-admin', () => ({
 }));
 
 const company = {
-  companyId: 'company-1', name: 'Andes Express', taxId: '20123456789', contactName: 'María',
+  companyId: 'company-1', name: 'Andes Express', taxId: '20601234567', contactName: 'María',
   contactPhone: '999111222', isActive: true,
 };
 const yarisModel = {
@@ -64,8 +64,8 @@ const busDoubleFloor = {
   ],
 };
 
-function renderPage() {
-  return render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><AuthProvider initialSession={{
+function renderPage(initialEntry = '/') {
+  return render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={[initialEntry]}><AuthProvider initialSession={{
     accessToken: 'token', expiresAtUtc: '2026-11-25T13:00:00Z', user: { id: 'admin', role: 'super_admin' },
   }}><PlatformAdminPage /></AuthProvider></MemoryRouter>);
 }
@@ -88,38 +88,52 @@ describe('platform administration screens', () => {
   it('loads companies and shows the empty agency state', async () => {
     renderPage();
     expect(await screen.findByText('Andes Express')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Agencias' }));
-    expect(await screen.findByText('Esta empresa aún no tiene agencias.')).toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'RUC' })).toBeInTheDocument();
+    expect(screen.getByText('20601234567')).toBeInTheDocument();
+    const page = screen.getByRole('region', { name: 'Empresas de transporte' });
+    expect(page).toBeInTheDocument();
+    cleanup();
+    renderPage('/superadmin?section=agencies');
+    expect(await screen.findByText('Aún no hay agencias registradas.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Nueva agencia' }));
     expect(screen.getByLabelText('Empresa')).toHaveValue('company-1');
   });
 
+  it('opens the platform section from its section query parameter', async () => {
+    renderPage('/superadmin?section=models');
+
+    expect(await screen.findByRole('heading', { name: 'Modelos de vehículo' })).toBeInTheDocument();
+  });
+
   it('keeps the seat geometry locked for an in-use model while allowing its name to be edited', async () => {
-    renderPage();
-    await screen.findByText('Andes Express');
-    fireEvent.click(screen.getByRole('button', { name: 'Modelos de vehículo' }));
+    renderPage('/superadmin?section=models');
+    await screen.findByRole('heading', { name: 'Toyota Avanza' });
     const modelCard = screen.getByRole('heading', { name: 'Toyota Avanza' }).closest('article')!;
-    fireEvent.click(within(modelCard).getByRole('button', { name: 'Editar' }));
+    expect(modelCard).toHaveClass('flex', 'flex-col');
+    expect(within(modelCard).getByRole('button', { name: 'Editar modelo Toyota Avanza' }).parentElement?.parentElement).toHaveClass('mt-auto');
+    fireEvent.click(within(modelCard).getByRole('button', { name: 'Editar modelo Toyota Avanza' }));
     expect(screen.getByRole('note')).toHaveTextContent('plano y la capacidad están bloqueados');
     expect(screen.getByRole('button', { name: 'Asiento 1, Libre' })).toBeDisabled();
     expect(screen.getByLabelText('Nombre visible')).toHaveValue('Toyota Avanza');
     expect(screen.getByRole('button', { name: 'Guardar cambios' })).toBeEnabled();
   });
 
-  it('offers only active models in the vehicle creation selector', async () => {
-    renderPage();
-    await screen.findByText('Andes Express');
-    fireEvent.click(screen.getByRole('button', { name: 'Modelos de vehículo' }));
-    const selector = await screen.findByRole('combobox', { name: 'Modelo para alta de vehículo' });
-    expect(screen.getByRole('option', { name: 'Toyota Avanza' })).toBeInTheDocument();
-    expect(screen.queryByRole('option', { name: 'Toyota antiguo' })).not.toBeInTheDocument();
-    expect(selector).toHaveValue('');
+  it('shows visible model actions with their icons and danger color', async () => {
+    renderPage('/superadmin?section=models');
+    await screen.findByRole('heading', { name: 'Toyota Avanza' });
+    const card = screen.getByRole('heading', { name: 'Toyota Avanza' }).closest('article')!;
+    const edit = within(card).getByRole('button', { name: 'Editar modelo Toyota Avanza' });
+    const deactivate = within(card).getByRole('button', { name: 'Desactivar modelo Toyota Avanza' });
+    expect(edit.querySelector('svg')).toBeInTheDocument();
+    expect(deactivate.querySelector('svg')).toBeInTheDocument();
+    expect(deactivate).toHaveClass('border-danger-600/30', 'text-danger-700');
   });
 
   it('renders the complete 15-seat van plan and keeps its empty lane distinct from an aisle', async () => {
     jest.mocked(adminApi.getVehicleModels).mockResolvedValueOnce([vanModel]);
-    renderPage();
-    await screen.findByText('Andes Express');
-    fireEvent.click(screen.getByRole('button', { name: 'Modelos de vehículo' }));
+    renderPage('/superadmin?section=models');
+    await screen.findByRole('heading', { name: 'Van' });
     const card = screen.getByRole('heading', { name: 'Van' }).closest('article')!;
     expect(within(card).getAllByRole('img', { name: /^Asiento/ })).toHaveLength(15);
     expect(within(card).getByRole('img', { name: 'Conductor, piso 1' })).toBeInTheDocument();
@@ -128,9 +142,8 @@ describe('platform administration screens', () => {
 
   it('draws Yaris, Avanza, and Minivan in the approved three-column driver layout and sorts by capacity', async () => {
     jest.mocked(adminApi.getVehicleModels).mockResolvedValueOnce([busDoubleFloor, vanModel, minivanModel, busSingleFloor, model, yarisModel]);
-    renderPage();
-    await screen.findByText('Andes Express');
-    fireEvent.click(screen.getByRole('button', { name: 'Modelos de vehículo' }));
+    renderPage('/superadmin?section=models');
+    await screen.findByRole('heading', { name: 'Toyota Yaris' });
     const cards = ['Toyota Yaris', 'Toyota Avanza', 'Minivan'].map(name =>
       screen.getByRole('heading', { name }).closest('article')!,
     );
@@ -170,9 +183,9 @@ describe('platform administration screens', () => {
   });
 
   it('starts a new model with a 4 by 5 editor and can resize its rows and columns', async () => {
-    renderPage();
-    await screen.findByText('Andes Express');
-    fireEvent.click(screen.getByRole('button', { name: 'Modelos de vehículo' }));
+    renderPage('/superadmin?section=models');
+    await screen.findByRole('heading', { name: 'Toyota Avanza' });
+    fireEvent.click(screen.getByRole('button', { name: 'Nuevo modelo' }));
     const editor = screen.getByRole('region', { name: 'Editor visual del plano de asientos' });
     const grid = editor.querySelector('[data-row-count]')!;
     expect(grid).toHaveAttribute('data-row-count', '5');
@@ -185,9 +198,8 @@ describe('platform administration screens', () => {
 
   it('renders the two bus floors with 12 lower and 40 upper seats plus the aisle and stairs', async () => {
     jest.mocked(adminApi.getVehicleModels).mockResolvedValueOnce([busSingleFloor, busDoubleFloor]);
-    renderPage();
-    await screen.findByText('Andes Express');
-    fireEvent.click(screen.getByRole('button', { name: 'Modelos de vehículo' }));
+    renderPage('/superadmin?section=models');
+    await screen.findByRole('heading', { name: 'Bus 2 pisos' });
     const doubleCard = screen.getByRole('heading', { name: 'Bus 2 pisos' }).closest('article')!;
     const lower = within(doubleCard).getByRole('region', { name: 'Piso 1' });
     const upper = within(doubleCard).getByRole('region', { name: 'Piso 2' });
@@ -203,11 +215,10 @@ describe('platform administration screens', () => {
 
   it('uses the editor palette to remove and restore seats with automatic front-to-back numbering', async () => {
     jest.mocked(adminApi.getVehicleModels).mockResolvedValueOnce([{ ...model, isInUse: false }]);
-    renderPage();
-    await screen.findByText('Andes Express');
-    fireEvent.click(screen.getByRole('button', { name: 'Modelos de vehículo' }));
+    renderPage('/superadmin?section=models');
+    await screen.findByRole('heading', { name: 'Toyota Avanza' });
     const card = screen.getByRole('heading', { name: 'Toyota Avanza' }).closest('article')!;
-    fireEvent.click(within(card).getByRole('button', { name: 'Editar' }));
+    fireEvent.click(within(card).getByRole('button', { name: 'Editar modelo Toyota Avanza' }));
     fireEvent.click(screen.getByRole('button', { name: 'Vacío' }));
     fireEvent.click(screen.getByRole('button', { name: 'Asiento 1, Libre' }));
     expect(screen.getByText('Asientos: 5')).toBeInTheDocument();
@@ -219,18 +230,17 @@ describe('platform administration screens', () => {
 
   it('allows editing an unused layout and reports a 409 if the server detects it became used', async () => {
     jest.mocked(adminApi.getVehicleModels).mockResolvedValueOnce([{ ...model, isInUse: false }]);
-    renderPage();
-    await screen.findByText('Andes Express');
-    fireEvent.click(screen.getByRole('button', { name: 'Modelos de vehículo' }));
+    renderPage('/superadmin?section=models');
+    await screen.findByRole('heading', { name: 'Toyota Avanza' });
     const modelCard = screen.getByRole('heading', { name: 'Toyota Avanza' }).closest('article')!;
-    fireEvent.click(within(modelCard).getByRole('button', { name: 'Editar' }));
+    fireEvent.click(within(modelCard).getByRole('button', { name: 'Editar modelo Toyota Avanza' }));
     fireEvent.click(screen.getByRole('button', { name: 'Vacío' }));
     const firstSeat = screen.getByRole('button', { name: 'Asiento 1, Libre' });
     fireEvent.click(firstSeat);
     expect(screen.getByRole('button', { name: 'Vacío, piso 1, fila 1, columna 3' })).toBeInTheDocument();
     jest.mocked(adminApi.saveVehicleModel).mockRejectedValueOnce(new Error('El plano está en uso y no puede modificarse (409).'));
     fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('no puede modificarse (409)');
+    expect(await screen.findByRole('status')).toHaveTextContent('no puede modificarse (409)');
     expect(adminApi.saveVehicleModel).toHaveBeenCalledWith('token', expect.objectContaining({ seats: expect.any(Array) }), 'model-1');
   });
 

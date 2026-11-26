@@ -9,7 +9,8 @@ namespace TransportPlatform.Modules.TransportScheduling.Application.Services;
 public sealed class TransportSchedulingApi(
     ITripSearchReadRepository tripSearchRepository,
     IReservationsApi reservationsApi,
-    IVehicleModelAdministrationRepository? vehicleModelRepository = null) : ITransportSchedulingApi, ITransportSchedulingAdminApi
+    IVehicleModelAdministrationRepository? vehicleModelRepository = null,
+    ICompaniesAgenciesApi? companiesAgencies = null) : ITransportSchedulingApi, ITransportSchedulingAdminApi
 {
     private IVehicleModelAdministrationRepository AdminRepository => vehicleModelRepository
         ?? throw new InvalidOperationException("Vehicle model administration is not configured.");
@@ -55,6 +56,14 @@ public sealed class TransportSchedulingApi(
         if (trips.Count == 0)
         {
             return trips;
+        }
+
+        if (companiesAgencies is not null)
+        {
+            var agencies = await companiesAgencies.GetPublicAgenciesAsync(trips.Select(item => item.AgencyId).Distinct().ToArray(), cancellationToken);
+            var activeIds = agencies.Where(item => item.AgencyIsActive && item.CompanyIsActive).Select(item => item.AgencyId).ToHashSet();
+            trips = trips.Where(item => activeIds.Contains(item.AgencyId)).ToArray();
+            if (trips.Count == 0) return trips;
         }
 
         var counts = await reservationsApi.GetAvailableSeatCountsAsync(

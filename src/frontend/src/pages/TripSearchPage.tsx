@@ -4,15 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import ayacuchoImage from '@/assets/search/fondo.jpg';
 import limaImage from '@/assets/search/fondo-2.jpg';
 import huantaImage from '@/assets/search/fondo-3.jpg';
-import cuscoImage from '@/assets/search/fondo-4.jpg';
+import puquioImage from '@/assets/search/fondo-4.jpg';
 import { limaToday } from '@/api/trips';
 
-const cities = ['Ayacucho', 'Lima', 'Huanta', 'Andahuaylas', 'Cusco'];
+const cities = ['Ayacucho', 'Lima', 'Huanta', 'San Miguel', 'Cangallo', 'Vilcas Huamán', 'Puquio', 'Coracora', 'Huancapi', 'Querobamba'];
 const popularRoutes = [
   { origin: 'Ayacucho', destination: 'Lima', image: limaImage, detail: 'Salidas diarias' },
-  { origin: 'Lima', destination: 'Huanta', image: ayacuchoImage, detail: 'Conecta con el valle' },
-  { origin: 'Huanta', destination: 'Andahuaylas', image: huantaImage, detail: 'Viaja por los Andes' },
-  { origin: 'Cusco', destination: 'Ayacucho', image: cuscoImage, detail: 'Descubre el sur andino' },
+  { origin: 'Ayacucho', destination: 'Huanta', image: huantaImage, detail: 'Salidas frecuentes' },
+  { origin: 'Ayacucho', destination: 'San Miguel', image: ayacuchoImage, detail: 'Conecta con La Mar' },
+  { origin: 'Ayacucho', destination: 'Puquio', image: puquioImage, detail: 'Descubre Lucanas' },
 ];
 
 export function TripSearchPage() {

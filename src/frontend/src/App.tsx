@@ -9,6 +9,7 @@ import { LoginPage } from '@/pages/auth/LoginPage';
 import { RegisterPage } from '@/pages/auth/RegisterPage';
 import { RequireRole } from '@/auth/RequireRole';
 import { PlatformAdminPage } from '@/pages/admin/PlatformAdminPage';
+import { AgencyCatalogPage } from '@/pages/admin/AgencyCatalogPage';
 
 export function AppRoutes() {
   return (
@@ -31,7 +32,11 @@ export function AppRoutes() {
       </Route>
       <Route element={<RequireRole allowed={['agency_admin']} />}>
         <Route path="/admin-agencia" element={<StaffShell role="Administrador de Agencia" />}>
-          <Route index element={<RoleLanding title="Administrador de Agencia" />} />
+          <Route index element={<AgencyCatalogPage section="routes" />} />
+          <Route path="rutas" element={<AgencyCatalogPage section="routes" />} />
+          <Route path="vehiculos" element={<AgencyCatalogPage section="vehicles" />} />
+          <Route path="viajes" element={<AgencyCatalogPage section="trips" />} />
+          <Route path="tarifas" element={<AgencyCatalogPage section="fares" />} />
           <Route path="*" element={<RoleLanding title="Administrador de Agencia" />} />
         </Route>
       </Route>

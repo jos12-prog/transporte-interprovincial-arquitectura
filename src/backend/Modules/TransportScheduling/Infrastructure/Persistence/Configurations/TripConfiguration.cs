@@ -19,6 +19,11 @@ public sealed class TripConfiguration : IEntityTypeConfiguration<Trip>
         builder.Property(trip => trip.ArrivalAtUtc).HasColumnName("arrival_at_utc").HasColumnType("timestamp with time zone");
         builder.Property(trip => trip.Price).HasColumnName("price").HasPrecision(10, 2);
         builder.Property(trip => trip.Currency).HasColumnName("currency").HasMaxLength(3).IsRequired();
+        builder.Property(trip => trip.OriginCitySnapshot).HasColumnName("origin_city_snapshot").HasMaxLength(120).IsRequired();
+        builder.Property(trip => trip.DestinationCitySnapshot).HasColumnName("destination_city_snapshot").HasMaxLength(120).IsRequired();
+        builder.Property(trip => trip.VehicleDisplayNameSnapshot).HasColumnName("vehicle_display_name_snapshot").HasMaxLength(120).IsRequired();
+        builder.Property(trip => trip.VehicleModelNameSnapshot).HasColumnName("vehicle_model_name_snapshot").HasMaxLength(120).IsRequired();
+        builder.Property(trip => trip.Status).HasColumnName("status").HasConversion<string>().HasMaxLength(16).HasDefaultValue(TripStatus.Scheduled).IsRequired();
         builder.HasOne<Route>().WithMany().HasForeignKey(trip => trip.RouteId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<Vehicle>().WithMany().HasForeignKey(trip => trip.VehicleId).OnDelete(DeleteBehavior.Restrict);
         builder.HasIndex(trip => new { trip.RouteId, trip.DepartureAtUtc });

@@ -59,7 +59,7 @@ public sealed class TripSearchDomainTests
     [Fact]
     public void RouteRejectsSameOriginAndDestination()
     {
-        Assert.Throws<ArgumentException>(() => new Route(Guid.NewGuid(), "Ayacucho", " ayacucho "));
+        Assert.Throws<ArgumentException>(() => new Route(Guid.NewGuid(), Guid.NewGuid(), "Ayacucho", " ayacucho "));
     }
 
     [Fact]
