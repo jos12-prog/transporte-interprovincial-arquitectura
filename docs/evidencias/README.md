@@ -1,22 +1,50 @@
 # Evidencias de entrega — Sprint 2
 
-Índice para relacionar las actividades de entrega con los documentos, pruebas y resultados guardados en el repositorio. No se encontró un PDF de Sprint 2 dentro del repositorio; las filas agrupan las actividades indicadas para esta entrega.
+Índice que relaciona las 8 actividades y los 5 entregables del Sprint 2 con los documentos, pruebas y resultados del repositorio. Las cifras de la columna "Resultado" se midieron el **2026-11-26**, salvo donde se indica otra fecha. El resumen de atributos de calidad (objetivo frente a lo obtenido) está en [**atributos-calidad.md**](atributos-calidad.md).
 
-| Actividad | Evidencia / ubicación | Resultado o estado |
+| Actividad del Sprint 2 | Evidencia / ubicación | Resultado |
 |---|---|---|
-| Estilo arquitectónico: monolito modular y Clean Architecture | `docs/02-arquitectura-software/`, `src/backend/Modules/` y [`solid-y-patrones.md`](solid-y-patrones.md) | Capas por módulo y contratos públicos; límites verificados con NetArchTest en `tests/Architecture/LayeringTests.cs`. |
-| Patrones y principios SOLID | [`solid-y-patrones.md`](solid-y-patrones.md) | Ejemplos con rutas y fragmentos del código actual. Adapter externo Culqi/WhatsApp se identifica como fuera de alcance y no implementado. |
-| SDD / OpenSpec | `openspec/specs/*` y `openspec/changes/archive/*` | Specs principales: `domain-baseline`, `seat-hold-reservation`, `service-health`, `trip-search`. Cambios archivados: `2026-11-21-normalize-documentation-baseline`, `2026-11-22-add-seat-hold-reservation`, `2026-11-22-add-trip-search`, `2026-11-22-setup-solution-skeleton`. |
-| Endpoints y documentación OpenAPI | Swagger/OpenAPI del API en `http://localhost:8080/swagger` y `src/backend/Modules/*/Presentation/`; [captura 02 — Swagger](capturas/02-swagger.png) | Endpoints incluidos: health, búsqueda pública, mapa, holds y liberación. |
-| Base de datos, índices y caché | [`bd-y-cache.md`](bd-y-cache.md) | EXPLAIN real con y sin índices en PostgreSQL 16.16 (**captura histórica:** 70 viajes, 1.120 asientos, 5 rutas); incluye el `Seq Scan` de búsqueda, cambio de plan del conteo, método B-Tree y tiempos reales de Redis activado/desactivado. El seed Development actualizado genera **34 rutas, 238 viajes y 2.688 asientos**; esos resultados de rendimiento corresponden a la captura histórica y no se presentan como mediciones del volumen actual. |
-| Pruebas .NET y cobertura backend | `tests/Unit/`, `tests/Architecture/`, `tests/Integration/`; [captura 03 — cobertura backend](capturas/03-cobertura-backend.png) | xUnit + coverlet, NetArchTest e integración con PostgreSQL/Testcontainers. Para `add-platform-admin`: Integration **15/15** (base recreada con `docker compose down -v`). Cobertura: **77,5 % líneas (2.123/2.738) y 71 % ramas**. Comandos reales: `dotnet test src/backend/TransportPlatform.sln -m:1 --collect:"XPlat Code Coverage" --results-directory coverage/backend` y `dotnet tool run reportgenerator -reports:"coverage/backend/**/coverage.cobertura.xml" -targetdir:coverage/backend/report -reporttypes:Html`. |
-| Pruebas y cobertura frontend | `src/frontend/src/**/*.test.tsx`; [captura 04 — cobertura frontend](capturas/04-cobertura-frontend.png) | Jest + React Testing Library: **16 pruebas**; cobertura **90,43 % líneas, 86,79 % sentencias, 78,48 % ramas y 79,12 % funciones**. Comando: `npm --prefix src/frontend test -- --coverage`. |
-| Pruebas HTTP de API | `tests/api/` | Jest contra API real. Para `add-platform-admin`: plataforma **8/8** e identidad **4/4**. Comando: `$env:API_BASE_URL='http://localhost:8080'; npm --prefix tests/api run test:coverage`. Resultado anterior tras incorporar reservas: 3 suites, 7 pruebas pasaron. La cobertura 0 % es esperable en este cliente de caja negra; la cobertura de C# procede de xUnit + ReportGenerator. |
-| GitHub Actions / CI | [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml); [captura 05 — Actions](capturas/05-actions.png) | CI verde informado para las ramas de los changes. Los jobs cubren backend, frontend, Compose/API+k6 y `openspec validate --all --strict`. |
-| Colección Postman | [`RutaAndina-Sprint2.postman_collection.json`](../../tests/postman/RutaAndina-Sprint2.postman_collection.json), [`README.md`](../../tests/postman/README.md), [`postman-sprint2.json`](postman-sprint2.json), [`postman-platform-admin.json`](postman-platform-admin.json); [captura 01 — Newman](capturas/01-newman.png) | Newman general: **9/9 requests, 19/19 assertions, 0 fallos**. Evidencia adicional de administración de plataforma: **77/77 assertions, 0 fallos**. |
-| Carga de búsqueda / EQ-01 y EQ-08 | `tests/performance/search-load.js`, [`search-load-redis-enabled.json`](search-load-redis-enabled.json), [`search-load-redis-disabled.json`](search-load-redis-disabled.json), [`bd-y-cache.md`](bd-y-cache.md) | Registros reales del 2026-11-22: Redis activado/desactivado; tramo de aceptación 200 VUs con p95 37,34 ms / 117,99 ms, sin fallos; Redis activado alcanzó 99,998 % HIT en el tramo. Rampa exploratoria hasta 2.000 VUs, sin aplicar allí el umbral EQ-01. |
-| Concurrencia de retención / EQ-02 | [`concurrencia-eq02.md`](concurrencia-eq02.md), [`concurrencia-eq02-summary.json`](concurrencia-eq02-summary.json), `tests/performance/seat-hold-concurrency.js` | Ejecución real: 50 VUs al mismo asiento, 1 HTTP 200, 49 HTTP 409, cero inesperadas; 51/51 checks aprobados, cero fallos HTTP, p95 32,72 ms. |
-| Capturas para la presentación | [01 Newman](capturas/01-newman.png), [02 Swagger](capturas/02-swagger.png), [03 cobertura backend](capturas/03-cobertura-backend.png), [04 cobertura frontend](capturas/04-cobertura-frontend.png), [05 Actions](capturas/05-actions.png) | Capturas enlazadas desde sus actividades correspondientes. |
+| 1. Estilo arquitectónico: monolito modular | `docs/02-arquitectura-software/`, `src/backend/Modules/`, [`solid-y-patrones.md`](solid-y-patrones.md) | Módulos con contratos públicos y esquema propio en PostgreSQL. NetArchTest (`tests/Architecture/LayeringTests.cs`) verifica los límites: 2/2 en verde. |
+| 2. Patrón arquitectónico: Clean Architecture | `src/backend/Modules/*/{Domain,Application,Infrastructure,Presentation}` | Capas por módulo; la regla de dependencias la comprueba NetArchTest. |
+| 3. Especificaciones SDD (OpenSpec) | `openspec/specs/*`, `openspec/changes/archive/*` | 7 specs principales: `domain-baseline`, `service-health`, `trip-search`, `seat-hold-reservation`, `identity-access`, `platform-administration`, `agency-catalog-administration`. 7 changes archivados, cada uno con proposal, design, tasks y criterios de aceptación (escenarios WHEN/THEN). `openspec validate --all --strict` en verde. |
+| 4. Endpoints REST con OpenAPI/Swagger | `http://localhost:8080/swagger`; [captura 02](capturas/02-swagger.png), [02b](capturas/02b-swagger.png), [02c](capturas/02c-swagger.png) | 41 endpoints en 8 grupos: búsqueda, asientos y holds, autenticación, agencias del personal, administración de plataforma, catálogo de agencia y health. Los endpoints protegidos usan JWT (candado en Swagger). |
+| 5. Base de datos y caché | [`bd-y-cache.md`](bd-y-cache.md) | EXPLAIN real con y sin índices (captura histórica del 22/11: 70 viajes, 1.120 asientos), índices B-Tree, Redis cache-aside con circuit breaker y comparación con Redis activado y desactivado. Incluye el hallazgo y la corrección del 26/11. |
+| 6. SOLID y patrones de diseño | [`solid-y-patrones.md`](solid-y-patrones.md) | Ejemplos con rutas del código actual. |
+| 7. Pruebas automatizadas y CI/CD | Frontend: `src/frontend/src/**/*.test.tsx`; API: `tests/api/`; backend: `tests/Unit`, `tests/Integration`; [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) | Jest frontend **72/72** (10 suites), cobertura **83,11 % líneas**, 75,22 % sentencias, 63,99 % ramas, 68,44 % funciones ([04](capturas/04-cobertura-frontend.png), [04b](capturas/04b-cobertura-frontend-resumen.png)). xUnit: 85 unitarias, 2 de arquitectura y 17 de integración, cobertura **81,3 % líneas** y 69,6 % ramas ([03](capturas/03-cobertura-backend.png), [03b](capturas/03b-pruebas-backend.png)). GitHub Actions: CI #24 de `main` en verde ([05](capturas/05-actions.png)). |
+| 8. Atributos de calidad (Postman, k6, Jest) | [**atributos-calidad.md**](atributos-calidad.md), `tests/postman/`, `tests/performance/` | Newman **58/58** solicitudes y **92/92** aserciones ([01](capturas/01-newman.png)). k6 de 200 a 2.000 VUs: con Redis, p95 103 ms con 200 VUs, **99,86 % HIT** y **0 errores en 764.317 solicitudes** ([13](capturas/13-k6-dashboard-redis-activado.png), [14a](capturas/14a-k6-umbrales-redis-activado.png), [14b](capturas/14b-k6-resultados-redis-activado.png)); sin Redis, p95 158 ms y 0 errores ([15a](capturas/15a-k6-umbrales-redis-desactivado.png), [15b](capturas/15b-k6-resultados-redis-desactivado.png)). Concurrencia EQ-02 (22/11): 1 éxito y 49 respuestas 409 ([concurrencia-eq02.md](concurrencia-eq02.md)). |
+
+### Entregables
+
+| Entregable | Dónde está |
+|---|---|
+| Código fuente organizado según la arquitectura | `src/backend/Modules/`, `src/frontend/src/` |
+| Primera versión funcional | `docker compose up --build -d`; capturas de UI 06 a 12 |
+| Documentación de API con OpenAPI/Swagger | `/swagger`; capturas 02, 02b y 02c |
+| Pruebas con Jest y reporte de cobertura | Capturas 03, 03b, 04 y 04b; `npm --prefix src/frontend test -- --coverage` |
+| Evidencias de validación de atributos de calidad | [atributos-calidad.md](atributos-calidad.md); reportes k6 en JSON y HTML (`search-load-redis-*-2026-11-26.json`, `k6-busqueda-redis-*.html`); [postman-agency-catalog.json](postman-agency-catalog.json) |
+
+### Archivos de resultados
+
+- **k6, 2026-11-26:** [`search-load-redis-enabled-2026-11-26.json`](search-load-redis-enabled-2026-11-26.json), [`search-load-redis-disabled-2026-11-26.json`](search-load-redis-disabled-2026-11-26.json), y los reportes con gráficos [`k6-busqueda-redis-activado.html`](k6-busqueda-redis-activado.html) y [`k6-busqueda-redis-desactivado.html`](k6-busqueda-redis-desactivado.html) (se abren en el navegador).
+- **k6, 2026-11-22 (histórico):** [`search-load-redis-enabled.json`](search-load-redis-enabled.json) y [`search-load-redis-disabled.json`](search-load-redis-disabled.json).
+- **Newman:** [`postman-agency-catalog.json`](postman-agency-catalog.json) (26/11), [`postman-platform-admin.json`](postman-platform-admin.json) y [`postman-sprint2.json`](postman-sprint2.json) (históricos).
+
+### Cómo repetir la carga con k6
+
+```powershell
+docker compose up --build -d
+$env:API_BASE_URL='http://localhost:8080'; $env:SEARCH_ORIGIN='Ayacucho'; $env:SEARCH_DESTINATION='Lima'
+$env:K6_WEB_DASHBOARD='true'; $env:REDIS_MODE='enabled'; $env:K6_WEB_DASHBOARD_EXPORT='docs/evidencias/k6-busqueda-redis-activado.html'
+1..30 | ForEach-Object { Invoke-WebRequest "http://localhost:8080/api/v1/trips/search?origin=Ayacucho&destination=Lima&date=2026-11-26" -UseBasicParsing | Out-Null }
+Start-Sleep -Seconds 35
+k6 run --summary-export docs/evidencias/search-load-redis-enabled-2026-11-26.json tests/performance/search-load.js
+docker compose stop redis
+$env:REDIS_MODE='disabled'; $env:K6_WEB_DASHBOARD_EXPORT='docs/evidencias/k6-busqueda-redis-desactivado.html'
+k6 run --summary-export docs/evidencias/search-load-redis-disabled-2026-11-26.json tests/performance/search-load.js
+docker compose start redis
+```
+
+Cambia la fecha de la búsqueda por el día de la prueba. Mientras corre, el panel en vivo está en `http://localhost:5665`.
 
 ## add-agency-catalog-admin
 
@@ -45,7 +73,7 @@ Invoke-RestMethod http://localhost:8080/health
 $env:API_BASE_URL='http://localhost:8080'
 npm --prefix tests/api run test:coverage
 
-npx newman run tests/postman/RutaAndina-Sprint2.postman_collection.json --env-var "agentPassword=$env:IDENTITY_SEED_AGENT_PASSWORD" --env-var "agencyAdminPassword=$env:IDENTITY_SEED_AGENCY_ADMIN_PASSWORD" --reporters cli,json --reporter-json-export docs/evidencias/postman-agency-catalog.json
+npx newman run tests/postman/RutaAndina-Sprint2.postman_collection.json --env-var "agentPassword=$env:IDENTITY_SEED_AGENT_PASSWORD" --env-var "agencyAdminPassword=$env:IDENTITY_SEED_AGENCY_ADMIN_PASSWORD" --env-var "superAdminPassword=$env:IDENTITY_SEED_SUPER_ADMIN_PASSWORD" --reporters cli,json --reporter-json-export docs/evidencias/postman-agency-catalog.json
 docker compose down
 ```
 
@@ -56,7 +84,7 @@ Si hay un volumen local de una versión anterior del esquema, recrearlo antes de
 | Criterio | Evidencia de este change |
 |---|---|
 | [1. Problema y requerimientos](../criterios-evaluacion.md#1-problema-y-requerimientos) | Catálogo funcional de rutas, tarifas, vehículos y viajes conforme a RF30–RF33, con límites de empresa/agencia. |
-| [4. Desarrollo basado en SDD](../criterios-evaluacion.md#4-desarrollo-basado-en-sdd) | [Proposal, design, tasks y delta specs](../../openspec/changes/add-agency-catalog-admin/); validación OpenSpec. El change sigue activo y aún debe archivarse. |
+| [4. Desarrollo basado en SDD](../criterios-evaluacion.md#4-desarrollo-basado-en-sdd) | [Proposal, design, tasks y delta specs](../../openspec/changes/archive/2026-11-26-add-agency-catalog-admin/); archivado el 2026-11-26 con las specs sincronizadas y `openspec validate --all --strict` en verde. |
 | [5. Pruebas unitarias e integración](../criterios-evaluacion.md#5-pruebas-unitarias-e-integracion) | xUnit existente y Integration/Testcontainers **17/17**, incluida la empresa externa al seed y los flujos del catálogo. |
 | [6. Pruebas End to End](../criterios-evaluacion.md#6-pruebas-end-to-end) | Jest API contra la API real y Newman **58 requests, 92/92 assertions, 0 fallos**. |
 | [7. Interfaz y UX](../criterios-evaluacion.md#7-interfaz-y-ux) | Capturas 06–12: empresas/modelos de superadmin y pantallas de rutas, vehículos, viajes y tarifas de agencia. |
@@ -65,7 +93,6 @@ Si hay un volumen local de una versión anterior del esquema, recrearlo antes de
 
 **Criterio asociado:** implementación funcional de los catálogos de superadministración con control de acceso, validación de respuestas y verificación automatizada. La evidencia cubre empresas, agencias y modelos; la exclusión pública de registros inactivos; y los contratos HTTP con respuestas de éxito y error. Se acredita con Integration **15/15**, Jest API (**8/8** administración de plataforma y **4/4** identidad) y Newman (**77/77 assertions**, 0 fallos), junto con la colección [`RutaAndina-Sprint2.postman_collection.json`](../../tests/postman/RutaAndina-Sprint2.postman_collection.json) y el resultado [`postman-platform-admin.json`](postman-platform-admin.json).
 
-No se encontró el PDF ni un archivo con los criterios oficiales de la rúbrica de Sprint 2 en el repositorio. La relación anterior describe el criterio evidenciado sin atribuirle una etiqueta oficial.
 
 ## Newman contra Docker Compose
 

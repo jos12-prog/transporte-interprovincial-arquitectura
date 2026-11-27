@@ -2701,12 +2701,12 @@
     "values": [
       {
         "type": "any",
-        "value": "agent12345local",
+        "value": "***REDACTED***",
         "key": "agentPassword"
       },
       {
         "type": "any",
-        "value": "superAdmi123",
+        "value": "***REDACTED***",
         "key": "superAdminPassword"
       }
     ]
@@ -13852,7 +13852,7 @@
           "method": "POST",
           "body": {
             "mode": "raw",
-            "raw": "{\"identifier\":\"agente@andesexpress.test\",\"password\":\"agent12345local\"}",
+            "raw": "{\"identifier\":\"agente@andesexpress.test\",\"password\":\"***REDACTED***\"}",
             "options": {
               "raw": {
                 "language": "json"
@@ -15975,7 +15975,7 @@
           "method": "POST",
           "body": {
             "mode": "raw",
-            "raw": "{\"identifier\":\"superadmin@rutaandina.test\",\"password\":\"superAdmi123\"}",
+            "raw": "{\"identifier\":\"superadmin@rutaandina.test\",\"password\":\"***REDACTED***\"}",
             "options": {
               "raw": {
                 "language": "json"

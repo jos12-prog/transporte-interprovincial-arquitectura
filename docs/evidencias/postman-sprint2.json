@@ -2237,7 +2237,7 @@
     "values": [
       {
         "type": "any",
-        "value": "agent12345local",
+        "value": "***REDACTED***",
         "key": "agentPassword"
       }
     ]
@@ -13640,7 +13640,7 @@
           "method": "POST",
           "body": {
             "mode": "raw",
-            "raw": "{\"identifier\":\"agente@andesexpress.test\",\"password\":\"agent12345local\"}",
+            "raw": "{\"identifier\":\"agente@andesexpress.test\",\"password\":\"***REDACTED***\"}",
             "options": {
               "raw": {
                 "language": "json"
