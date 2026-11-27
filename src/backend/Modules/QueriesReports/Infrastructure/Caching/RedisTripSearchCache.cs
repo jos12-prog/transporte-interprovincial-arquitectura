@@ -10,7 +10,12 @@ public sealed class RedisTripSearchCache(IDistributedCache distributedCache) : I
     private static readonly TimeSpan MaximumTtl = TimeSpan.FromSeconds(60);
     private static readonly TimeSpan OperationTimeout = TimeSpan.FromMilliseconds(300);
     private static readonly TimeSpan BreakDuration = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan LocalGenerationTtl = TimeSpan.FromSeconds(2);
     private const string GenerationKey = "trip-search:generation:v1";
+
+    // The generation is kept in memory for a short time so that each search performs a single
+    // Redis operation. The same instance sees an invalidation immediately; other instances within 2 s.
+    private LocalGeneration? _localGeneration;
 
     // Circuit breaker: while open, Redis is skipped and searches go straight to PostgreSQL.
     private long _openUntilTicks;
@@ -20,38 +25,57 @@ public sealed class RedisTripSearchCache(IDistributedCache distributedCache) : I
     private void Open() =>
         Interlocked.Exchange(ref _openUntilTicks, DateTime.UtcNow.Add(BreakDuration).Ticks);
 
+    private void RememberGeneration(string generation) =>
+        Volatile.Write(ref _localGeneration, new LocalGeneration(generation, DateTime.UtcNow.Add(LocalGenerationTtl).Ticks));
+
+    private void ForgetGeneration() => Volatile.Write(ref _localGeneration, null);
+
     public async Task<string> GetGenerationAsync(CancellationToken cancellationToken = default)
     {
         if (IsOpen) return "cache-bypass";
+        var local = Volatile.Read(ref _localGeneration);
+        if (local is not null && DateTime.UtcNow.Ticks < local.ExpiresAtTicks) return local.Value;
         try
         {
             var generation = await distributedCache.GetStringAsync(GenerationKey, cancellationToken)
                 .WaitAsync(OperationTimeout, cancellationToken);
-            if (generation is not null) return generation;
+            if (generation is null)
+            {
+                generation = Guid.NewGuid().ToString("N");
+                await distributedCache.SetStringAsync(GenerationKey, generation, new DistributedCacheEntryOptions(), cancellationToken)
+                    .WaitAsync(OperationTimeout, cancellationToken);
+            }
 
-            generation = Guid.NewGuid().ToString("N");
-            await distributedCache.SetStringAsync(GenerationKey, generation, new DistributedCacheEntryOptions(), cancellationToken)
-                .WaitAsync(OperationTimeout, cancellationToken);
+            RememberGeneration(generation);
             return generation;
         }
         catch (Exception) when (!cancellationToken.IsCancellationRequested)
         {
             Open();
+            ForgetGeneration();
             return "cache-bypass";
         }
     }
 
     public async Task InvalidateAsync(CancellationToken cancellationToken = default)
     {
-        if (IsOpen) return;
+        if (IsOpen)
+        {
+            ForgetGeneration();
+            return;
+        }
+
         try
         {
-            await distributedCache.SetStringAsync(GenerationKey, Guid.NewGuid().ToString("N"), new DistributedCacheEntryOptions(), cancellationToken)
+            var generation = Guid.NewGuid().ToString("N");
+            await distributedCache.SetStringAsync(GenerationKey, generation, new DistributedCacheEntryOptions(), cancellationToken)
                 .WaitAsync(OperationTimeout, cancellationToken);
+            RememberGeneration(generation);
         }
         catch (Exception) when (!cancellationToken.IsCancellationRequested)
         {
             Open();
+            ForgetGeneration();
         }
     }
 
@@ -112,4 +136,6 @@ public sealed class RedisTripSearchCache(IDistributedCache distributedCache) : I
             Open();
         }
     }
+
+    private sealed record LocalGeneration(string Value, long ExpiresAtTicks);
 }

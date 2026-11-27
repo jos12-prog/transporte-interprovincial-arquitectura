@@ -24,6 +24,75 @@ public sealed class RedisTripSearchCacheTests
         Assert.Equal(1, distributedCache.CallCount);
     }
 
+    [Fact]
+    public async Task GenerationIsReadFromRedisOnceWithinLocalTtl()
+    {
+        var distributedCache = new RecordingDistributedCache();
+        var cache = new RedisTripSearchCache(distributedCache);
+
+        var first = await cache.GetGenerationAsync();
+        var second = await cache.GetGenerationAsync();
+
+        Assert.Equal(first, second);
+        Assert.Equal(1, distributedCache.GetCallCount);
+    }
+
+    [Fact]
+    public async Task InvalidationIsVisibleImmediatelyWithoutReadingRedis()
+    {
+        var distributedCache = new RecordingDistributedCache();
+        var cache = new RedisTripSearchCache(distributedCache);
+
+        var before = await cache.GetGenerationAsync();
+        await cache.InvalidateAsync();
+        var after = await cache.GetGenerationAsync();
+
+        Assert.NotEqual(before, after);
+        Assert.Equal(1, distributedCache.GetCallCount);
+    }
+
+    private sealed class RecordingDistributedCache : IDistributedCache
+    {
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte[]> _values = new();
+        private int _getCallCount;
+
+        public int GetCallCount => Volatile.Read(ref _getCallCount);
+
+        public byte[]? Get(string key)
+        {
+            Interlocked.Increment(ref _getCallCount);
+            return _values.TryGetValue(key, out var value) ? value : null;
+        }
+
+        public Task<byte[]?> GetAsync(string key, CancellationToken token = default) => Task.FromResult(Get(key));
+
+        public void Refresh(string key)
+        {
+        }
+
+        public Task RefreshAsync(string key, CancellationToken token = default) => Task.CompletedTask;
+
+        public void Remove(string key) => _values.TryRemove(key, out _);
+
+        public Task RemoveAsync(string key, CancellationToken token = default)
+        {
+            Remove(key);
+            return Task.CompletedTask;
+        }
+
+        public void Set(string key, byte[] value, DistributedCacheEntryOptions options) => _values[key] = value;
+
+        public Task SetAsync(
+            string key,
+            byte[] value,
+            DistributedCacheEntryOptions options,
+            CancellationToken token = default)
+        {
+            Set(key, value, options);
+            return Task.CompletedTask;
+        }
+    }
+
     private sealed class ThrowingDistributedCache : IDistributedCache
     {
         private int _callCount;
